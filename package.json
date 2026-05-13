@@ -1,0 +1,21 @@
+{
+  "name": "saa-c03-quiz-app",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "extract-pdf": "pdftotext -layout /Users/gondk/Downloads/SAA-C03.pdf data/saa-c03.txt",
+    "parse": "node scripts/parse.js",
+    "classify": "node scripts/classify.js",
+    "build-tests": "node scripts/build-tests.js",
+    "build": "npm run extract-pdf && npm run parse && npm run classify && npm run build-tests",
+    "test": "node --test scripts/*.test.js",
+    "serve": "npx -y http-server public -p 8080 -c-1"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.30.0"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
