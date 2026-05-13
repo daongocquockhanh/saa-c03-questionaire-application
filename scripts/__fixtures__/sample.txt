@@ -1,0 +1,77 @@
+QUESTION 1
+A scenario question about ALB.
+Sample multi-line scenario continues here.
+
+What should the architect do?
+
+A. First option text.
+B. Second option text that
+   wraps to a second line.
+C. Third option.
+D. Fourth option.
+
+Answer: C
+Explanation:
+This is the explanation text.
+https://docs.aws.amazon.com/example
+
+
+QUESTION 2
+Scenario for multi-select.
+
+Which two steps? (Choose two.)
+
+A. Step one.
+B. Step two.
+C. Step three.
+D. Step four.
+E. Step five.
+
+Answer: BD
+Explanation:
+B and D because reasons.
+
+
+QUESTION 3
+A question missing its answer in the dump.
+
+What is the right call?
+
+A. Option A.
+B. Option B.
+C. Option C.
+D. Option D.
+
+Explanation:
+Answer is D based on the rationale.
+
+
+Get Latest & Actual SAA-C03 Exam's Question and Answers from Passleader.    99
+https://www.passleader.com
+QUESTION 4
+Question with a page footer split mid-block.
+
+What to do?
+
+A. Aaa.
+B. Bbb.
+C. Ccc.
+D. Ddd.
+
+Answer: A
+
+
+QUESTION 5
+Five-option question.
+
+Choose the best.
+
+A. One.
+B. Two.
+C. Three.
+D. Four.
+E. Five.
+
+Answer: E
+Explanation:
+E is correct.
