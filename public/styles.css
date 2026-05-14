@@ -19,3 +19,16 @@ button:disabled { opacity: 0.5; cursor: not-allowed; }
 .test-card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; }
 .test-card-header h3 { margin: 0; font-size: 1.05rem; }
 .muted { color: #888; font-size: 0.85rem; }
+.runner-topbar { display: flex; justify-content: space-between; align-items: center; padding: 0.75rem; background: #fff; border-radius: 6px; margin-bottom: 1rem; }
+.question .scenario { white-space: pre-wrap; }
+.question .prompt { font-size: 1.05rem; }
+.option { display: flex; gap: 0.5rem; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; margin-bottom: 0.4rem; cursor: pointer; }
+.option:has(input:checked) { background: #eef4ff; border-color: #4a8eff; }
+.runner-footer { display: flex; gap: 0.5rem; margin: 1rem 0; }
+.runner-footer button { flex: 0 0 auto; }
+.runner-footer .primary { margin-left: auto; }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(36px, 1fr)); gap: 0.25rem; padding: 0.5rem; background: #fff; border-radius: 6px; }
+.grid-cell { padding: 0.25rem 0; border: 1px solid #ccc; background: #fafafa; font-size: 0.85rem; }
+.grid-cell.answered { background: #cfe2ff; }
+.grid-cell.flagged { border-color: #ff9900; }
+.grid-cell.current { outline: 2px solid #232f3e; }
