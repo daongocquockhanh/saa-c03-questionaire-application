@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { partitionTests, seededShuffle } from './build-tests.js';
+import { partitionTests, seededShuffle, TOTAL_TESTS, TEST_SIZE, DOMAIN_QUOTA } from './build-tests.js';
 
 function fakeQuestions(perDomain) {
   const out = [];
@@ -19,39 +19,54 @@ test('seededShuffle is deterministic for same seed', () => {
   assert.notDeepEqual(a, c);
 });
 
-test('partitionTests creates 14 tests, 897 questions used exactly once', () => {
-  const qs = fakeQuestions({ 1: 270, 2: 233, 3: 215, 4: 179 });
+test('partitionTests creates exactly 50 tests', () => {
+  const qs = fakeQuestions({ 1: 262, 2: 271, 3: 221, 4: 143 });
   const tests = partitionTests(qs);
-  assert.equal(tests.length, 14);
-  const allIds = tests.flatMap(t => t.questionIds);
-  assert.equal(allIds.length, 897);
-  assert.equal(new Set(allIds).size, 897);
+  assert.equal(tests.length, 50);
 });
 
-test('first 13 tests have 65 questions each', () => {
-  const qs = fakeQuestions({ 1: 270, 2: 233, 3: 215, 4: 179 });
+test('every test has exactly 65 questions', () => {
+  const qs = fakeQuestions({ 1: 262, 2: 271, 3: 221, 4: 143 });
   const tests = partitionTests(qs);
-  for (let i = 0; i < 13; i++) {
-    assert.equal(tests[i].questionIds.length, 65, `Test ${i + 1} size`);
+  for (const t of tests) {
+    assert.equal(t.questionIds.length, 65, `Test ${t.id} size`);
   }
 });
 
-test('test 14 contains the remainder (897 - 13*65 = 52)', () => {
-  const qs = fakeQuestions({ 1: 270, 2: 233, 3: 215, 4: 179 });
+test('every test has no duplicate questions within itself', () => {
+  const qs = fakeQuestions({ 1: 262, 2: 271, 3: 221, 4: 143 });
   const tests = partitionTests(qs);
-  assert.equal(tests[13].questionIds.length, 52);
+  for (const t of tests) {
+    assert.equal(new Set(t.questionIds).size, t.questionIds.length, `Test ${t.id} duplicates`);
+  }
 });
 
-test('domain composition of full tests is close to 20/17/16/12 (±2)', () => {
-  const qs = fakeQuestions({ 1: 270, 2: 233, 3: 215, 4: 179 });
+test('every test matches the 20/17/16/12 domain quota exactly', () => {
+  const qs = fakeQuestions({ 1: 262, 2: 271, 3: 221, 4: 143 });
   const tests = partitionTests(qs);
   const byId = new Map(qs.map(q => [q.id, q]));
-  for (let i = 0; i < 13; i++) {
+  for (const t of tests) {
     const counts = { 1: 0, 2: 0, 3: 0, 4: 0 };
-    for (const id of tests[i].questionIds) counts[byId.get(id).domain]++;
-    assert.ok(Math.abs(counts[1] - 20) <= 2, `Test ${i + 1} D1=${counts[1]}`);
-    assert.ok(Math.abs(counts[2] - 17) <= 2, `Test ${i + 1} D2=${counts[2]}`);
-    assert.ok(Math.abs(counts[3] - 16) <= 2, `Test ${i + 1} D3=${counts[3]}`);
-    assert.ok(Math.abs(counts[4] - 12) <= 2, `Test ${i + 1} D4=${counts[4]}`);
+    for (const id of t.questionIds) counts[byId.get(id).domain]++;
+    assert.equal(counts[1], DOMAIN_QUOTA[1], `Test ${t.id} D1`);
+    assert.equal(counts[2], DOMAIN_QUOTA[2], `Test ${t.id} D2`);
+    assert.equal(counts[3], DOMAIN_QUOTA[3], `Test ${t.id} D3`);
+    assert.equal(counts[4], DOMAIN_QUOTA[4], `Test ${t.id} D4`);
   }
+});
+
+test('partitionTests is deterministic across calls', () => {
+  const qs = fakeQuestions({ 1: 262, 2: 271, 3: 221, 4: 143 });
+  const a = partitionTests(qs);
+  const b = partitionTests(qs);
+  for (let i = 0; i < a.length; i++) {
+    assert.deepEqual(a[i].questionIds, b[i].questionIds, `Test ${a[i].id} differs across calls`);
+  }
+});
+
+test('different tests draw different (but overlapping) questions', () => {
+  const qs = fakeQuestions({ 1: 262, 2: 271, 3: 221, 4: 143 });
+  const tests = partitionTests(qs);
+  // Tests 1 and 2 should not be identical
+  assert.notDeepEqual(tests[0].questionIds, tests[1].questionIds);
 });

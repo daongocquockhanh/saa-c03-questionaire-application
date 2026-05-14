@@ -8,9 +8,9 @@ const PROJECT_ROOT = join(__dirname, '..');
 const IN_PATH = join(PROJECT_ROOT, 'data', 'questions.json');
 const OUT_PATH = join(PROJECT_ROOT, 'public', 'tests.json');
 
-const TOTAL_TESTS = 14;
-const TEST_SIZE = 65;
-const DOMAIN_QUOTA = { 1: 20, 2: 17, 3: 16, 4: 12 };
+export const TOTAL_TESTS = 50;
+export const TEST_SIZE = 65;
+export const DOMAIN_QUOTA = { 1: 20, 2: 17, 3: 16, 4: 12 };
 
 export function seededShuffle(arr, seed) {
   const hash = createHash('sha256').update(seed).digest();
@@ -35,34 +35,20 @@ export function partitionTests(questions) {
   for (const q of questions) {
     if (pools[q.domain]) pools[q.domain].push(q.id);
   }
-  for (const d of [1, 2, 3, 4]) {
-    pools[d] = seededShuffle(pools[d], `domain-${d}`);
-  }
 
   const tests = [];
-  for (let i = 0; i < TOTAL_TESTS - 1; i++) {
+  for (let i = 0; i < TOTAL_TESTS; i++) {
     const ids = [];
     for (const d of [1, 2, 3, 4]) {
-      ids.push(...pools[d].splice(0, DOMAIN_QUOTA[d]));
-    }
-    while (ids.length < TEST_SIZE) {
-      const next = [1, 2, 3, 4].find(d => pools[d].length > 0);
-      if (!next) break;
-      ids.push(pools[next].shift());
+      const shuffled = seededShuffle(pools[d], `test-${i + 1}-d${d}`);
+      ids.push(...shuffled.slice(0, DOMAIN_QUOTA[d]));
     }
     tests.push({
       id: i + 1,
       title: `Practice Test ${i + 1}`,
-      questionIds: seededShuffle(ids, `test-${i + 1}`),
+      questionIds: seededShuffle(ids, `test-${i + 1}-order`),
     });
   }
-
-  const remainder = [1, 2, 3, 4].flatMap(d => pools[d]);
-  tests.push({
-    id: TOTAL_TESTS,
-    title: `Practice Test ${TOTAL_TESTS} (Final, ${remainder.length} Qs)`,
-    questionIds: seededShuffle(remainder, `test-${TOTAL_TESTS}`),
-  });
 
   return tests;
 }
