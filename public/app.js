@@ -31,7 +31,42 @@ function route() {
 }
 
 function renderDashboard() {
-  render('<h1>Dashboard</h1><p>Tests will be listed here.</p>');
+  const totalPassed = Object.values(PROGRESS.tests).filter(t => t.bestPercent >= DATA.passPercent).length;
+  const cards = DATA.tests.map(t => {
+    const p = PROGRESS.tests[t.id] || { status: 'not-started' };
+    const status = p.status || 'not-started';
+    const score = p.bestScore != null ? `Best: ${p.bestScore}/${t.questionIds.length} (${p.bestPercent}%)` : 'No attempts yet';
+    const passBadge = p.bestPercent >= DATA.passPercent
+      ? '<span class="badge pass">Pass ✓</span>'
+      : p.bestPercent != null ? '<span class="badge fail">Fail ✗</span>' : '';
+    const last = p.lastAttempt ? `Last: ${new Date(p.lastAttempt).toLocaleDateString()}` : '';
+    const action = status === 'in-progress' ? 'Resume' : status === 'done' ? 'Retake' : 'Start';
+    return `
+      <div class="card test-card">
+        <div class="test-card-header">
+          <h3>${t.title}</h3>
+          <span class="badge ${status}">${status.replace('-', ' ')}</span>
+        </div>
+        <p>${score} ${passBadge}</p>
+        <p class="muted">${last}</p>
+        <a href="#/test/${t.id}"><button class="primary">${action}</button></a>
+      </div>
+    `;
+  }).join('');
+  render(`
+    <h1>Practice Tests</h1>
+    <p>${totalPassed} of ${DATA.totalTests} tests passed.</p>
+    <div class="test-grid">${cards}</div>
+    <p><a href="#" id="reset-link">Reset all progress</a></p>
+  `);
+  document.getElementById('reset-link').addEventListener('click', e => {
+    e.preventDefault();
+    if (confirm('Erase all progress?')) {
+      PROGRESS = { tests: {} };
+      saveProgress();
+      route();
+    }
+  });
 }
 function renderRunner(testId) {
   render(`<h1>Test ${testId}</h1><p>Runner placeholder.</p>`);
