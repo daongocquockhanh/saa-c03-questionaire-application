@@ -50,3 +50,5 @@ button:disabled { opacity: 0.5; cursor: not-allowed; }
   .test-grid { grid-template-columns: 1fr; }
   .domain-row { grid-template-columns: 8rem 1fr 6rem; }
 }
+.brand-block { display: flex; flex-direction: column; line-height: 1.1; }
+.brand-disclaimer { font-size: 0.7rem; color: #b8c3d4; margin-top: 2px; }
