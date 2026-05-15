@@ -261,7 +261,89 @@ function submitTest() {
   location.hash = `#/result/${test.id}`;
 }
 function renderResult(testId) {
-  render(`<h1>Result ${testId}</h1><p>Result placeholder.</p>`);
+  const test = DATA.tests.find(t => t.id === testId);
+  const prog = PROGRESS.tests[testId];
+  if (!prog || !prog.lastResult) { render('<p>No result yet.</p>'); return; }
+  const r = prog.lastResult;
+  const pass = r.percent >= DATA.passPercent;
+  const durationMin = Math.round((r.finishedAt - r.startedAt) / 60000);
+
+  const byDomain = { 1: { correct: 0, total: 0 }, 2: { correct: 0, total: 0 }, 3: { correct: 0, total: 0 }, 4: { correct: 0, total: 0 } };
+  for (const id of test.questionIds) {
+    const q = getQuestion(id);
+    const given = (r.answers[id] || []).slice().sort();
+    const exp = q.correctAnswers.slice().sort();
+    const isRight = given.length && given.length === exp.length && given.every((v, i) => v === exp[i]);
+    byDomain[q.domain].total++;
+    if (isRight) byDomain[q.domain].correct++;
+  }
+
+  const domainNames = { 1: 'Secure', 2: 'Resilient', 3: 'High-Performing', 4: 'Cost-Optimized' };
+  const domainBars = Object.entries(byDomain).map(([d, v]) => {
+    const pct = v.total ? Math.round((v.correct / v.total) * 100) : 0;
+    return `<div class="domain-row"><span>D${d} ${domainNames[d]}</span><div class="bar"><div class="bar-fill" style="width:${pct}%"></div></div><span>${v.correct}/${v.total} (${pct}%)</span></div>`;
+  }).join('');
+
+  const filters = `
+    <div class="filters">
+      <button data-filter="all" class="primary">All</button>
+      <button data-filter="wrong">Wrong only</button>
+      <button data-filter="flagged">Flagged only</button>
+    </div>`;
+
+  const rows = test.questionIds.map((id, idx) => {
+    const q = getQuestion(id);
+    const given = (r.answers[id] || []).slice().sort();
+    const exp = q.correctAnswers.slice().sort();
+    const isRight = given.length && given.length === exp.length && given.every((v, i) => v === exp[i]);
+    const flagged = r.flags && r.flags[id];
+    const optHtml = q.options.map(o => {
+      const isGiven = given.includes(o.letter);
+      const isCorrect = exp.includes(o.letter);
+      const cls = isCorrect ? 'opt-correct' : isGiven ? 'opt-wrong' : '';
+      return `<li class="${cls}"><strong>${o.letter}.</strong> ${escapeHtml(o.text)}${isCorrect ? ' ✓' : ''}${isGiven && !isCorrect ? ' ✗' : ''}</li>`;
+    }).join('');
+    const refs = (q.references || []).map(u => `<li><a href="${u}" target="_blank" rel="noopener">${u}</a></li>`).join('');
+    return `
+      <details class="card result-q" data-wrong="${!isRight}" data-flagged="${!!flagged}">
+        <summary>
+          Q${idx + 1} — ${isRight ? '<span class="badge pass">Correct</span>' : '<span class="badge fail">Incorrect</span>'}
+          ${flagged ? '★' : ''} <span class="muted">D${q.domain} ${domainNames[q.domain]}</span>
+        </summary>
+        <p class="scenario">${escapeHtml(q.scenario).replace(/\n/g, '<br>')}</p>
+        <p><strong>${escapeHtml(q.prompt)}</strong></p>
+        <ul class="opts">${optHtml}</ul>
+        <p><strong>Your answer:</strong> ${given.join(', ') || '—'} <strong>Correct:</strong> ${exp.join(', ') || 'N/A'}</p>
+        ${q.explanation ? `<p class="explanation">${escapeHtml(q.explanation).replace(/\n/g, '<br>')}</p>` : ''}
+        ${refs ? `<ul class="refs">${refs}</ul>` : ''}
+      </details>`;
+  }).join('');
+
+  render(`
+    <h1>${escapeHtml(test.title)} — Result</h1>
+    <div class="card result-summary">
+      <div class="score"><strong>${r.score} / ${r.total}</strong> (${r.percent}%)</div>
+      <div>${pass ? '<span class="badge pass">Pass ✓</span>' : '<span class="badge fail">Fail ✗</span>'}</div>
+      <div class="muted">Time taken: ${durationMin} min</div>
+    </div>
+    <div class="card">
+      <h3>By domain</h3>
+      ${domainBars}
+    </div>
+    ${filters}
+    <div id="result-list">${rows}</div>
+    <p><a href="#/dashboard"><button>Back to Dashboard</button></a> <a href="#/test/${testId}"><button class="primary">Retake</button></a></p>
+  `);
+
+  document.querySelectorAll('.filters button').forEach(b => b.addEventListener('click', () => {
+    const f = b.dataset.filter;
+    document.querySelectorAll('.filters button').forEach(x => x.classList.toggle('primary', x === b));
+    document.querySelectorAll('.result-q').forEach(card => {
+      const wrong = card.dataset.wrong === 'true';
+      const flagged = card.dataset.flagged === 'true';
+      card.style.display = (f === 'all') || (f === 'wrong' && wrong) || (f === 'flagged' && flagged) ? '' : 'none';
+    });
+  }));
 }
 
 window.addEventListener('hashchange', route);
