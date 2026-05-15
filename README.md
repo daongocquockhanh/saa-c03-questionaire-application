@@ -67,3 +67,14 @@ npm test
 ## Architecture
 
 See `docs/superpowers/specs/2026-05-14-saa-c03-quiz-app-design.md` and `docs/superpowers/plans/2026-05-14-saa-c03-quiz-app.md`.
+
+## License & Disclaimer
+
+Licensed under **Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International (CC BY-NC-ND 4.0)**.
+Full text in [`public/LICENSE.txt`](public/LICENSE.txt).
+
+- Personal study tool. **Not for sale, not a business, no revenue.**
+- Not affiliated with, endorsed by, or sponsored by Amazon Web Services, Inc. or Passleader.
+- Question content is sourced from publicly circulated study material and used solely for non-commercial personal exam preparation.
+- Access restricted to the author and invited colleagues.
+- Rights-holder takedown requests: contact `daongocquockhanh@gmail.com`.

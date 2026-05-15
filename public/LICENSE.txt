@@ -1,0 +1,49 @@
+SAA-C03 Practice Quiz — Personal Study Tool
+============================================
+
+Copyright (c) 2026 daongocquockhanh@gmail.com
+
+This work, including the source code and the compiled question dataset
+hosted at public/tests.json, is licensed under the
+Creative Commons Attribution-NonCommercial-NoDerivatives 4.0
+International License (CC BY-NC-ND 4.0).
+
+You may view and share this site for personal, non-commercial study
+purposes only. Commercial use, sale, redistribution, modification, or
+derivative works are NOT permitted.
+
+To view a copy of the license, visit:
+  https://creativecommons.org/licenses/by-nc-nd/4.0/
+
+----------------------------------------------------------------------
+Disclaimers
+----------------------------------------------------------------------
+
+1. NON-COMMERCIAL. This site is a personal study tool. It is not for
+   sale, not a business, and generates no revenue. There is no
+   advertising, no subscriptions, no paid features, and no sponsored
+   content.
+
+2. NOT AFFILIATED. This site is not affiliated with, endorsed by, or
+   sponsored by Amazon Web Services, Inc., Amazon.com, Inc., or any of
+   their subsidiaries. "AWS", "Amazon Web Services", "AWS Certified
+   Solutions Architect", and "SAA-C03" are trademarks of their
+   respective owners. This site is also not affiliated with, endorsed
+   by, or sponsored by Passleader or any other third-party exam
+   preparation provider.
+
+3. CONTENT SOURCE. Question content is sourced from publicly
+   circulated study material. It is used here solely for the personal,
+   non-commercial exam preparation of the site author and a small
+   number of invited colleagues. No claim of authorship is made over
+   the question text.
+
+4. NO WARRANTY. The site is provided "as is" without warranty of any
+   kind. Answers and explanations may contain errors. Users should
+   verify all information against the current official AWS
+   documentation before relying on it for exam preparation or any
+   other purpose.
+
+5. TAKEDOWN REQUESTS. If you are a rights holder and believe content
+   on this site infringes your rights, please contact the author at
+   daongocquockhanh@gmail.com and the content will be removed promptly.

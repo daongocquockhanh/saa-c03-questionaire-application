@@ -356,8 +356,23 @@ function renderResult(testId) {
   }));
 }
 
+function initSplash() {
+  const yearEl = document.getElementById('footer-year');
+  if (yearEl) yearEl.textContent = new Date().getFullYear();
+  const modal = document.getElementById('splash-modal');
+  if (!modal) return;
+  const acked = localStorage.getItem('saa-c03-splash-ack');
+  if (!acked) modal.classList.remove('hidden');
+  const btn = document.getElementById('splash-dismiss');
+  if (btn) btn.addEventListener('click', () => {
+    localStorage.setItem('saa-c03-splash-ack', new Date().toISOString());
+    modal.classList.add('hidden');
+  });
+}
+
 window.addEventListener('hashchange', route);
 window.addEventListener('DOMContentLoaded', async () => {
+  initSplash();
   try {
     DATA = await loadData();
     PROGRESS = loadProgress();
