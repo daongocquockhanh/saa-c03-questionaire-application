@@ -198,6 +198,16 @@ function renderRunner(testId) {
   document.querySelectorAll('.grid-cell').forEach(btn =>
     btn.addEventListener('click', () => { RUNNER.current = Number(btn.dataset.idx); persistRunnerState(); renderRunner(testId); }));
 
+  if (window.__KEY_HANDLER__) document.removeEventListener('keydown', window.__KEY_HANDLER__);
+  const keyHandler = e => {
+    if (e.target.tagName === 'INPUT') return;
+    if (e.key === 'ArrowLeft' && RUNNER && RUNNER.current > 0) { RUNNER.current--; persistRunnerState(); renderRunner(testId); }
+    if (e.key === 'ArrowRight' && RUNNER && RUNNER.current < test.questionIds.length - 1) { RUNNER.current++; persistRunnerState(); renderRunner(testId); }
+    if (e.key === 'f' && RUNNER) { RUNNER.flags[qId] = !RUNNER.flags[qId]; persistRunnerState(); renderRunner(testId); }
+  };
+  window.__KEY_HANDLER__ = keyHandler;
+  document.addEventListener('keydown', keyHandler);
+
   if (!window.__TIMER_ID__) window.__TIMER_ID__ = setInterval(tickTimer, 1000);
 }
 

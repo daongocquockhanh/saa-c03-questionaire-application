@@ -45,3 +45,8 @@ button:disabled { opacity: 0.5; cursor: not-allowed; }
 .explanation { background: #f0f4f8; padding: 0.75rem; border-radius: 4px; }
 .refs { font-size: 0.85rem; }
 .result-q summary { cursor: pointer; padding: 0.5rem 0; }
+@media (max-width: 720px) {
+  .runner-topbar { flex-wrap: wrap; gap: 0.5rem; }
+  .test-grid { grid-template-columns: 1fr; }
+  .domain-row { grid-template-columns: 8rem 1fr 6rem; }
+}
