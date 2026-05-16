@@ -27,7 +27,18 @@ function route() {
   const [, screen, arg] = hash.split('/');
   if (screen === 'test' && arg) renderRunner(Number(arg));
   else if (screen === 'result' && arg) renderResult(Number(arg));
+  else if (screen === 'theory') renderTheory(arg || null);
   else renderDashboard();
+  updateTopbar(screen || 'dashboard');
+}
+
+function updateTopbar(screen) {
+  const el = document.getElementById('topbar-right');
+  if (!el) return;
+  el.innerHTML = `
+    <a href="#/dashboard" class="nav-link ${screen === 'dashboard' ? 'active' : ''}">Practice Tests</a>
+    <a href="#/theory" class="nav-link ${screen === 'theory' ? 'active' : ''}">Theory</a>
+  `;
 }
 
 function renderDashboard() {
@@ -368,6 +379,241 @@ function initSplash() {
     localStorage.setItem('saa-c03-splash-ack', new Date().toISOString());
     modal.classList.add('hidden');
   });
+}
+
+// ---- Theory section ----
+let THEORY_SECTIONS = null;
+
+function svgFlow(title, nodes) {
+  const W = 168, H = 50, GAP = 30;
+  let x = 12;
+  const parts = [];
+  nodes.forEach((n, i) => {
+    if (i > 0) {
+      parts.push(`<line x1="${x - GAP}" y1="${37}" x2="${x}" y2="${37}" stroke="#8896aa" stroke-width="2" marker-end="url(#arrowhead)"/>`);
+    }
+    parts.push(`<rect x="${x}" y="12" width="${W}" height="${H}" rx="6" fill="#eef4ff" stroke="#4a8eff" stroke-width="1.5"/>`);
+    parts.push(`<text x="${x + W / 2}" y="42" text-anchor="middle" font-size="12.5" fill="#1a2a3a">${escapeHtml(n)}</text>`);
+    x += W + GAP;
+  });
+  const total = x;
+  return `<figure class="diagram">
+    <svg viewBox="0 0 ${total} 74" preserveAspectRatio="xMidYMid meet" role="img">
+      <defs><marker id="arrowhead" markerWidth="8" markerHeight="8" refX="7" refY="3.5" orient="auto">
+        <path d="M0,0 L8,3.5 L0,7 Z" fill="#8896aa"/></marker></defs>
+      ${parts.join('')}
+    </svg>
+    <figcaption>${escapeHtml(title)}</figcaption>
+  </figure>`;
+}
+
+function svgFanout() {
+  return `<figure class="diagram">
+    <svg viewBox="0 0 540 200" preserveAspectRatio="xMidYMid meet" role="img">
+      <defs><marker id="ah2" markerWidth="8" markerHeight="8" refX="7" refY="3.5" orient="auto">
+        <path d="M0,0 L8,3.5 L0,7 Z" fill="#8896aa"/></marker></defs>
+      <rect x="12" y="78" width="150" height="44" rx="6" fill="#fff3cd" stroke="#d9a300" stroke-width="1.5"/>
+      <text x="87" y="105" text-anchor="middle" font-size="13" fill="#1a2a3a">SNS Topic</text>
+      <line x1="162" y1="100" x2="230" y2="40" stroke="#8896aa" stroke-width="2" marker-end="url(#ah2)"/>
+      <line x1="162" y1="100" x2="230" y2="100" stroke="#8896aa" stroke-width="2" marker-end="url(#ah2)"/>
+      <line x1="162" y1="100" x2="230" y2="160" stroke="#8896aa" stroke-width="2" marker-end="url(#ah2)"/>
+      <rect x="234" y="18" width="120" height="42" rx="6" fill="#eef4ff" stroke="#4a8eff" stroke-width="1.5"/>
+      <text x="294" y="44" text-anchor="middle" font-size="12.5" fill="#1a2a3a">SQS Queue 1</text>
+      <rect x="234" y="79" width="120" height="42" rx="6" fill="#eef4ff" stroke="#4a8eff" stroke-width="1.5"/>
+      <text x="294" y="105" text-anchor="middle" font-size="12.5" fill="#1a2a3a">SQS Queue 2</text>
+      <rect x="234" y="140" width="120" height="42" rx="6" fill="#eef4ff" stroke="#4a8eff" stroke-width="1.5"/>
+      <text x="294" y="166" text-anchor="middle" font-size="12.5" fill="#1a2a3a">SQS Queue 3</text>
+      <line x1="354" y1="39" x2="412" y2="39" stroke="#8896aa" stroke-width="2" marker-end="url(#ah2)"/>
+      <line x1="354" y1="100" x2="412" y2="100" stroke="#8896aa" stroke-width="2" marker-end="url(#ah2)"/>
+      <line x1="354" y1="161" x2="412" y2="161" stroke="#8896aa" stroke-width="2" marker-end="url(#ah2)"/>
+      <rect x="416" y="18" width="112" height="42" rx="6" fill="#e8f6ec" stroke="#28a745" stroke-width="1.5"/>
+      <text x="472" y="44" text-anchor="middle" font-size="12.5" fill="#1a2a3a">Consumer</text>
+      <rect x="416" y="79" width="112" height="42" rx="6" fill="#e8f6ec" stroke="#28a745" stroke-width="1.5"/>
+      <text x="472" y="105" text-anchor="middle" font-size="12.5" fill="#1a2a3a">Consumer</text>
+      <rect x="416" y="140" width="112" height="42" rx="6" fill="#e8f6ec" stroke="#28a745" stroke-width="1.5"/>
+      <text x="472" y="166" text-anchor="middle" font-size="12.5" fill="#1a2a3a">Consumer</text>
+    </svg>
+    <figcaption>Fan-out: SNS → nhiều SQS → nhiều consumer</figcaption>
+  </figure>`;
+}
+
+function svgDR() {
+  const rows = [
+    ['Backup & Restore', 'Giờ – ngày', 'Giờ', 'Thấp nhất'],
+    ['Pilot Light', 'Chục phút', 'Phút', 'Trung bình'],
+    ['Warm Standby', 'Phút', 'Giây – phút', 'Cao'],
+    ['Multi-Site (Hot)', 'Gần 0', 'Gần 0', 'Cao nhất'],
+  ];
+  let bars = '';
+  rows.forEach((r, i) => {
+    const y = 40 + i * 42;
+    const w = 60 + i * 110;
+    bars += `<text x="12" y="${y + 18}" font-size="12.5" fill="#1a2a3a">${escapeHtml(r[0])}</text>`;
+    bars += `<rect x="170" y="${y}" width="${w}" height="26" rx="4" fill="#4a8eff" opacity="${0.45 + i * 0.18}"/>`;
+    bars += `<text x="${178}" y="${y + 17}" font-size="11" fill="#fff">RTO ${escapeHtml(r[1])} · RPO ${escapeHtml(r[2])}</text>`;
+    bars += `<text x="${170 + w + 8}" y="${y + 17}" font-size="11" fill="#666">${escapeHtml(r[3])}</text>`;
+  });
+  return `<figure class="diagram">
+    <svg viewBox="0 0 560 232" preserveAspectRatio="xMidYMid meet" role="img">
+      <text x="12" y="22" font-size="12.5" fill="#666">Càng xuống dưới: RTO/RPO càng nhỏ, chi phí càng cao →</text>
+      ${bars}
+    </svg>
+    <figcaption>Disaster Recovery: 4 chiến lược theo RTO / RPO / chi phí</figcaption>
+  </figure>`;
+}
+
+function svgVPC() {
+  return `<figure class="diagram">
+    <svg viewBox="0 0 560 240" preserveAspectRatio="xMidYMid meet" role="img">
+      <rect x="8" y="8" width="544" height="224" rx="8" fill="#f5f8ff" stroke="#4a8eff" stroke-width="1.5"/>
+      <text x="20" y="28" font-size="12.5" fill="#4a8eff" font-weight="700">VPC (CIDR riêng)</text>
+      <rect x="24" y="40" width="250" height="180" rx="6" fill="#e8f6ec" stroke="#28a745" stroke-width="1.5"/>
+      <text x="36" y="60" font-size="12" fill="#28a745" font-weight="700">Public Subnet</text>
+      <rect x="40" y="72" width="100" height="38" rx="5" fill="#fff" stroke="#28a745"/>
+      <text x="90" y="95" text-anchor="middle" font-size="11.5" fill="#1a2a3a">Internet GW</text>
+      <rect x="156" y="72" width="100" height="38" rx="5" fill="#fff" stroke="#28a745"/>
+      <text x="206" y="95" text-anchor="middle" font-size="11.5" fill="#1a2a3a">NAT Gateway</text>
+      <rect x="40" y="128" width="216" height="38" rx="5" fill="#fff" stroke="#28a745"/>
+      <text x="148" y="151" text-anchor="middle" font-size="11.5" fill="#1a2a3a">ALB / Bastion</text>
+      <rect x="286" y="40" width="250" height="180" rx="6" fill="#fdf0e6" stroke="#d9822b" stroke-width="1.5"/>
+      <text x="298" y="60" font-size="12" fill="#d9822b" font-weight="700">Private Subnet</text>
+      <rect x="302" y="72" width="216" height="38" rx="5" fill="#fff" stroke="#d9822b"/>
+      <text x="410" y="95" text-anchor="middle" font-size="11.5" fill="#1a2a3a">EC2 / App tier</text>
+      <rect x="302" y="128" width="216" height="38" rx="5" fill="#fff" stroke="#d9822b"/>
+      <text x="410" y="151" text-anchor="middle" font-size="11.5" fill="#1a2a3a">RDS Multi-AZ</text>
+      <text x="302" y="200" font-size="11" fill="#666">Private subnet ra Internet 1 chiều qua NAT GW</text>
+    </svg>
+    <figcaption>VPC: Public subnet (IGW, NAT) và Private subnet</figcaption>
+  </figure>`;
+}
+
+function diagramsForSection(title) {
+  const t = title.toLowerCase();
+  if (t.includes('decoupling') || t.includes('patterns')) {
+    return [
+      svgFlow('3-tier web', ['Internet', 'ALB', 'Web ASG', 'App ASG', 'RDS Multi-AZ']),
+      svgFlow('Serverless web', ['CloudFront', 'API Gateway', 'Lambda', 'DynamoDB']),
+      svgFlow('Async processing', ['API Gateway', 'SQS', 'Lambda / ECS', 'Database']),
+      svgFanout(),
+      svgFlow('Event-driven', ['Source event', 'EventBridge rule', 'Lambda']),
+      svgFlow('Streaming analytics', ['Kinesis Data Streams', 'Firehose', 'S3', 'Athena']),
+      svgFlow('Static site + CDN', ['Route 53', 'CloudFront', 'S3 (static)']),
+    ].join('');
+  }
+  if (t.includes('disaster recovery')) return svgDR();
+  if (t.includes('vpc')) return svgVPC();
+  return '';
+}
+
+function mdInline(s) {
+  return escapeHtml(s)
+    .replace(/`([^`]+)`/g, '<code>$1</code>')
+    .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+    .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>');
+}
+
+function parseMarkdownBody(lines) {
+  const out = [];
+  let i = 0;
+  while (i < lines.length) {
+    const line = lines[i];
+    if (/^#{3}\s/.test(line)) { out.push(`<h3>${mdInline(line.replace(/^#{3}\s/, ''))}</h3>`); i++; continue; }
+    if (/^#{4}\s/.test(line)) { out.push(`<h4>${mdInline(line.replace(/^#{4}\s/, ''))}</h4>`); i++; continue; }
+    if (/^---+\s*$/.test(line)) { out.push('<hr>'); i++; continue; }
+    if (/^>\s?/.test(line)) { out.push(`<blockquote>${mdInline(line.replace(/^>\s?/, ''))}</blockquote>`); i++; continue; }
+    if (/^\s*\|.*\|\s*$/.test(line)) {
+      const rows = [];
+      while (i < lines.length && /^\s*\|.*\|\s*$/.test(lines[i])) { rows.push(lines[i]); i++; }
+      const cells = r => r.trim().replace(/^\||\|$/g, '').split('|').map(c => c.trim());
+      const head = cells(rows[0]);
+      const bodyRows = rows.slice(2);
+      let t = '<table><thead><tr>' + head.map(h => `<th>${mdInline(h)}</th>`).join('') + '</tr></thead><tbody>';
+      bodyRows.forEach(r => { t += '<tr>' + cells(r).map(c => `<td>${mdInline(c)}</td>`).join('') + '</tr>'; });
+      t += '</tbody></table>';
+      out.push(t);
+      continue;
+    }
+    if (/^\s*([-*]|\d+\.)\s/.test(line)) {
+      const ordered = /^\s*\d+\.\s/.test(line);
+      const items = [];
+      while (i < lines.length && /^\s*([-*]|\d+\.)\s/.test(lines[i])) {
+        const indented = /^\s{2,}/.test(lines[i]);
+        const text = lines[i].replace(/^\s*([-*]|\d+\.)\s/, '');
+        items.push(`<li class="${indented ? 'sub' : ''}">${mdInline(text)}</li>`);
+        i++;
+      }
+      out.push(`<${ordered ? 'ol' : 'ul'}>${items.join('')}</${ordered ? 'ol' : 'ul'}>`);
+      continue;
+    }
+    if (line.trim() === '') { i++; continue; }
+    const para = [];
+    while (i < lines.length && lines[i].trim() !== '' && !/^(#{1,4}\s|>|\s*\||\s*([-*]|\d+\.)\s|---+\s*$)/.test(lines[i])) {
+      para.push(lines[i]); i++;
+    }
+    out.push(`<p>${mdInline(para.join(' '))}</p>`);
+  }
+  return out.join('\n');
+}
+
+function parseTheory(md) {
+  const lines = md.split('\n');
+  const sections = [];
+  let intro = [];
+  let current = null;
+  for (const line of lines) {
+    if (/^##\s/.test(line)) {
+      if (current) sections.push(current);
+      current = { title: line.replace(/^##\s/, '').trim(), lines: [] };
+    } else if (current) {
+      current.lines.push(line);
+    } else if (!/^#\s/.test(line)) {
+      intro.push(line);
+    }
+  }
+  if (current) sections.push(current);
+  return sections.map((s, idx) => ({
+    id: String(idx),
+    title: s.title,
+    html: diagramsForSection(s.title) + parseMarkdownBody(s.lines),
+  }));
+}
+
+async function loadTheory() {
+  if (THEORY_SECTIONS) return THEORY_SECTIONS;
+  const res = await fetch('theory.md');
+  if (!res.ok) throw new Error('Could not load theory.md');
+  THEORY_SECTIONS = parseTheory(await res.text());
+  return THEORY_SECTIONS;
+}
+
+async function renderTheory(sectionId) {
+  let sections;
+  try { sections = await loadTheory(); }
+  catch (e) { render(`<p>Error: ${e.message}</p>`); return; }
+  const current = sections.find(s => s.id === sectionId) || sections[0];
+  const toc = sections.map(s =>
+    `<li><a href="#/theory/${s.id}" class="${s.id === current.id ? 'active' : ''}">${escapeHtml(s.title)}</a></li>`
+  ).join('');
+  const curIdx = sections.findIndex(s => s.id === current.id);
+  const prev = curIdx > 0 ? sections[curIdx - 1] : null;
+  const next = curIdx < sections.length - 1 ? sections[curIdx + 1] : null;
+  render(`
+    <div class="theory">
+      <aside class="theory-toc">
+        <h3>Nội dung</h3>
+        <ol>${toc}</ol>
+      </aside>
+      <article class="theory-content">
+        <h2>${escapeHtml(current.title)}</h2>
+        ${current.html}
+        <nav class="theory-nav">
+          ${prev ? `<a href="#/theory/${prev.id}">← ${escapeHtml(prev.title)}</a>` : '<span></span>'}
+          ${next ? `<a href="#/theory/${next.id}">${escapeHtml(next.title)} →</a>` : '<span></span>'}
+        </nav>
+      </article>
+    </div>
+  `);
+  window.scrollTo(0, 0);
 }
 
 window.addEventListener('hashchange', route);

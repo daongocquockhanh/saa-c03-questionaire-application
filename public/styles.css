@@ -61,3 +61,33 @@ button:disabled { opacity: 0.5; cursor: not-allowed; }
 .splash-modal-card ul { padding-left: 1.25rem; }
 .splash-modal-card li { margin: 0.35rem 0; line-height: 1.4; }
 .splash-modal-card button { margin-top: 0.5rem; }
+#topbar-right { display: flex; gap: 1rem; }
+.nav-link { color: #cdd6e4; text-decoration: none; font-size: 0.9rem; padding: 0.25rem 0; border-bottom: 2px solid transparent; }
+.nav-link.active { color: #ff9900; border-bottom-color: #ff9900; }
+.theory { display: grid; grid-template-columns: 240px 1fr; gap: 1.5rem; align-items: start; }
+.theory-toc { background: #fff; border: 1px solid #e0e0e0; border-radius: 6px; padding: 0.75rem; position: sticky; top: 1rem; max-height: 85vh; overflow-y: auto; }
+.theory-toc h3 { margin: 0.25rem 0 0.5rem; font-size: 0.95rem; }
+.theory-toc ol { margin: 0; padding-left: 1.2rem; }
+.theory-toc li { margin: 0.2rem 0; }
+.theory-toc a { color: #1a4480; text-decoration: none; font-size: 0.82rem; }
+.theory-toc a.active { color: #ff9900; font-weight: 700; }
+.theory-content { background: #fff; border: 1px solid #e0e0e0; border-radius: 6px; padding: 1.25rem 1.5rem; }
+.theory-content h2 { margin-top: 0; color: #232f3e; }
+.theory-content h3 { color: #1a4480; margin-top: 1.4rem; }
+.theory-content h4 { color: #3a5070; margin-bottom: 0.3rem; }
+.theory-content table { border-collapse: collapse; width: 100%; margin: 0.8rem 0; font-size: 0.88rem; }
+.theory-content th, .theory-content td { border: 1px solid #d8dee8; padding: 0.4rem 0.6rem; text-align: left; }
+.theory-content th { background: #f0f4f8; }
+.theory-content code { background: #eef1f5; padding: 0.1rem 0.3rem; border-radius: 3px; font-size: 0.88em; }
+.theory-content blockquote { border-left: 3px solid #ff9900; margin: 0.8rem 0; padding: 0.4rem 0.9rem; background: #fff8ee; color: #555; }
+.theory-content li.sub { list-style: circle; margin-left: 1rem; }
+.theory-content hr { border: none; border-top: 1px solid #e8e8e8; margin: 1.2rem 0; }
+.diagram { margin: 1rem 0; padding: 0.5rem; background: #fafbfd; border: 1px solid #e6e9ef; border-radius: 6px; }
+.diagram svg { width: 100%; height: auto; }
+.diagram figcaption { text-align: center; font-size: 0.82rem; color: #666; margin-top: 0.3rem; }
+.theory-nav { display: flex; justify-content: space-between; gap: 1rem; margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid #eee; font-size: 0.85rem; }
+.theory-nav a { color: #1a4480; text-decoration: none; }
+@media (max-width: 720px) {
+  .theory { grid-template-columns: 1fr; }
+  .theory-toc { position: static; max-height: none; }
+}
