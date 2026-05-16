@@ -769,7 +769,7 @@
       "B"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "AWS Config has a managed rule to check ACM certificate expiry; pairing it with an EventBridge rule that triggers an SNS notification gives an automated, managed alert when a certificate is within 30 days of expiring. ACM itself cannot publish scheduled custom messages.",
     "references": [
       "https://aws.amazon.com/premiumsupport/knowledge-center/acm-certificate-expiration/"
     ],
@@ -1841,7 +1841,7 @@
       "B"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "Data from the most recent 2 years must remain immediately retrievable, so it stays in S3 Standard. Only after 2 years should a lifecycle policy transition objects to S3 Glacier Deep Archive, the lowest-cost tier for long-term retention.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 4
@@ -2557,7 +2557,7 @@
       "A"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "700 TB cannot move over a 500 Mbps link within one month, so AWS Snowball devices physically ship the data. A lifecycle policy then transitions it to S3 Glacier Deep Archive for the lowest storage cost.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 4
@@ -2589,7 +2589,7 @@
       "B"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "A Route 53 active-passive failover configuration sends users to the primary ALB while it is healthy and automatically redirects to a static error page in an S3 bucket when the health check fails. This minimizes changes and adds no infrastructure.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 2
@@ -2643,7 +2643,7 @@
       "E"
     ],
     "isMultiSelect": true,
-    "explanation": null,
+    "explanation": "Following least privilege, create an IAM user in a group whose policy grants only the needed CloudFormation actions, and define an IAM role with permissions scoped to the specific stack resources. Root credentials or broad PowerUser/Administrator policies would over-grant access.",
     "references": [
       "https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles.html",
       "https://docs.aws.amazon.com/IAM/latest/UserGuide/id_users.html"
@@ -2744,7 +2744,7 @@
       "B"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "A load balancer fronting the Auto Scaling group distributes incoming traffic and lets the group scale out and in with demand. Note: UDP traffic specifically requires a Network Load Balancer (Layer 4) — verify the intended answer against current AWS documentation.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 3
@@ -2776,7 +2776,7 @@
       "B"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "Amazon Redshift handles the defined analytical access pattern; concurrency scaling absorbs variable read and write demand, audit logging satisfies the auditing requirement, and scheduled snapshots provide backups.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 3
@@ -2808,7 +2808,7 @@
       "D"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "EC2 Instance Savings Plans cover the two always-on baseline instances at a discount, On-Demand Instances absorb the variable extra load up to five, and an RDS Reserved DB Instance discounts the steady database — the most cost-effective mix that keeps the app always available.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 4
@@ -2872,7 +2872,7 @@
       "A"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "A cluster placement group packs the 16 instances close together for the lowest node-to-node latency, and a shared Provisioned IOPS SSD volume gives the high, consistent I/O the HPC workload needs.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 3
@@ -2904,7 +2904,7 @@
       "D"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "Amazon RDS Proxy pools and reuses database connections, preventing the connection timeouts that occur when up to 800 Lambda invocations per minute each open their own connection to the Aurora cluster.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 3
@@ -3036,7 +3036,7 @@
       "A"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "Deploying the full infrastructure and using Route 53 active-passive failover meets a 30-minute RTO with acceptable data loss, while avoiding the cost of a scaled deployment that handles load when the primary is healthy.",
     "references": [
       "https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/dns-failover-types.html"
     ],
@@ -3075,7 +3075,7 @@
       "E"
     ],
     "isMultiSelect": true,
-    "explanation": null,
+    "explanation": "Consolidating many small files into larger objects and converting CSV files to columnar Apache Parquet format via an ETL job both cut the per-query scan overhead in Amazon Athena, reducing failed and slow queries.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 3
@@ -4234,7 +4234,7 @@
       "C"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "An S3 Lifecycle policy moves records to S3 Glacier Deep Archive after 1 year for cost-effective archival, and S3 Object Lock in compliance mode makes them undeletable by anyone — including root and administrators — for the full 10-year retention.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 1
@@ -4368,7 +4368,7 @@
       "B"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "Amazon Rekognition provides ready-made image moderation to detect inappropriate content without training a model; routing low-confidence results to human review handles uncertain cases.",
     "references": [
       "https://docs.aws.amazon.com/rekognition/latest/dg/moderation.html?pg=ln&sec=ft"
     ],
@@ -4733,7 +4733,7 @@
       "B"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "Amazon QuickSight connects directly to the data lake sources (S3 and RDS for PostgreSQL), builds datasets and dashboards for visualization, and lets you share dashboards only with the specific authorized users.",
     "references": [
       "https://docs.aws.amazon.com/quicksight/latest/user/sharing-a-dashboard.html",
       "https://docs.aws.amazon.com/quicksight/latest/user/share-a-dashboard-grant-access-users.html"
@@ -4807,7 +4807,7 @@
       "B"
     ],
     "isMultiSelect": true,
-    "explanation": null,
+    "explanation": "An S3 event notification puts a message on an SQS queue when an image is uploaded, and the Lambda function uses that SQS queue as its event source to process images — durable, stateless, automatic decoupled processing.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 2
@@ -6027,7 +6027,7 @@
       "A"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "AWS Config rules continuously and automatically detect resources that are not properly tagged, with the least configuration and operational effort compared to custom API scripts.",
     "references": [
       "https://docs.aws.amazon.com/config/latest/developerguide/tagging.html"
     ],
@@ -6632,7 +6632,7 @@
       "C"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "Amazon RDS Custom for Oracle is a managed service that still provides access to the underlying operating system, satisfying that requirement; a cross-Region read replica provides low-overhead disaster recovery.",
     "references": [
       "https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/rds-custom.html",
       "https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/working-with-custom-oracle.html"
@@ -6840,7 +6840,7 @@
       "C"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "Adding a CloudFront distribution in front of the S3 bucket caches the static site at edge locations worldwide, decreasing latency for global users; Route 53 records point to the CloudFront distribution.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 3
@@ -7545,7 +7545,7 @@
       "A"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "An interface VPC endpoint routes S3 API calls over the private AWS network rather than the public internet, and a bucket resource policy restricts uploads to only that EC2 instance.",
     "references": [
       "https://aws.amazon.com/premiumsupport/knowledge-center/connect-s3-vpc-endpoint/"
     ],
@@ -7716,7 +7716,7 @@
       "E"
     ],
     "isMultiSelect": true,
-    "explanation": null,
+    "explanation": "A Lambda function triggered on upload uses Amazon Textract to extract text from scanned documents and Amazon Comprehend Medical to extract medical information; storing the data in S3 and querying with Amazon Athena gives scalable SQL access.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 3
@@ -7816,7 +7816,7 @@
       "C"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "For only about 300 MB of JSON needing a disaster-recovery backup, Amazon S3 Standard is durable, immediately available, and far cheaper and simpler than running a database or search service.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 4
@@ -8299,7 +8299,7 @@
       "C"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "Placing the EC2 instances in an Auto Scaling group and having the order system send messages to an Amazon SQS queue decouples order intake from processing, so orders are not lost and do not need reprocessing when an instance fails.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 2
@@ -8643,7 +8643,7 @@
       "D"
     ],
     "isMultiSelect": true,
-    "explanation": null,
+    "explanation": "S3 Object Lock in compliance mode prevents documents from being overwritten or deleted for the 5-year period, and server-side encryption with an AWS KMS customer managed key with automatic rotation encrypts at rest and rotates keys yearly.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 1
@@ -9921,7 +9921,7 @@
       "C"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "A gateway VPC endpoint for S3 lets the containers reach S3 over the private network at no additional cost and avoids NAT gateway data-processing charges — the cheapest option for 1 TB per day while keeping traffic off the internet.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 1
@@ -10823,7 +10823,7 @@
       "A"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "Creating an IAM role in the company account that the vendor’s IAM role can assume delegates cross-account access securely, without creating long-lived IAM users or credentials.",
     "references": [
       "https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_common-scenarios_third-party.html"
     ],
@@ -10902,7 +10902,7 @@
       "E"
     ],
     "isMultiSelect": true,
-    "explanation": null,
+    "explanation": "A Route 53 multivalue answer routing policy returns multiple healthy instance IPs so traffic reaches all instances randomly, and launching four instances spread two-per-AZ across two Availability Zones provides high availability and fault tolerance.",
     "references": [
       "https://aws.amazon.com/premiumsupport/knowledge-center/multivalue-versus-simple-policies/"
     ],
@@ -11037,7 +11037,7 @@
       "A"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "Amazon Aurora Serverless for Aurora MySQL automatically scales database capacity up and down with demand, removing the manual replication and scaling work while staying MySQL-compatible.",
     "references": [
       "https://aws.amazon.com/rds/aurora/serverless/"
     ],
@@ -11173,7 +11173,7 @@
       "C"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "AWS KMS encrypts the EBS volumes and Aurora database storage at rest, and an ACM certificate on the ALB encrypts data in transit — the standard managed approach for end-to-end encryption.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 1
@@ -11311,7 +11311,7 @@
       "A"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "An Amazon API Gateway REST API can invoke the Lambda function and provides built-in IAM authentication on its methods, so clients call an HTTPS endpoint and AWS IAM authenticates the requests.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 1
@@ -11343,7 +11343,7 @@
       "D"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "Hosting the visualization tool in the same Region as the data warehouse keeps query traffic inside AWS, and accessing it over Direct Connect gives consistent, low-latency private connectivity for the office users.",
     "references": [
       "https://aws.amazon.com/directconnect/pricing/",
       "https://aws.amazon.com/blogs/aws/aws-data-transfer-prices-reduced/"
@@ -11378,7 +11378,7 @@
       "C"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "Amazon RDS for PostgreSQL with a cross-Region read replica keeps data online and available in multiple Regions with low operational overhead — Multi-AZ only covers one Region, and snapshot copies are not continuously online.",
     "references": [
       "https://aws.amazon.com/blogs/aws/cross-region-read-replicas-for-amazon-rds-for-mysql/"
     ],
@@ -11508,7 +11508,7 @@
       "D"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "An internet-facing ALB must live in public subnets that route to an internet gateway. Creating public subnets in each Availability Zone and associating them with the ALB lets it receive internet traffic and forward it to the private EC2 instances.",
     "references": [
       "https://aws.amazon.com/premiumsupport/knowledge-center/public-load-balancer-private-ec2/"
     ],
@@ -11647,7 +11647,7 @@
       "D"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "Sending VPC Flow Logs to Amazon S3 and using an S3 Lifecycle policy to transition them to S3 Standard-Infrequent Access after 90 days matches the access pattern (frequent for 90 days, then intermittent) cost-effectively.",
     "references": [
       "https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/CloudWatchLogsConcepts.html"
     ],
@@ -11884,7 +11884,7 @@
       "A"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "AWS Backup with a backup vault and a daily backup plan set to a 2-year expiration centrally manages consistent, restorable RDS backups and enforces the retention policy with the least effort.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 2
@@ -11953,7 +11953,7 @@
       "C"
     ],
     "isMultiSelect": true,
-    "explanation": null,
+    "explanation": "Amazon CloudFront caches multiple versions of the content at the edge, and a Lambda@Edge function inspects the User-Agent header to return device-specific objects to each user.",
     "references": [
       "https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/header-caching.html",
       "https://docs.aws.amazon.com/lambda/latest/dg/lambda-edge.html"
@@ -12223,7 +12223,7 @@
       "C"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "A target tracking scaling policy triggered at a lower CPU threshold scales out sooner, and a shorter cooldown lets the group add instances faster — fixing the slow start without permanently over-provisioning.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 3
@@ -12260,7 +12260,7 @@
       "D"
     ],
     "isMultiSelect": true,
-    "explanation": null,
+    "explanation": "Enabling RDS storage Auto Scaling stops the Oracle instance from running out of storage, and configuring the EC2 Auto Scaling group to scale on average CPU lets it add instances automatically as traffic grows.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 3
@@ -12329,7 +12329,7 @@
       "E"
     ],
     "isMultiSelect": true,
-    "explanation": null,
+    "explanation": "Amazon DynamoDB stores the hierarchical employee data with low-latency, high-traffic queries and exports to S3 monthly; Amazon Macie integrated with EventBridge sends monthly SNS notifications when financial information is detected.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 1
@@ -12361,7 +12361,7 @@
       "A"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "An AWS Backup plan scheduled for the first of each month with a lifecycle policy meets the monthly-backup, 6-month-available, and 7-year-retention compliance requirements with the least custom code.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 2
@@ -12525,7 +12525,7 @@
       "B"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "AWS Cost Explorer can generate a report of billed items grouped by user/linked account and download it — the most efficient built-in way to get the data for department budgets.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 4
@@ -12801,7 +12801,7 @@
       "B"
     ],
     "isMultiSelect": true,
-    "explanation": null,
+    "explanation": "Both valid solutions ingest the real-time stream and transform it before writing to S3: Kinesis Data Streams with Kinesis Data Analytics, or Amazon MSK with AWS Glue. The transformed data in S3 can then be queried with SQL.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 3
@@ -12865,7 +12865,7 @@
       "B"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "A gateway VPC endpoint for Amazon S3 lets EC2 instances reach the bucket over the private AWS network so traffic never traverses the internet, at no additional cost.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 1
@@ -13063,7 +13063,7 @@
       "C"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "For a 24/7 application with steadily growing data, EC2 Reserved Instances discount the always-on compute and Amazon Aurora Reserved Instances discount the database — the most cost-effective option for predictable, continuous workloads.",
     "references": [
       "https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/Aurora.AuroraMySQL.html"
     ],
@@ -13136,7 +13136,7 @@
       "C"
     ],
     "isMultiSelect": true,
-    "explanation": null,
+    "explanation": "Amazon CloudFront delivers and caches the video content close to users to fix buffering, and Amazon Elastic Transcoder converts the raw videos into mobile-friendly formats to improve playback and reduce size.",
     "references": [
       "https://aws.amazon.com/elastictranscoder/"
     ],
@@ -13341,7 +13341,7 @@
       "D"
     ],
     "isMultiSelect": true,
-    "explanation": null,
+    "explanation": "Trusted Advisor checks are best viewed from the consolidated billing (management) account to see all RDS instances at once, and the RDS Idle DB Instances check identifies underused databases that drive unnecessary cost.",
     "references": [
       "https://aws.amazon.com/premiumsupport/knowledge-center/trusted-advisor-cost-optimization/"
     ],
@@ -13550,7 +13550,7 @@
       "C"
     ],
     "isMultiSelect": true,
-    "explanation": null,
+    "explanation": "An Amazon Aurora PostgreSQL cluster with a Reserved Instance plus an Aurora Replica lets the monthly reporting queries run against the replica, so they do not affect document modifications on the primary.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 3
@@ -13648,7 +13648,7 @@
       "A"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "A scheduled AWS Glue ETL job converts the CSV files into a format the COTS application can query (such as Parquet) with the least operational overhead — no servers or custom scripts to manage.",
     "references": [
       "https://docs.aws.amazon.com/glue/latest/dg/aws-glue-programming-etl-format-csv-home.html"
     ],
@@ -13687,7 +13687,7 @@
       "D"
     ],
     "isMultiSelect": true,
-    "explanation": null,
+    "explanation": "AWS CloudTrail records the API activity (who changed what) for auditing, and AWS Config tracks resource configuration changes and evaluates compliance rules — together they track and audit inventory and configuration changes.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 1
@@ -13751,7 +13751,7 @@
       "A"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "AWS Lake Formation data filters implement row-level and cell-level security, preventing access to the sensitive portions of the data without removing or duplicating it.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 1
@@ -13817,7 +13817,7 @@
       "C"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "Placing a message on an Amazon SQS queue when an image is uploaded lets the app immediately confirm receipt to the user, while a separate consumer processes the slow thumbnail generation asynchronously.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 2
@@ -13849,7 +13849,7 @@
       "A"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "An Amazon API Gateway REST API can invoke the Lambda function and supports built-in IAM authentication, so clients reach the microservice over HTTPS and AWS IAM authenticates the calls.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 1
@@ -13881,7 +13881,7 @@
       "D"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "An AWS Storage Gateway Volume Gateway stored volume keeps the entire dataset on premises (so users have immediate, low-latency access to all files) while asynchronously backing it up to AWS as EBS snapshots for disaster recovery.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 2
@@ -14182,7 +14182,7 @@
       "C"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "Because the spike happens on a known monthly schedule, an EC2 Auto Scaling scheduled scaling policy pre-provisions capacity before the batch job runs, avoiding the 100% CPU disruption.",
     "references": [
       "https://docs.aws.amazon.com/autoscaling/ec2/userguide/ec2-auto-scaling-scheduled-scaling.html"
     ],
@@ -14216,7 +14216,7 @@
       "A"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "AWS Transfer Family with an SFTP-enabled server for Amazon S3 and integrated Active Directory authentication lets the customer download files using their existing SFTP client and AD credentials with no application changes.",
     "references": [
       "https://docs.aws.amazon.com/transfer/latest/userguide/directory-services-users.html"
     ],
@@ -14484,7 +14484,7 @@
       "C"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "A predictive scaling policy forecasts the recurring weekly batch load and provisions capacity ahead of time automatically, removing the manual Auto Scaling adjustments with the least operational overhead.",
     "references": [
       "https://docs.aws.amazon.com/autoscaling/ec2/userguide/ec2-auto-scaling-predictive-scaling.html"
     ],
@@ -14518,7 +14518,7 @@
       "C"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "An Amazon Aurora global database with the primary cluster in one Region and a secondary cluster in the DR Region provides managed, low-overhead cross-Region disaster recovery.",
     "references": [
       "https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/Aurora.Replication.html"
     ],
@@ -14720,7 +14720,7 @@
       "B"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "To share an encrypted Aurora snapshot, you must add the acquiring company’s AWS account to the KMS key policy so they can use the customer managed key, then share the snapshot — keeping the data encrypted end to end.",
     "references": [
       "https://aws.amazon.com/premiumsupport/knowledge-center/aurora-share-encrypted-snapshot/"
     ],
@@ -14759,7 +14759,7 @@
       "C"
     ],
     "isMultiSelect": true,
-    "explanation": null,
+    "explanation": "Converting the Single-AZ instance to a Multi-AZ deployment provides high availability and automatic failover, and creating a read replica and pointing reports to it stops the reporting queries from slowing customer transactions.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 2
@@ -14892,7 +14892,7 @@
       "B"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "Amazon RDS Proxy pools and shares database connections, eliminating the connection-timeout errors from many Lambda invocations during peak traffic — with no application code change.",
     "references": [
       "https://aws.amazon.com/rds/proxy/"
     ],
@@ -15091,7 +15091,7 @@
       "C"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "AWS Transfer Family provides a managed FTP server (no EC2 to maintain) that stores incoming files on an EBS volume, and a scheduled job processes the files — meeting the requirement with minimal operational change.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 2
@@ -15123,7 +15123,7 @@
       "C"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "Amazon EFS is a POSIX-compliant shared file system that can be mounted by all the Linux web servers simultaneously, providing the shared file store with no application changes.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 2
@@ -15321,7 +15321,7 @@
       "D"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "Amazon CloudFront caches S3 content at edge locations, serving authorized external users in milliseconds while reducing S3 request and data-transfer costs — the most cost-effective option.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 4
@@ -15385,7 +15385,7 @@
       "D"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "An AWS Storage Gateway stored volume gateway keeps the full dataset on premises for low-latency local access while asynchronously and securely backing it up to AWS as EBS snapshots.",
     "references": [
       "https://docs.aws.amazon.com/storagegateway/latest/vgw/WhatIsStorageGateway.html"
     ],
@@ -15485,7 +15485,7 @@
       "A"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "Extending the Auto Scaling groups into a second Region and using Amazon Route 53 to direct global traffic, with an Aurora global database, lets the company expand globally with minimal downtime.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 2
@@ -15517,7 +15517,7 @@
       "B"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "A public SSL/TLS certificate from AWS Certificate Manager is free, and CloudFront requires the certificate in the us-east-1 Region — so requesting an ACM public certificate in us-east-1 deploys it with no additional cost.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 1
@@ -15549,7 +15549,7 @@
       "C"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "An Amazon Aurora global database with the primary cluster in one Region and a secondary cluster in the DR Region provides managed, low-overhead, multi-Region disaster recovery.",
     "references": [
       "https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/Aurora.Replication.html"
     ],
@@ -15652,7 +15652,7 @@
       "A"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "Global customers have dynamic IPs, so the web tier security group must allow inbound HTTPS (port 443) from 0.0.0.0/0; the database security group should allow MySQL (port 3306) only from the web tier security group.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 1
@@ -15950,7 +15950,7 @@
       "C"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "Amazon Transcribe with PII redaction turned on converts the audio recordings to text and automatically removes personally identifiable information in a single managed step.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 1
@@ -16019,7 +16019,7 @@
       "D"
     ],
     "isMultiSelect": true,
-    "explanation": null,
+    "explanation": "Storing session data in an external durable store — an Amazon DynamoDB table or an Amazon ElastiCache for Redis cluster — keeps sessions available even if an EC2 instance fails, unlike server-local or sticky-session storage.",
     "references": [
       "https://aws.amazon.com/caching/session-management/"
     ],
@@ -16053,7 +16053,7 @@
       "C"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "The job has known, constant CPU and memory needs and runs up to an hour, so Amazon ECS on AWS Fargate triggered by an EventBridge scheduled event runs it serverlessly with the least operational effort (no EC2 or Auto Scaling to manage).",
     "references": [],
     "needsManualAnswer": false,
     "domain": 4
@@ -16117,7 +16117,7 @@
       "A"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "Amazon Cognito handles authentication for the small user base, Lambda@Edge handles authorization at the edge, and Amazon CloudFront serves the content globally with the lowest login latency — a fully serverless, scalable design.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 1
@@ -16213,7 +16213,7 @@
       "C"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "Amazon EFS is highly available, POSIX-compliant, and shareable across the EC2 instances; an EFS lifecycle policy moves data to the Infrequent Access tier after 30 days for cost savings.",
     "references": [
       "https://aws.amazon.com/efs/features/infrequent-access/"
     ],
@@ -16247,7 +16247,7 @@
       "B"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "S3 Standard-Infrequent Access stores the rarely accessed 1 PB cost-effectively while keeping images immediately available; default encryption protects data at rest and versioning protects against accidental deletion.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 2
@@ -16414,7 +16414,7 @@
       "C"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "S3 Standard-Infrequent Access stores a rarely accessed secondary copy at low cost while keeping it immediately retrievable and durable across multiple Availability Zones.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 4
@@ -16451,7 +16451,7 @@
       "D"
     ],
     "isMultiSelect": true,
-    "explanation": null,
+    "explanation": "A security group on the web servers allowing inbound 443 from 0.0.0.0/0, and a security group on the DB instance allowing 3306 only from the web servers’ security group, scope access correctly using stateful security groups.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 1
@@ -16483,7 +16483,7 @@
       "D"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "S3 Standard keeps the most recent 30 days of data instantly available for daily retraining; a lifecycle policy then transitions older objects to S3 Standard-IA (still available for the quarterly 12-month analysis) for the lowest cost.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 4
@@ -16588,7 +16588,7 @@
       "E"
     ],
     "isMultiSelect": true,
-    "explanation": null,
+    "explanation": "A target tracking scaling policy on CPU handles the working-hours traffic increases, and a scheduled scaling action that sets capacity to zero on weekends (and back afterward) eliminates idle cost.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 3
@@ -16684,7 +16684,7 @@
       "A"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "An Amazon RDS read replica serves the business reporting queries separately from the primary, so reporting does not impact write operations on the production database.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 3
@@ -16785,7 +16785,7 @@
       "D"
     ],
     "isMultiSelect": true,
-    "explanation": null,
+    "explanation": "Enabling EBS encryption by default in the Region with the customer managed key, plus an IAM role granting the EKS node group permission to use that key, encrypts all node EBS volumes with the least operational overhead.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 1
@@ -16854,7 +16854,7 @@
       "E"
     ],
     "isMultiSelect": true,
-    "explanation": null,
+    "explanation": "Both options preserve per-payment-ID ordering: an Amazon Kinesis data stream using the payment ID as the partition key, or an Amazon SQS FIFO queue using the payment ID as the message group ID.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 2
@@ -17080,7 +17080,7 @@
       "B"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "Storing the large GIS images in Amazon S3 and keeping the geographic code with the image S3 URL in Amazon DynamoDB gives a highly available, scalable, and cost-effective key-value lookup that handles bursts of updates.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 4
@@ -17247,7 +17247,7 @@
       "B"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "Amazon SNS FIFO topics deliver events to multiple subscribing services concurrently while strictly preserving the order in which events were published.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 2
@@ -17316,7 +17316,7 @@
       "E"
     ],
     "isMultiSelect": true,
-    "explanation": null,
+    "explanation": "Least privilege is met by creating an IAM user in a group with a policy granting only the needed CloudFormation actions, and an IAM role with permissions scoped to the specific stack resources — not root or broad admin policies.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 1
@@ -17348,7 +17348,7 @@
       "D"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "Amazon FSx for Lustre is a fully managed file system that natively supports Lustre clients, meeting the gaming application’s shared-storage requirement.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 3
@@ -17380,7 +17380,7 @@
       "B"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "An Amazon S3 File Gateway exposes a network share to the business system; reports written to that share land in Amazon S3 in near real time with the least administrative overhead.",
     "references": [
       "https://aws.amazon.com/storagegateway/file/?nc1=h_ls"
     ],
@@ -17414,7 +17414,7 @@
       "A"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "Because the access patterns are unknown and vary, an S3 Lifecycle rule that transitions objects to S3 Intelligent-Tiering automatically optimizes storage cost without manual analysis.",
     "references": [
       "https://aws.amazon.com/s3/storage-classes/intelligent-tiering/"
     ],
@@ -17624,7 +17624,7 @@
       "B"
     ],
     "isMultiSelect": true,
-    "explanation": null,
+    "explanation": "An identity-based IAM policy can be attached only to IAM identities — users, groups, and roles. Of the listed options, Role and Group are valid IAM principals; an organization or AWS resources are not.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 1
@@ -17656,7 +17656,7 @@
       "B"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "Reserved Instances discount the always-on frontend nodes, and Spot Instances run the short-lived, variable backend workload at the lowest cost — the most cost-effective mix for this workload pattern.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 4
@@ -17722,7 +17722,7 @@
       "A"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "AWS DataSync securely migrates the frequently changing data to Amazon S3, and AWS CloudTrail data event logging records access at the object level to satisfy the audit requirement.",
     "references": [
       "https://docs.aws.amazon.com/ja_jp/datasync/latest/userguide/encryption-in-transit.html"
     ],
@@ -17820,7 +17820,7 @@
       "D"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "The policy allows ec2:StopInstances and ec2:TerminateInstances scoped to the us-east-1 Region and conditioned on MFA, so group members can perform only those two actions, only in us-east-1, and only when signed in with MFA.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 1
@@ -17992,7 +17992,7 @@
       "D"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "Pre-provisioning an Auto Scaling group and load balancer in the DR Region (warm standby) with the DynamoDB table as a global table, plus Route 53 health-check failover, gives the least downtime.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 2
@@ -18024,7 +18024,7 @@
       "A"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "For a 20 TB database that must move within 2 weeks with minimal downtime, an AWS Snowball Edge Storage Optimized device handles the bulk transfer and AWS DMS with SCT performs the migration and ongoing change capture cost-effectively.",
     "references": [
       "https://docs.aws.amazon.com/dms/latest/userguide/CHAP_LargeDBs.Process.html"
     ],
@@ -18291,7 +18291,7 @@
       "A"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "Amazon S3 with Transfer Acceleration routes large uploads and downloads over the optimized AWS edge network, minimizing latency for globally distributed users at low cost.",
     "references": [
       "https://docs.aws.amazon.com/ja_jp/AmazonS3/latest/userguide/transfer-acceleration.html"
     ],
@@ -18421,7 +18421,7 @@
       "A"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "Amazon Route 53 health checks for each Region with an active-active failover configuration route traffic to healthy Regional API Gateway/Lambda endpoints and fail over automatically.",
     "references": [
       "https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/dns-failover.html"
     ],
@@ -18487,7 +18487,7 @@
       "B"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "Amazon RDS Custom for Oracle is a managed service that still allows the privileged/OS-level customization the third-party features require — quicker and cheaper than self-managing Oracle on EC2.",
     "references": [
       "https://aws.amazon.com/about-aws/whats-new/2021/10/amazon-rds-custom-oracle/"
     ],
@@ -18531,7 +18531,7 @@
       "F"
     ],
     "isMultiSelect": true,
-    "explanation": null,
+    "explanation": "A Well-Architected design uses a VPC across two Availability Zones with separated web/app/database tiers, Elastic Load Balancers with security-group references between layers, and a Multi-AZ RDS deployment in private subnets reachable only from the application tier.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 2
@@ -18573,7 +18573,7 @@
       "F"
     ],
     "isMultiSelect": true,
-    "explanation": null,
+    "explanation": "Under the shared responsibility model the customer manages: creating the RDS instance and its maintenance window, configuring extra software on ECS (monitoring, patching, logging, intrusion detection), and encrypting data in transit over Direct Connect. AWS handles the RDS OS, hardware patching, and physical security.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 1
@@ -18605,7 +18605,7 @@
       "B"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "A 10-second hourly job using 1 GB of memory fits well within AWS Lambda limits; running it as a Lambda function on an EventBridge schedule removes the idle EC2 cost entirely.",
     "references": [
       "https://docs.aws.amazon.com/lambda/latest/operatorguide/computing-power.html"
     ],
@@ -18639,7 +18639,7 @@
       "D"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "AWS Backup with a backup vault in compliance mode locks the backup files so they cannot be altered or deleted for the required retention period — meeting the regulatory immutability requirement.",
     "references": [
       "https://docs.aws.amazon.com/aws-backup/latest/devguide/vault-lock.html"
     ],
@@ -18715,7 +18715,7 @@
       "F"
     ],
     "isMultiSelect": true,
-    "explanation": null,
+    "explanation": "Create per-account budgets in AWS Budgets, create an IAM role for AWS Budgets to run budget actions, and add alerts plus a budget action that applies that IAM identity to block further resource provisioning when the threshold is reached.",
     "references": [
       "https://docs.aws.amazon.com/ja_jp/awsaccountbilling/latest/aboutv2/view-billing-dashboard.html"
     ],
@@ -19143,7 +19143,7 @@
       "B"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "A REST API in Amazon API Gateway is the right interface for the catalog frontend, and a VPC link lets it reach the backend services running in containers in private VPC subnets.",
     "references": [
       "https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-private-integration.html"
     ],
@@ -19177,7 +19177,7 @@
       "C"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "Because access patterns are unpredictable, an S3 Lifecycle rule transitioning objects to S3 Intelligent-Tiering automatically moves data between access tiers to reduce cost without manual analysis.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 4
@@ -19273,7 +19273,7 @@
       "A"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "Amazon DynamoDB Accelerator (DAX) is an in-memory cache for DynamoDB that delivers microsecond read latency and requires only pointing the code at the DAX endpoint — minimal application change.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 3
@@ -19420,7 +19420,7 @@
       "D"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "The group can list the bucket but not delete objects, so the policy needs an additional statement that allows the s3:DeleteObject action on the bucket’s objects (the bucket-content ARN), following least privilege.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 1
@@ -19452,7 +19452,7 @@
       "B"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "A new S3 bucket with versioning enabled and S3 Object Lock applying a retention period until the designated date makes the public files readable but immutable — no one can modify or delete them before that date.",
     "references": [
       "https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-lock.html"
     ],
@@ -19985,7 +19985,7 @@
       "D"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "The IAM policy includes a condition restricting access to specific source IP CIDR blocks; the 403 error occurs because the administrator’s request did not originate from 192.0.2.0/24 or 203.0.113.0/24.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 1
@@ -20753,7 +20753,7 @@
       "A"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "AWS Systems Manager Session Manager can be configured directly in its console to send session logs to an S3 bucket — the most operationally efficient option, with no agent or pipeline to build.",
     "references": [
       "https://docs.aws.amazon.com/systems-manager/latest/userguide/session-manager-logging.html"
     ],
@@ -21117,7 +21117,7 @@
       "D"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "AWS Transfer Family provides a managed FTP server that stores incoming files directly in Amazon S3; an S3-event-triggered Lambda function processes each file as soon as it arrives, with minimal change to the FTP clients.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 3
@@ -21149,7 +21149,7 @@
       "B"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "Migrating the databases to Amazon RDS and enabling encryption at rest increases security and reduces operational overhead, since RDS is a managed service handling patching, backups, and maintenance.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 1
@@ -21181,7 +21181,7 @@
       "C"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "AWS Global Accelerator placed in front of the Network Load Balancers routes TCP and UDP traffic over the AWS global network to the nearest healthy Region, improving performance and decreasing latency.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 3
@@ -21213,7 +21213,7 @@
       "A"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "A Lambda function URL gives the function a dedicated HTTPS endpoint that the third party can call directly for the webhook — the most operationally efficient option, with no extra services.",
     "references": [
       "https://docs.aws.amazon.com/lambda/latest/dg/lambda-urls.html"
     ],
@@ -21257,7 +21257,7 @@
       "F"
     ],
     "isMultiSelect": true,
-    "explanation": null,
+    "explanation": "Register a domain and create a wildcard custom domain name in Route 53, request a matching wildcard ACM certificate in the same Region, and create a custom domain name in API Gateway that imports that certificate — giving each customer a secure individual URL efficiently.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 1
@@ -21289,7 +21289,7 @@
       "A"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "Amazon Macie automatically discovers PII in S3 buckets; an EventBridge rule filtering Macie SensitiveData findings sends an SNS notification to the security team.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 1
@@ -21321,7 +21321,7 @@
       "C"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "Transitioning objects to S3 Glacier Flexible Retrieval after 30 days (frequent analysis is done by then) and writing an expiration action to delete them at 90 days meets the retention requirements most cost-effectively.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 4
@@ -21353,7 +21353,7 @@
       "B"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "Creating a KMS key and enabling Amazon EKS KMS secrets encryption (envelope encryption) on the cluster encrypts the Kubernetes secrets stored in the etcd key-value store.",
     "references": [
       "https://docs.aws.amazon.com/eks/latest/userguide/enable-kms.html"
     ],
@@ -21453,7 +21453,7 @@
       "A"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "CloudFront geographic restrictions with an allow list let only viewers in the rolled-out countries access the content, returning a custom error to everyone else — a built-in, phased rollout control.",
     "references": [
       "https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/georestrictions.html"
     ],
@@ -21487,7 +21487,7 @@
       "B"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "A warm standby Amazon RDS for SQL Server with AWS DMS change data capture keeps the standby continuously updated, meeting a sub-30-second RPO and 60-minute RTO while costing less than an active/active Enterprise setup.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 2
@@ -21519,7 +21519,7 @@
       "C"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "Amazon RDS for Oracle in a Multi-AZ cluster deployment provides high availability and a reader instance; directing reporting queries to the reader offloads them from the primary with the least operational effort.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 2
@@ -21561,7 +21561,7 @@
       "E"
     ],
     "isMultiSelect": true,
-    "explanation": null,
+    "explanation": "Most cost-effectively: an API Gateway plus Lambda backend (pay-per-use for unpredictable, idle-heavy traffic), an Amazon Cognito user pool to authenticate paying subscribers, and AWS Amplify with CloudFront to serve the static frontend.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 1
@@ -21593,7 +21593,7 @@
       "B"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "CloudFront signed URLs grant time-limited access to individual files and work for on-demand single-item delivery such as movie rentals or music downloads, restricting access to premium customers.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 1
@@ -21630,7 +21630,7 @@
       "E"
     ],
     "isMultiSelect": true,
-    "explanation": null,
+    "explanation": "To apply Savings Plan discounts across accounts, create an AWS Organization in the account holding the Savings Plan and invite the others, then turn on discount sharing in the management account’s billing preferences.",
     "references": [
       "https://docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/ri-turn-off.html"
     ],
@@ -21698,7 +21698,7 @@
       "D"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "AWS Storage Gateway Tape Gateway exposes an iSCSI virtual tape library, so existing backup applications and workflows keep working while physical tapes are eliminated and backups go to AWS.",
     "references": [
       "https://aws.amazon.com/storagegateway/vtl/?nc1=h_ls"
     ],
@@ -21764,7 +21764,7 @@
       "B"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "Organizing accounts into OUs in AWS Organizations and attaching service control policies (SCPs) centrally restricts which AWS services each department can use, with the least operational overhead.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 1
@@ -21796,7 +21796,7 @@
       "B"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "A NAT gateway in the public subnets, with the private subnet route table sending internet-bound traffic to it, lets the private MySQL instances reach the third-party provider securely without exposing them, and is managed by AWS.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 2
@@ -22027,7 +22027,7 @@
       "B"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "Creating an IAM role with the needed DynamoDB permissions and adding it to the EC2 instance profile lets the application instances access the tables using temporary credentials — no API keys in the template.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 1
@@ -22229,7 +22229,7 @@
       "B"
     ],
     "isMultiSelect": true,
-    "explanation": null,
+    "explanation": "Creating a gateway VPC endpoint for DynamoDB and adding a route table entry for it keeps API calls from the EC2 instances to DynamoDB on the private AWS network instead of the internet.",
     "references": [
       "https://docs.aws.amazon.com/vpc/latest/privatelink/vpc-endpoints-ddb.html"
     ],
@@ -22393,7 +22393,7 @@
       "A"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "Amazon API Gateway with AWS Lambda to receive and process the sensor data and Amazon DynamoDB to store it is a fully managed, serverless design with the least operational overhead and room to add components later.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 3
@@ -22425,7 +22425,7 @@
       "A"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "Amazon S3 stores petabytes of engineering drawings durably and cheaply, and Amazon CloudFront caches them at edge locations to minimize load time for users.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 3
@@ -22457,7 +22457,7 @@
       "A"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "Amazon EventBridge publishes metrics to CloudWatch in the AWS/Events namespace; checking those metrics shows whether the rule matched events and whether its target was invoked.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 2
@@ -22489,7 +22489,7 @@
       "B"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "Because the spike repeats on a known schedule (every Friday evening), an Auto Scaling group with a scheduled action scales to six instances at the right time with the least operational overhead.",
     "references": [
       "https://docs.aws.amazon.com/autoscaling/ec2/userguide/ec2-auto-scaling-scheduled-scaling.html"
     ],
@@ -22817,7 +22817,7 @@
       "D"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "For a lift-and-shift of a latency-sensitive app with no architecture change, hosting on an EC2 instance with a General Purpose SSD (gp3) EBS volume gives durable block storage at lower cost than gp2 or FSx options.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 4
@@ -22881,7 +22881,7 @@
       "A"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "A geolocation routing policy in Route 53 sends users near us-west-1 to the on-premises data center and users near eu-central-1 to the AWS-hosted site, minimizing load time by serving the closest endpoint.",
     "references": [
       "https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/routing-policy-geo.html"
     ],
@@ -22915,7 +22915,7 @@
       "C"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "Ordering multiple AWS Snowball devices with Tape Gateway lets the company copy 5 PB of physical tapes to virtual tapes and ship them, avoiding a multi-month transfer over the 1 Gbps link — the most cost-effective option.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 4
@@ -22979,7 +22979,7 @@
       "D"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "Only an On-Demand Capacity Reservation actually guarantees EC2 capacity in the failover Region; Savings Plans and Reserved Instances provide billing discounts but do not reserve capacity.",
     "references": [
       "https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/reserved-instances-scope.html"
     ],
@@ -23145,7 +23145,7 @@
       "A"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "Creating a read replica and directing the monthly report queries to it keeps those queries off the primary instance, preserving daily workload performance.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 3
@@ -23211,7 +23211,7 @@
       "D"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "Amazon S3 stores the images cheaply, and Amazon CloudFront distributes them quickly worldwide with geographic restrictions to deny specified countries; signed URLs control per-customer access.",
     "references": [
       "https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/georestrictions.html"
     ],
@@ -23245,7 +23245,7 @@
       "A"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "Multi-AZ Redis replication groups with sharded clusters (multiple nodes per shard) provide node-level and Availability-Zone-level high availability with automatic failover and no data loss.",
     "references": [
       "https://docs.aws.amazon.com/AmazonElastiCache/latest/red-ug/Replication.html"
     ],
@@ -23631,7 +23631,7 @@
       "D"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "10 PB cannot move over a shared 500 Mbps link within 6 weeks, so ordering multiple AWS Snowball devices and shipping them to AWS is the only solution that meets the deadline.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 4
@@ -23663,7 +23663,7 @@
       "D"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "An AWS Storage Gateway volume gateway with cached volumes keeps frequently used data cached locally for low latency while storing the full dataset in Amazon S3, reducing on-premises servers with minimal changes.",
     "references": [
       "https://docs.aws.amazon.com/storagegateway/latest/vgw/WhatIsStorageGateway.html"
     ],
@@ -23697,7 +23697,7 @@
       "B"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "Storing objects in S3 Standard and using a lifecycle rule to transition them to S3 Standard-Infrequent Access after 30 days keeps data durable and instantly available while cutting cost for the rarely accessed older objects.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 4
@@ -23729,7 +23729,7 @@
       "C"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "Storing the 6 MB document blobs in Amazon S3 and keeping only their metadata in the database removes the largest data from expensive RDS storage, improving performance and reducing cost.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 4
@@ -23889,7 +23889,7 @@
       "D"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "A VPC endpoint for Amazon S3 lets the private-subnet EC2 instances reach the bucket over the private AWS network; the bucket policy restricts access to that endpoint so no internet is used.",
     "references": [
       "https://docs.aws.amazon.com/whitepapers/latest/aws-privatelink/what-are-vpc-endpoints.html"
     ],
@@ -24090,7 +24090,7 @@
       "C"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "An FSx for Windows File Server Multi-AZ file system with AWS Backup copying daily backups to us-west-2, where a vault lock prevents deletion for 5 years, meets the replication and immutability requirements.",
     "references": [
       "https://docs.aws.amazon.com/aws-backup/latest/devguide/vault-lock.html"
     ],
@@ -24124,7 +24124,7 @@
       "C"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "A service control policy attached to the developer accounts prevents anyone — including the account root user — from modifying the mandatory CloudTrail configuration, because SCPs override account-level permissions.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 1
@@ -24156,7 +24156,7 @@
       "C"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "A Provisioned IOPS SSD Amazon EBS volume delivers durable block storage with consistent, low-latency performance for a business-critical application — instance store is not durable and HDD volumes are not low-latency.",
     "references": [
       "https://aws.amazon.com/ebs/volume-types/"
     ],
@@ -24263,7 +24263,7 @@
       "B"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "AWS WAF, associated directly with the API Gateway REST API, provides managed rules to block SQL injection and cross-site scripting attacks — the most operationally efficient option, with no extra CloudFront layer.",
     "references": [
       "https://docs.aws.amazon.com/waf/latest/developerguide/classic-web-acl-xss-conditions.html"
     ],
@@ -24297,7 +24297,7 @@
       "D"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "SAML 2.0-based federation lets the 1,500 Active Directory users sign in to AWS with their existing corporate identity; IAM roles mapped to AD groups grant the appropriate AWS permissions while on-premises access is preserved.",
     "references": [
       "https://aws.amazon.com/identity/saml/"
     ],
@@ -24397,7 +24397,7 @@
       "A"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "Importing the zone files into Amazon Route 53 hosted zones replaces the two self-managed DNS servers with a fully managed, highly available DNS service, eliminating server management overhead.",
     "references": [
       "https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/migrate-dns-domain-in-use.html"
     ],
@@ -24499,7 +24499,7 @@
       "C"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "An ECS Fargate task triggered by an EventBridge schedule runs the 2-hour daily job serverlessly, paying only for the runtime — more cost-effective than an always-on Reserved Instance, and Lambda’s 15-minute limit rules it out.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 4
@@ -24631,7 +24631,7 @@
       "C"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "Configuring cross-account access on the S3 bucket lets each agency read the data from their own AWS accounts securely, without making the bucket public or creating many IAM users in the source account.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 1
@@ -24734,7 +24734,7 @@
       "C"
     ],
     "isMultiSelect": true,
-    "explanation": null,
+    "explanation": "AWS Lambda scales instantly from 0 to hundreds of requests per second for the unpredictable API workload, and Amazon DynamoDB provides a serverless key-value store that scales with sub-1-GB data and unpredictable growth.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 3
@@ -24766,7 +24766,7 @@
       "A"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "An AWS Lambda function that generates an S3 presigned URL gives employees secure, time-limited access to the data without managing IAM users or file gateways — the least operational overhead.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 1
@@ -24798,7 +24798,7 @@
       "A"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "Traffic favoring one instance is caused by session affinity (sticky sessions); disabling sticky sessions on the ALB lets it distribute requests evenly across all instances.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 3
@@ -24835,7 +24835,7 @@
       "E"
     ],
     "isMultiSelect": true,
-    "explanation": null,
+    "explanation": "The Lambda function needs a kms:decrypt-capable IAM execution role, and the KMS key policy must grant that Lambda IAM role permission to use the key — both the role and the key policy must allow decryption.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 1
@@ -24901,7 +24901,7 @@
       "A"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "A Network Load Balancer operates at Layer 4 and supports UDP listeners, so it can front the Auto Scaling group serving UDP gaming traffic and scale with demand. An ALB (Layer 7) does not support UDP.",
     "references": [
       "https://docs.aws.amazon.com/autoscaling/ec2/userguide/autoscaling-load-balancer.html"
     ],
@@ -24935,7 +24935,7 @@
       "A"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "Storing the logs in Amazon S3 and querying them on demand with Amazon Athena (standard SQL, pay-per-query) is the most cost-effective option for infrequent weekly analysis — no cluster or database to keep running.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 4
@@ -24972,7 +24972,7 @@
       "E"
     ],
     "isMultiSelect": true,
-    "explanation": null,
+    "explanation": "Request a public ACM certificate covering the apex domain example.com and a wildcard (*.example.com) for the country subdomains, and validate domain ownership by adding the required DNS records — enabling TLS in transit on the ALB.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 1
@@ -25004,7 +25004,7 @@
       "B"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "An AWS KMS external key store backed by an external key manager keeps the cryptographic keys outside AWS and supports multiple vendors’ key managers, meeting the regulatory requirement with the least operational overhead.",
     "references": [
       "https://docs.aws.amazon.com/kms/latest/developerguide/keystore-external.html"
     ],
@@ -25070,7 +25070,7 @@
       "A"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "AWS Global Accelerator provides static anycast IP addresses and health-check-based automated failover across Regions, routing VoIP traffic to the nearest healthy endpoint without relying on client IP caching.",
     "references": [
       "https://docs.aws.amazon.com/global-accelerator/latest/dg/introduction-benefits-of-migrating.html"
     ],
@@ -25104,7 +25104,7 @@
       "B"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "Amazon FSx for Lustre persistent file systems provide highly available, high-throughput, sub-millisecond-latency shared storage that thousands of HPC compute instances can access simultaneously.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 3
@@ -25136,7 +25136,7 @@
       "C"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "A General Purpose SSD (gp3) volume lets IOPS be provisioned independently of storage capacity (up to 16,000 IOPS) and is cheaper than Provisioned IOPS (io1) for the 15,000-IOPS peak.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 4
@@ -25168,7 +25168,7 @@
       "A"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "Amazon RDS for Microsoft SQL Server is a managed service that supports the Enterprise edition; read replicas offload the analytical reporting from the transactional workload — least operational overhead.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 2
@@ -25200,7 +25200,7 @@
       "A"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "Transitioning to S3 Standard-IA after 180 days, S3 Glacier Instant Retrieval after 360 days (instant access for archives), and S3 Glacier Deep Archive after 5 years (auditor retrieval within 12 hours) meets every requirement most cost-effectively while keeping data durable.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 4
@@ -25264,7 +25264,7 @@
       "B"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "An AWS Lambda function looks up the creating user’s cost center in the RDS table and applies it as a tag; an EventBridge rule reacting to CloudTrail resource-creation events in the specific account triggers the tagging.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 1
@@ -25296,7 +25296,7 @@
       "D"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "Hosting static content on Amazon S3 behind CloudFront, running the PHP application on a managed compute service, and using a Multi-AZ ElastiCache for Redis cluster for sessions makes the architecture highly available with managed services.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 2
@@ -25333,7 +25333,7 @@
       "E"
     ],
     "isMultiSelect": true,
-    "explanation": null,
+    "explanation": "A public Application Load Balancer supports the application target group and sticky sessions, and a web ACL in AWS WAF associated with that ALB endpoint adds the required protection.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 1
@@ -25365,7 +25365,7 @@
       "D"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "Images requested only once or twice a year are infrequently accessed, so S3 Standard-Infrequent Access stores and serves them durably and highly available at lower cost than S3 Standard.",
     "references": [
       "https://docs.aws.amazon.com/AmazonS3/latest/userguide/storage-class-intro.html"
     ],
@@ -25399,7 +25399,7 @@
       "B"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "A VPC customer managed prefix list holding the office CIDR ranges, shared organization-wide with AWS Resource Access Manager, lets you update CIDRs in one place and have every referencing security group pick up the change.",
     "references": [
       "https://docs.aws.amazon.com/vpc/latest/userguide/managed-prefix-lists.html"
     ],
@@ -25438,7 +25438,7 @@
       "E"
     ],
     "isMultiSelect": true,
-    "explanation": null,
+    "explanation": "Lowest latency comes from compute optimized EC2 instances in a cluster placement group, attached to an Amazon FSx for NetApp ONTAP file system, which provides multi-protocol NFS and SMB access.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 3
@@ -25470,7 +25470,7 @@
       "C"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "The Site-to-Site VPN is 90% utilized, so transferring 50 TB over it within 2 weeks is not feasible; an AWS Snowball Edge Storage Optimized device ships the data physically and securely.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 2
@@ -25502,7 +25502,7 @@
       "D"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "Because peak hours occur at the same time each day, a scheduled scaling policy launches instances before peak begins, so capacity is ready and users do not experience the slow start.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 3
@@ -25534,7 +25534,7 @@
       "B"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "Amazon RDS Proxy pools and manages database connections and scales with the variable application demand; pointing the applications at the RDS Proxy endpoint requires the least operational overhead.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 3
@@ -25566,7 +25566,7 @@
       "D"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "Snapshot costs grow because old snapshots accumulate; deleting nonessential snapshots and using Amazon Data Lifecycle Manager to automatically create and expire snapshots per policy optimizes cost with the least ongoing effort.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 4
@@ -25630,7 +25630,7 @@
       "D"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "AWS Elastic Beanstalk with burstable performance instances in unlimited mode handles the brief CPU spikes, and configuring the environment to scale on demand automatically adds capacity when load increases.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 3
@@ -25662,7 +25662,7 @@
       "B"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "AWS CloudFormation automates and standardizes the infrastructure deployment as code, and AWS Config tracks every incremental configuration change for the security team to audit.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 1
@@ -25699,7 +25699,7 @@
       "E"
     ],
     "isMultiSelect": true,
-    "explanation": null,
+    "explanation": "Migrating the database to an Amazon RDS for MySQL Multi-AZ instance and putting the stateless application behind an Application Load Balancer with an Auto Scaling group across two Availability Zones makes both tiers highly available without changing application code.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 2
@@ -25731,7 +25731,7 @@
       "C"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "Interface VPC endpoints (powered by AWS PrivateLink) for Amazon S3 let both the Region and the on-premises location reach S3 privately over the Direct Connect connection, so traffic never traverses the internet.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 1
@@ -25797,7 +25797,7 @@
       "C"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "Integrating AWS Secrets Manager with Amazon RDS for PostgreSQL automates secure storage and 30-day rotation of the master password with no custom Lambda code — the least operational overhead.",
     "references": [
       "https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/rds-secrets-manager.html"
     ],
@@ -26145,7 +26145,7 @@
       "E"
     ],
     "isMultiSelect": true,
-    "explanation": null,
+    "explanation": "Create an S3 bucket with Object Lock enabled, configure a 30-day default retention period to prevent modification, and add an S3 Lifecycle policy that expires (deletes) the objects after 30 days.",
     "references": [
       "https://docs.aws.amazon.com/AmazonS3/latest/userguide/batch-ops-retention-date.html"
     ],
@@ -26211,7 +26211,7 @@
       "A"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "An AWS KMS customer managed key encrypts the EBS volumes and lets the company control key rotation, with less overhead than importing external key material.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 1
@@ -26344,7 +26344,7 @@
       "B"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "An RDS Proxy endpoint pools and limits database connections so unpredictable Lambda invocations do not overload the PostgreSQL instance; the Lambda functions must run inside the VPC to reach the private database.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 3
@@ -26376,7 +26376,7 @@
       "D"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "A transit gateway acts as a central hub: VPC attachments connect the growing number of VPCs and VPN attachments connect the on-premises locations, simplifying administration and scaling new connections.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 2
@@ -26413,7 +26413,7 @@
       "D"
     ],
     "isMultiSelect": true,
-    "explanation": null,
+    "explanation": "Amazon Forecast is a managed service that needs no ML expertise: train a Forecast predictor on the historical S3 data, then call it from a Lambda function (with a function URL) to generate the monthly resource predictions.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 3
@@ -26445,7 +26445,7 @@
       "C"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "Creating IAM Identity Center users once, organizing them into developer and administrator groups, and assigning permission sets to those groups lets you manage permissions centrally across all accounts; new hires simply join the appropriate group — the least operational overhead.",
     "references": [
       "https://docs.aws.amazon.com/controltower/latest/userguide/sso.html"
     ],
@@ -26518,7 +26518,7 @@
       "D"
     ],
     "isMultiSelect": true,
-    "explanation": null,
+    "explanation": "S3 multipart uploads parallelize and scale upload throughput from on premises, and fetching multiple byte-ranges of an object in parallel scales download throughput to the EC2 instances.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 3
@@ -26555,7 +26555,7 @@
       "E"
     ],
     "isMultiSelect": true,
-    "explanation": null,
+    "explanation": "Amazon EFS provides a shared, strongly consistent file system mounted on all Auto Scaling instances, or an S3 bucket with Cache-Control no-cache served via CloudFront — both return the newest content immediately after a change.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 2
@@ -26621,7 +26621,7 @@
       "D"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "Spreading the Auto Scaling group across three Availability Zones makes the application highly available, and migrating the embedded NoSQL database to Amazon DynamoDB (eventually consistent) removes the database management overhead.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 2
@@ -26653,7 +26653,7 @@
       "B"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "Amazon ElastiCache for Redis caches the monthly catalog data for low latency and durably stores each user’s shopping cart and session data so it survives disconnects and reconnects.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 2
@@ -26717,7 +26717,7 @@
       "C"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "Provisioning a separate AWS KMS key per customer and encrypting data server-side, then in each KMS key policy denying use of the key to everyone except that customer’s account, ensures only the customer — not employees — can decrypt their data.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 1
@@ -26749,7 +26749,7 @@
       "B"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "An internet-facing Application Load Balancer in a public subnet receives external traffic and forwards it to the EC2 instance kept in the private subnet, satisfying the mandate that instances stay private.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 2
@@ -26781,7 +26781,7 @@
       "B"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "Amazon EFS provides a highly available, fault-tolerant shared file system that multiple Fargate-launched EKS containers can mount simultaneously via an EFS StorageClass — the least operational overhead for shared persistence.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 2
@@ -26885,7 +26885,7 @@
       "C"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "AWS Shield Advanced provides managed DDoS protection and access to the AWS DDoS Response Team, with minimal configuration changes and an audit trail of attack sources.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 1
@@ -26917,7 +26917,7 @@
       "D"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "Importing the data directly into an Amazon FSx for Lustre file system gives the HPC cluster the consistent sub-millisecond latency and high throughput it needs to process the survey data.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 3
@@ -26949,7 +26949,7 @@
       "B"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "AWS DataSync with an agent on the on-premises NFS servers periodically and cost-effectively syncs small amounts of data to Amazon S3, with no FTP server or Direct Connect to maintain.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 4
@@ -26981,7 +26981,7 @@
       "C"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "A Network Load Balancer handles millions of UDP requests per second at Layer 4 with ultra-low latency and is the most cost-effective option — an ALB cannot serve UDP.",
     "references": [
       "https://docs.aws.amazon.com/elasticloadbalancing/latest/network/introduction.html"
     ],
@@ -27020,7 +27020,7 @@
       "D"
     ],
     "isMultiSelect": true,
-    "explanation": null,
+    "explanation": "AWS DMS Schema Conversion transforms the MySQL objects to PostgreSQL, and an AWS DMS task with change data capture (CDC) replicates ongoing data changes during the migration to the Aurora PostgreSQL cluster.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 2
@@ -27052,7 +27052,7 @@
       "C"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "Creating a read replica and pointing the reporting script at it isolates the reporting query load from the critical application, improving performance with minimal cost and operational overhead.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 3
@@ -27084,7 +27084,7 @@
       "B"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "Enabling ALB access logging to Amazon S3 and querying the logs with an Amazon Athena table gives operationally efficient visibility into the abnormal traffic patterns — ALB traffic is not in CloudTrail.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 1
@@ -27153,7 +27153,7 @@
       "E"
     ],
     "isMultiSelect": true,
-    "explanation": null,
+    "explanation": "Service control policies apply to OUs or accounts. Attaching the SCP directly to the three nonproduction member accounts, or creating an OU for those accounts and attaching the SCP to it, restricts only the nonproduction accounts.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 1
@@ -27217,7 +27217,7 @@
       "C"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "Adding reader instances to the Aurora cluster scales read load, and an RDS Proxy target group pools connections to handle the write load and connection spikes — improving scalability and availability with the least downtime.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 3
@@ -27249,7 +27249,7 @@
       "A"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "A Route 53 Resolver outbound endpoint with a resolver rule associated to the VPC forwards DNS queries for the on-premises domains to the data center’s DNS servers, enabling private name resolution securely.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 1
@@ -27281,7 +27281,7 @@
       "D"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "Storing the photos in S3 Intelligent-Tiering automatically optimizes cost across the varying access patterns, and keeping photo metadata plus the S3 location in DynamoDB supports fast lookups.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 4
@@ -27313,7 +27313,7 @@
       "B"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "The least outstanding requests routing algorithm sends new requests to the targets with the fewest in-flight requests, using the RequestCountPerTarget and ActiveConnectionCount metrics to avoid overloading busy instances.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 3
@@ -27345,7 +27345,7 @@
       "A"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "Creating an AWS Budgets budget for the Savings Plans with a coverage threshold automatically sends a notification when Compute Savings Plans coverage drops — the most operationally efficient option.",
     "references": [
       "https://docs.aws.amazon.com/savingsplans/latest/userguide/sp-usingBudgets.html"
     ],
@@ -27379,7 +27379,7 @@
       "A"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "Configuring public subnets in the existing VPC and deploying the MSK cluster there, with MSK security settings enabling TLS encryption in transit, makes the ingestion solution publicly available with the most operational efficiency.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 1
@@ -27411,7 +27411,7 @@
       "D"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "An internal AWS Transfer Family SFTP server in two Availability Zones (reachable over the existing on-premises connectivity) with Amazon S3 storage, plus a Lambda function to process files, integrates with the ERP system reliably.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 2
@@ -27443,7 +27443,7 @@
       "C"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "AWS Outposts brings AWS infrastructure on premises, so running Amazon EMR clusters on Outposts gives a scalable, managed Hadoop/Spark platform while keeping the data processing on premises.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 3
@@ -27475,7 +27475,7 @@
       "C"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "Amazon S3 with S3 Intelligent-Tiering automatically optimizes cost for the mix of routine and infrequent data; an AWS Storage Gateway S3 File Gateway provides SMB and NFS access for the Windows, Mac, and Linux instances.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 4
@@ -27507,7 +27507,7 @@
       "B"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "Running the application on Amazon ECS as independently deployable microservices with service auto scaling removes single-instance downtime during patching and lets the tightly coupled modules be updated separately.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 3
@@ -27539,7 +27539,7 @@
       "C"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "AWS Lambda runs Python natively, scales automatically to hundreds of requests per second, and requires no infrastructure management — ideal for creating and testing a single serverless microservice.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 3
@@ -27571,7 +27571,7 @@
       "A"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "A transit gateway with a transit VIF for the Direct Connect connection and route propagation turned on lets all 30 VPCs communicate with each other and on-premises networks from one central, low-overhead hub.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 2
@@ -27603,7 +27603,7 @@
       "C"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "Default Host Configuration Management in Systems Manager automatically grants EC2 instances the required SSM permissions without removing or altering the existing IAM role used for RDS access, so applications keep running.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 1
@@ -27635,7 +27635,7 @@
       "B"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "The Kubernetes Cluster Autoscaler automatically adds and removes EKS worker nodes when pods cannot be scheduled, resolving the node-capacity issue with the least administrative overhead.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 3
@@ -27667,7 +27667,7 @@
       "B"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "Failed or abandoned multipart uploads leave incomplete parts that still incur storage charges; an S3 Lifecycle policy that deletes incomplete multipart uploads removes this hidden, growing cost.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 4
@@ -27699,7 +27699,7 @@
       "D"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "An Amazon ElastiCache for Redis cluster in front of the database provides fast in-memory reads and writes for the high-frequency location updates and retrievals, relieving the overloaded RDS instance.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 3
@@ -27731,7 +27731,7 @@
       "C"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "Enabling deletion protection on the DynamoDB tables prevents a table from being accidentally deleted, directly addressing the incident with the least operational overhead.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 2
@@ -27763,7 +27763,7 @@
       "C"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "AWS Storage Gateway stored volumes keep the full dataset on premises for immediate, no-cost retrieval while asynchronously backing up point-in-time snapshots to Amazon S3, minimizing bandwidth costs.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 2
@@ -27795,7 +27795,7 @@
       "B"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "Predictive scaling forecasts the daily and weekly workload trends and pre-provisions capacity, while dynamic scaling with target tracking reacts to live utilization changes — together they meet both requirements.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 3
@@ -27827,7 +27827,7 @@
       "A"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "An Amazon ElastiCache for Redis cluster caches the repeated read queries in memory, removing that load from the Aurora cluster most cost-effectively without adding more replicas.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 3
@@ -27859,7 +27859,7 @@
       "C"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "Requests not returning the latest data indicate eventually consistent reads; requesting strongly consistent reads on the DynamoDB table ensures each read returns the most recent committed write.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 2
@@ -27891,7 +27891,7 @@
       "B"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "AWS WAF protects the application from SQL injection and other web attacks with managed rules, and RDS parameter groups configure database security settings — meeting the requirements with the least operational overhead.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 1
@@ -27923,7 +27923,7 @@
       "B"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "Enabling the Amazon RDS Protection feature in Amazon GuardDuty for the organization’s member accounts automatically detects suspicious and abnormal login attempts to the Aurora databases — the most operationally efficient option.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 1
@@ -27955,7 +27955,7 @@
       "D"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "Connecting the existing Direct Connect connection to a Direct Connect gateway lets the virtual private gateways of VPCs in multiple Regions and both data centers interconnect, providing a scalable, low-overhead design.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 2
@@ -27987,7 +27987,7 @@
       "A"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "Amazon Kinesis Data Streams absorbs large traffic spikes and preserves order, AWS Lambda processes the updates serverlessly, and a highly available database stores results — minimal management overhead.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 2
@@ -28019,7 +28019,7 @@
       "B"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "S3 Same-Region Replication automatically replicates logs from each account’s bucket into one centralized bucket in us-west-2, keeping data in-Region and centralizing analysis with minimal operational overhead.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 2
@@ -28056,7 +28056,7 @@
       "E"
     ],
     "isMultiSelect": true,
-    "explanation": null,
+    "explanation": "Configuring two-way (bidirectional) replication among the S3 buckets in all three Regions keeps every Region’s data in sync, and an S3 Multi-Region Access Point lets the application use one ARN that routes to the nearest bucket — minimizing latency with the fewest application changes.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 2
@@ -28088,7 +28088,7 @@
       "B"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "Storing content in Amazon S3 and using S3 Transfer Acceleration routes uploads over the optimized AWS edge network, giving the lowest-latency uploads for globally distributed users.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 3
@@ -28120,7 +28120,7 @@
       "A"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "Sending requests to an Amazon SNS topic with SQS queues subscribed, using SNS subscription filter policies, lets each target Lambda receive only the messages it needs — fan-out with filtering and the least operational overhead.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 2
@@ -28152,7 +28152,7 @@
       "A"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "An Amazon S3 Inventory report identifies the unencrypted objects, an S3 Batch Operations job encrypts those existing objects, and S3 default encryption handles all future objects.",
     "references": [
       "https://aws.amazon.com/blogs/storage/encrypting-objects-with-amazon-s3-batch-operations/"
     ],
@@ -28186,7 +28186,7 @@
       "A"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "Creating an Amazon Route 53 public hosted zone and importing the existing zone file rapidly migrates DNS hosting to the resilient, managed Route 53 service.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 2
@@ -28218,7 +28218,7 @@
       "A"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "AWS AppConfig manages the application configuration and AWS Secrets Manager securely stores, retrieves, and rotates the database and service credentials — both managed services, least administrative overhead.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 1
@@ -28250,7 +28250,7 @@
       "D"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "Downloading the AWS-provided RDS root certificates and using them in all client connections enables TLS/SSL encryption of data in transit to the RDS MySQL instance.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 1
@@ -28282,7 +28282,7 @@
       "C"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "Clients can only whitelist fixed IP addresses, so an Amazon Route 53 A record pointing to a static Elastic IP address gives them a stable IP to authorize on their firewalls.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 2
@@ -28314,7 +28314,7 @@
       "B"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "Securing a new account’s root user means creating IAM users for daily administrative work and enabling multi-factor authentication on the root user — the root user should not be used routinely or have access keys.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 1
@@ -28351,7 +28351,7 @@
       "C"
     ],
     "isMultiSelect": true,
-    "explanation": null,
+    "explanation": "Enhanced networking gives each EC2 instance higher packet-per-second performance and lower latency, and a cluster placement group packs the instances close together — together they provide the lowest node-to-node latency.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 3
@@ -28383,7 +28383,7 @@
       "C"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "AWS DataSync migrates the millions of small SMB-based files into Amazon FSx for Windows File Server, which natively serves SMB so applications keep accessing the data unchanged — least operational overhead.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 2
@@ -28415,7 +28415,7 @@
       "A"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "Enabling CloudWatch cross-account observability for the monitoring account and deploying the provided CloudFormation template lets that account query and visualize metrics and logs across all the organization’s accounts.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 2
@@ -28447,7 +28447,7 @@
       "B"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "AWS WAF is already protecting the application; adding an IP match (set) condition to the WAF web ACL blocks the malicious IP address at the CloudFront/ALB edge.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 1
@@ -28479,7 +28479,7 @@
       "C"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "AWS IAM Identity Center connected to the existing identity provider lets several thousand employees authenticate with their existing identities and get access to the 10 AWS accounts through provisioned users and groups.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 1
@@ -28511,7 +28511,7 @@
       "C"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "AdministratorAccess is an identity-based managed policy; attaching it to the IAM user group and placing the five employees’ users in that group grants them full access. Resource-based policies cannot be attached to user groups.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 1
@@ -28548,7 +28548,7 @@
       "D"
     ],
     "isMultiSelect": true,
-    "explanation": null,
+    "explanation": "AWS Lambda removes infrastructure management for the compute layers, and Amazon SQS FIFO queues guarantee exactly-once processing and ordered delivery for the payment messaging.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 2
@@ -28580,7 +28580,7 @@
       "D"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "AWS Transfer for SFTP with an Amazon S3 bucket is fully managed, highly available, and resilient; the batch application then pulls files from S3 — minimizing operational effort.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 2
@@ -28612,7 +28612,7 @@
       "B"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "Application Load Balancers in each Region handle the HTTP application, AWS WAF on the ALBs protects against common web exploits, and AWS Global Accelerator provides static IP addresses and improves global availability and performance.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 1
@@ -28644,7 +28644,7 @@
       "B"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "Amazon RDS Proxy pools and manages database connections, which fixes the too-many-connections errors and reduces failover time when a replica is promoted to writer.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 2
@@ -28676,7 +28676,7 @@
       "A"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "An S3 Object Lambda Access Point with a Lambda function that redacts PII as files are read lets the external provider access redacted conversations without the company duplicating or pre-processing data — least operational overhead.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 1
@@ -28708,7 +28708,7 @@
       "C"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "A CloudWatch alarm with the EC2 instance recovery action automatically recovers the single instance on failure, improving recovery time without modifying the application or running multiple instances.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 2
@@ -28740,7 +28740,7 @@
       "A"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "Amazon ECS with Service Auto Scaling using target tracking and tasks spread across three Availability Zones makes the containerized workload highly available with minimal application change and least operational overhead.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 2
@@ -28772,7 +28772,7 @@
       "C"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "Storing newer (high-demand) movies in S3 Intelligent-Tiering and older movies in S3 Glacier Flexible Retrieval — which can be retrieved within minutes to satisfy the 5-minute streaming requirement — minimizes cost based on demand.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 4
@@ -28804,7 +28804,7 @@
       "C"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "Amazon ECS on AWS Fargate runs the vendor’s Docker container serverlessly and supports configurable ephemeral task storage (well above 50 GB), meeting the requirement with the least operational overhead.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 3
@@ -28836,7 +28836,7 @@
       "D"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "Because the LDAP directory is not SAML-compatible, a custom identity broker application that calls AWS STS to obtain short-lived credentials lets users authenticate via LDAP and access the AWS Management Console.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 1
@@ -28902,7 +28902,7 @@
       "B"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "150 TB cannot upload over a night-only 100 Mbps link within a month, so ordering multiple AWS Snowball devices ships the data physically — the most cost-effective way to meet the deadline.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 4
@@ -28934,7 +28934,7 @@
       "B"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "Migrating the web tier to public subnets, the application tier to private subnets, and the database to Amazon RDS for MySQL keeps the architecture nearly identical while RDS automated backups provide point-in-time restore with low overhead.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 2
@@ -28966,7 +28966,7 @@
       "C"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "An Amazon SQS access policy (a resource-based policy on the queue) grants the other company’s account permission to poll the queue without that company giving up its own account permissions.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 1
@@ -28998,7 +28998,7 @@
       "D"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "Attaching the AmazonSSMManagedInstanceCore policy to the EC2 instance role lets developers connect via AWS Systems Manager Session Manager — secure SSH-like access with no bastion host, the most cost-effective option.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 1
@@ -29030,7 +29030,7 @@
       "C"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "An AWS Storage Gateway volume gateway with cached volumes stores the full dataset in Amazon S3 while caching the frequently accessed subset locally for low-lag access, reducing on-premises capital expense.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 2
@@ -29062,7 +29062,7 @@
       "A"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "Enabling point-in-time recovery on the DynamoDB table lets the company restore the table to any second within the last 35 days (covering the 24-hour requirement) with the least operational overhead.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 2
@@ -29094,7 +29094,7 @@
       "D"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "An S3 object-created event notification that invokes an AWS Lambda function processes each uploaded file in seconds, scaling automatically from a few to hundreds of concurrent uploads — a cost-effective serverless design.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 3
@@ -29126,7 +29126,7 @@
       "C"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "Compute Savings Plans discount the constantly running production instances, while On-Demand Instances run the nonproduction instances that are shut down outside business hours — the most cost-effective mix.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 4
@@ -29158,7 +29158,7 @@
       "C"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "The AWS Schema Conversion Tool converts the Oracle schema to Aurora PostgreSQL, and AWS DMS with change data capture migrates the data while capturing changes that occur during the migration.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 2
@@ -29195,7 +29195,7 @@
       "B"
     ],
     "isMultiSelect": true,
-    "explanation": null,
+    "explanation": "Amazon ECS with AWS Fargate and Amazon EKS with AWS Fargate both run containers on a fully managed, serverless platform that scales per service with no worker nodes or infrastructure to manage.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 3
@@ -29227,7 +29227,7 @@
       "D"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "An Auto Scaling group that scales out as traffic increases, using a launch template with a preconfigured AMI, handles the seasonal sale spikes while only paying for capacity when needed — the most cost-effective option.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 4
@@ -29259,7 +29259,7 @@
       "B"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "Enabling the AWS Config managed rule restricted-ssh detects security groups that allow SSH from 0.0.0.0/0, and an SNS notification on noncompliance alerts the team — a managed solution with the least operational overhead.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 1
@@ -29291,7 +29291,7 @@
       "B"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "Amazon VPC Lattice creates a service network that handles service-to-service communication across accounts for the Lambda and EKS microservices, with the least administrative overhead.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 2
@@ -29323,7 +29323,7 @@
       "C"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "An Amazon ElastiCache for Redis layer in front of the RDS database provides sub-millisecond reads for the game metadata and supports snapshots and replication — solving the load-time slowdowns.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 3
@@ -29360,7 +29360,7 @@
       "C"
     ],
     "isMultiSelect": true,
-    "explanation": null,
+    "explanation": "Sharing the AMIs requires adding the development team’s OU ARN to the AMI launch permissions and updating the KMS key policy to allow that OU to use the keys that decrypt the encrypted snapshots.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 1
@@ -29392,7 +29392,7 @@
       "B"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "80 offices each with 1 PB and only 1–2 Gbps of bandwidth cannot transfer over the network within 4 weeks, so multiple AWS Snowball Edge storage-optimized devices ship the data most cost-effectively.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 4
@@ -29424,7 +29424,7 @@
       "B"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "A resource policy on the EFS file system that denies the elasticfilesystem:ClientWrite action to the IAM roles attached to the EC2 instances enforces read-only access through IAM, preventing the applications from modifying or deleting the dataset.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 1
@@ -29456,7 +29456,7 @@
       "A"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "Creating an IAM role in the company account that delegates access to the vendor’s IAM role lets the vendor’s tool assume the role with temporary credentials — the most secure cross-account approach, with no long-lived users or keys.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 1
@@ -29488,7 +29488,7 @@
       "A"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "Cost allocation tags label resource owners per department, and a usage budget in AWS Budgets with a 60% alert threshold sends the notification the CFO wants when spending reaches that level.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 4
@@ -29520,7 +29520,7 @@
       "B"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "Deploying the EC2 instances in private subnets behind an internal ALB keeps the app reachable only from the office over the Site-to-Site VPN, and a NAT gateway lets the instances download patches from the internet without being publicly exposed.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 1
@@ -29552,7 +29552,7 @@
       "D"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "Amazon QLDB is a managed ledger database that provides an immutable, cryptographically verifiable history of all data changes, meeting the accounting audit requirement with minimal operational support.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 1
@@ -29584,7 +29584,7 @@
       "C"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "AWS Glue DataBrew runs the data preparation jobs, and an AWS Step Functions state machine orchestrates them — running jobs in parallel and in order while handling error handling, retries, and state management automatically.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 2
@@ -29616,7 +29616,7 @@
       "D"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "Storing due payments in a DynamoDB table (which enforces unique keys) and using DynamoDB Streams to invoke processing ensures each payment is recorded once, preventing duplicate processing.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 2
@@ -29648,7 +29648,7 @@
       "B"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "AWS Application Discovery Service, with the home Region set in AWS Migration Hub, collects usage and configuration data about on-premises servers and workloads to plan the migration.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 2
@@ -29680,7 +29680,7 @@
       "A"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "Deploying AWS Control Tower in the Organizations management account and enabling AWS Security Hub and Account Factory audits all API calls and logins across existing and new accounts and flags non-compliance with the FSBP standard — least operational overhead.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 1
@@ -29712,7 +29712,7 @@
       "C"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "An AWS Glue crawler catalogs the Parquet data and Amazon Athena runs SQL directly on it in S3, with pay-per-query pricing — the most cost-effective option for occasional analysis (no cluster to run).",
     "references": [],
     "needsManualAnswer": false,
     "domain": 4
@@ -29744,7 +29744,7 @@
       "D"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "A service control policy blocks the noncompliant actions — creating IAM resources with inline policies or wildcards and launching EC2 instances with public IPs — preventively across the organization.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 1
@@ -29781,7 +29781,7 @@
       "E"
     ],
     "isMultiSelect": true,
-    "explanation": null,
+    "explanation": "Configuring EC2 Auto Scaling across multiple Availability Zones in private subnets provides scalability and high availability, and an internet-facing Application Load Balancer in a public subnet distributes the web traffic — no application rewrite needed.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 2
@@ -29813,7 +29813,7 @@
       "D"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "Creating an AWS KMS key and enabling Lambda encryption helpers encrypts the environment variables so developers cannot see them in plaintext in the console.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 1
@@ -29845,7 +29845,7 @@
       "A"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "An Amazon Cognito user pool authenticates the millions of users, and Amazon API Gateway REST APIs with a Cognito authorizer verify each request — the most operationally efficient managed solution.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 1
@@ -29877,7 +29877,7 @@
       "C"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "An EventBridge rule that reacts to the KMS DeleteKey operation can trigger an automated response and an SNS email notification to administrators with the least operational overhead — KMS already enforces a key-deletion waiting period.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 1
@@ -29909,7 +29909,7 @@
       "B"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "Because the report program runs briefly (under 10 minutes) and only during the last week of each month, running it in AWS Lambda triggered by EventBridge costs nothing when idle — the most cost-effective option.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 4
@@ -29946,7 +29946,7 @@
       "D"
     ],
     "isMultiSelect": true,
-    "explanation": null,
+    "explanation": "An Amazon FSx for Lustre scratch file system provides the high-performance storage, and an Elastic Fabric Adapter on the EC2 instances provides the low-latency, high-throughput networking for the tightly coupled HPC workload.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 3
@@ -29978,7 +29978,7 @@
       "B"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "An AWS Lambda function that calls Amazon Rekognition detects unwanted image content using a pre-built service, so no machine learning model needs to be trained; a Lambda function URL lets the web application invoke it.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 1
@@ -30010,7 +30010,7 @@
       "B"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "Adding multiple MFA devices to the root user account means the company can still sign in with another registered device if one MFA device is lost, avoiding loss of root access.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 1
@@ -30042,7 +30042,7 @@
       "B"
     ],
     "isMultiSelect": false,
-    "explanation": null,
+    "explanation": "An Amazon SNS topic with an HTTP/HTTPS endpoint protocol lets hundreds of partners simply subscribe and receive user-ID notifications when points are awarded — the least implementation effort.",
     "references": [],
     "needsManualAnswer": false,
     "domain": 2
