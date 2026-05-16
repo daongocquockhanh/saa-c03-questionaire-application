@@ -487,6 +487,74 @@ function svgVPC() {
   </figure>`;
 }
 
+function svgBars(title, caption, rows) {
+  // rows: [label, widthFactor 0..1, innerText, noteRight]
+  const rowH = 38, top = 14, maxW = 300, labelW = 150;
+  let body = '';
+  rows.forEach((r, i) => {
+    const y = top + i * rowH;
+    const w = Math.max(40, r[1] * maxW);
+    body += `<text x="10" y="${y + 22}" font-size="12" fill="#1a2a3a">${escapeHtml(r[0])}</text>`;
+    body += `<rect x="${labelW}" y="${y + 4}" width="${w}" height="26" rx="4" fill="#4a8eff" opacity="${0.45 + i * 0.13}"/>`;
+    body += `<text x="${labelW + 8}" y="${y + 21}" font-size="11" fill="#fff">${escapeHtml(r[2])}</text>`;
+    if (r[3]) body += `<text x="${labelW + w + 8}" y="${y + 21}" font-size="11" fill="#666">${escapeHtml(r[3])}</text>`;
+  });
+  const h = top + rows.length * rowH + 8;
+  return `<figure class="diagram">
+    <svg viewBox="0 0 560 ${h}" preserveAspectRatio="xMidYMid meet" role="img">${body}</svg>
+    <figcaption>${escapeHtml(caption)}</figcaption>
+  </figure>`;
+}
+
+function svgELB() {
+  const types = [
+    ['Application LB', 'Layer 7 — HTTP/HTTPS, routing path/host/header', '#4a8eff'],
+    ['Network LB', 'Layer 4 — TCP/UDP/TLS, static IP, latency thấp', '#28a745'],
+    ['Gateway LB', 'Layer 3 — firewall ảo, IDS/IPS', '#d9822b'],
+  ];
+  let body = '';
+  types.forEach((t, i) => {
+    const y = 14 + i * 56;
+    body += `<rect x="10" y="${y}" width="180" height="44" rx="6" fill="#fff" stroke="${t[2]}" stroke-width="1.5"/>`;
+    body += `<text x="100" y="${y + 28}" text-anchor="middle" font-size="13" fill="#1a2a3a" font-weight="700">${escapeHtml(t[0])}</text>`;
+    body += `<text x="206" y="${y + 28}" font-size="11.5" fill="#555">${escapeHtml(t[1])}</text>`;
+  });
+  return `<figure class="diagram">
+    <svg viewBox="0 0 560 184" preserveAspectRatio="xMidYMid meet" role="img">${body}</svg>
+    <figcaption>3 loại Elastic Load Balancer theo tầng OSI</figcaption>
+  </figure>`;
+}
+
+function svgRDS() {
+  return `<figure class="diagram">
+    <svg viewBox="0 0 560 210" preserveAspectRatio="xMidYMid meet" role="img">
+      <defs><marker id="ah3" markerWidth="8" markerHeight="8" refX="7" refY="3.5" orient="auto">
+        <path d="M0,0 L8,3.5 L0,7 Z" fill="#8896aa"/></marker></defs>
+      <text x="10" y="20" font-size="12.5" fill="#4a8eff" font-weight="700">Multi-AZ — tăng AVAILABILITY</text>
+      <rect x="10" y="30" width="150" height="40" rx="6" fill="#eef4ff" stroke="#4a8eff"/>
+      <text x="85" y="55" text-anchor="middle" font-size="12" fill="#1a2a3a">Primary (AZ-a)</text>
+      <line x1="160" y1="50" x2="220" y2="50" stroke="#8896aa" stroke-width="2" marker-end="url(#ah3)"/>
+      <text x="170" y="44" font-size="9.5" fill="#666">sync</text>
+      <rect x="222" y="30" width="150" height="40" rx="6" fill="#f0f0f0" stroke="#999"/>
+      <text x="297" y="55" text-anchor="middle" font-size="12" fill="#1a2a3a">Standby (AZ-b)</text>
+      <text x="384" y="54" font-size="11" fill="#666">failover tự động</text>
+      <text x="10" y="115" font-size="12.5" fill="#28a745" font-weight="700">Read Replica — scale READ</text>
+      <rect x="10" y="125" width="150" height="40" rx="6" fill="#eef4ff" stroke="#4a8eff"/>
+      <text x="85" y="150" text-anchor="middle" font-size="12" fill="#1a2a3a">Primary</text>
+      <line x1="160" y1="145" x2="220" y2="125" stroke="#8896aa" stroke-width="2" marker-end="url(#ah3)"/>
+      <line x1="160" y1="145" x2="220" y2="165" stroke="#8896aa" stroke-width="2" marker-end="url(#ah3)"/>
+      <text x="168" y="135" font-size="9.5" fill="#666">async</text>
+      <rect x="222" y="105" width="150" height="36" rx="6" fill="#e8f6ec" stroke="#28a745"/>
+      <text x="297" y="128" text-anchor="middle" font-size="12" fill="#1a2a3a">Read Replica 1</text>
+      <rect x="222" y="150" width="150" height="36" rx="6" fill="#e8f6ec" stroke="#28a745"/>
+      <text x="297" y="173" text-anchor="middle" font-size="12" fill="#1a2a3a">Read Replica 2</text>
+      <text x="384" y="148" font-size="11" fill="#666">tối đa 15, có thể</text>
+      <text x="384" y="163" font-size="11" fill="#666">cross-region</text>
+    </svg>
+    <figcaption>RDS Multi-AZ (HA, standby sync) vs Read Replica (scale đọc, async)</figcaption>
+  </figure>`;
+}
+
 function diagramsForSection(title) {
   const t = title.toLowerCase();
   if (t.includes('decoupling') || t.includes('patterns')) {
@@ -502,6 +570,46 @@ function diagramsForSection(title) {
   }
   if (t.includes('disaster recovery')) return svgDR();
   if (t.includes('vpc')) return svgVPC();
+  if (t.startsWith('ii.') || t.includes('iam')) {
+    return svgFlow('IAM — đánh giá quyền', ['Request', 'Mặc định: DENY', 'Explicit DENY → chặn', 'Explicit ALLOW → cho phép']);
+  }
+  if (t.includes('ec2')) {
+    return svgBars('', 'EC2 pricing: chi phí giảm dần ↓, ràng buộc tăng dần', [
+      ['On-Demand', 1.0, 'Linh hoạt nhất', 'đắt nhất'],
+      ['Savings Plans', 0.55, 'Cam kết $/giờ', '~ -66%'],
+      ['Reserved (RI)', 0.5, 'Cam kết 1–3 năm', 'tới -72%'],
+      ['Spot', 0.15, 'AWS thu hồi 2 phút', 'tới -90%'],
+    ]);
+  }
+  if (t.includes('ebs') || t.includes('efs')) {
+    return svgBars('', 'EBS volume — IOPS/throughput giảm dần, giá rẻ dần', [
+      ['io2 Block Express', 1.0, 'SSD, mission-critical', 'đắt'],
+      ['gp3 / gp2', 0.6, 'SSD đa năng', 'cân bằng'],
+      ['st1', 0.4, 'HDD throughput cao', 'big data'],
+      ['sc1', 0.2, 'HDD lạnh', 'rẻ nhất'],
+    ]);
+  }
+  if (t.includes('elb')) return svgELB();
+  if (t.startsWith('vii.') || t.includes('s3 (simple')) {
+    return svgBars('', 'S3 storage classes: chi phí lưu trữ giảm dần, độ trễ lấy tăng dần', [
+      ['S3 Standard', 1.0, 'Truy cập thường xuyên', 'ms'],
+      ['Standard-IA', 0.55, 'Ít truy cập', 'ms'],
+      ['Glacier Instant', 0.35, 'Archive tức thời', 'ms'],
+      ['Glacier Flexible', 0.2, 'Archive', 'phút–giờ'],
+      ['Glacier Deep Archive', 0.1, 'Rẻ nhất', '12 giờ'],
+    ]);
+  }
+  if (t.includes('rds') || t.includes('aurora') || t.includes('dynamodb')) return svgRDS();
+  if (t.includes('bảo mật') || t.includes('security')) {
+    return svgFlow('Envelope encryption', ['KMS key (CMK)', 'mã hóa Data Key', 'Data Key mã hóa dữ liệu', 'Ciphertext + Data Key đã mã hóa']);
+  }
+  if (t.includes('messaging') || t.includes('streaming')) {
+    return [
+      svgFlow('SQS — hàng đợi, decoupling', ['Producer', 'SQS Queue', 'Consumer (poll)']),
+      svgFlow('SNS — pub/sub, 1→nhiều', ['Publisher', 'SNS Topic', 'Nhiều Subscriber']),
+      svgFlow('Kinesis — stream real-time', ['Producer', 'Data Streams (shard)', 'Firehose / Lambda', 'S3 / đích']),
+    ].join('');
+  }
   return '';
 }
 

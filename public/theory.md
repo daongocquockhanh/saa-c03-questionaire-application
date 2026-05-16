@@ -699,7 +699,85 @@ Công cụ: **AWS Backup**, **AWS Elastic Disaster Recovery (DRS)**, RDS snapsho
 
 ---
 
-## XXVIII. Gợi ý ôn thi
+## XXVIII. Hands-on Labs (thực hành trên AWS Free Tier)
+
+> Làm tay từng lab giúp nhớ lâu hơn đọc lý thuyết. Mỗi lab nêu **mục tiêu → các bước → học được gì**.
+
+### Lab 1 — Tạo VPC với public + private subnet
+**Mục tiêu**: hiểu mạng nền tảng.
+1. VPC console → **Create VPC** → chọn "VPC and more" → CIDR `10.0.0.0/16`.
+2. Chọn 2 AZ, 2 public subnet, 2 private subnet.
+3. Để wizard tạo sẵn **Internet Gateway** và **1 NAT Gateway**.
+4. Xem **Route Tables**: public subnet có route `0.0.0.0/0 → IGW`; private subnet có `0.0.0.0/0 → NAT`.
+**Học được**: subnet gắn 1 AZ, public/private khác nhau ở route ra IGW, NAT cho private ra Internet 1 chiều.
+
+### Lab 2 — Launch EC2 + Security Group + Session Manager
+**Mục tiêu**: chạy server, kết nối an toàn không cần key.
+1. EC2 → **Launch instance** → Amazon Linux, `t2.micro` (free tier).
+2. Tạo **Security Group**: chỉ mở port 443 từ `0.0.0.0/0` (KHÔNG mở 22).
+3. Gắn **IAM role** có policy `AmazonSSMManagedInstanceCore`.
+4. Sau khi chạy → **Connect → Session Manager**.
+**Học được**: Session Manager kết nối không cần bastion/port 22/SSH key; SG stateful, chỉ Allow.
+
+### Lab 3 — ALB + Auto Scaling Group
+**Mục tiêu**: HA và scale ngang.
+1. Tạo **Launch Template** từ AMI Amazon Linux + user data cài web server.
+2. Tạo **Target Group** (HTTP, health check `/`).
+3. Tạo **Application Load Balancer** ở 2 public subnet, gắn target group.
+4. Tạo **Auto Scaling Group**: min 2 / desired 2 / max 4, trải 2 AZ, gắn ALB target group.
+5. Thêm **Target Tracking policy**: giữ CPU 50%.
+**Học được**: ALB phân phối tải, ASG tự thay instance lỗi và scale theo CPU, multi-AZ = HA.
+
+### Lab 4 — S3: versioning + lifecycle + static website
+**Mục tiêu**: object storage, tối ưu chi phí.
+1. Tạo bucket, bật **Versioning**.
+2. Upload `index.html` → **Properties → Static website hosting** → enable.
+3. **Management → Lifecycle rule**: chuyển object sang Standard-IA sau 30 ngày, Glacier sau 90 ngày.
+4. Thử bật **Block Public Access** và quan sát truy cập bị chặn.
+**Học được**: versioning chống ghi đè/xóa nhầm, lifecycle tự hạ tier giảm giá, Block Public Access mặc định bật.
+
+### Lab 5 — IAM role cho EC2 truy cập S3
+**Mục tiêu**: cấp quyền không dùng access key.
+1. IAM → **Create role** → trusted entity = EC2.
+2. Gắn policy `AmazonS3ReadOnlyAccess` (hoặc policy custom giới hạn 1 bucket).
+3. Gán role vào EC2 (Actions → Security → Modify IAM role).
+4. SSH/Session vào instance, chạy `aws s3 ls` — chạy được mà không cấu hình key.
+**Học được**: role cấp credential tạm qua STS, không nhúng secret; nguyên tắc least privilege.
+
+### Lab 6 — RDS Multi-AZ + Read Replica
+**Mục tiêu**: HA và scale đọc cho database.
+1. Tạo **RDS MySQL** → bật **Multi-AZ deployment**.
+2. Bật **encryption at rest** (KMS) ngay lúc tạo.
+3. Sau khi running → **Actions → Create read replica**.
+4. Quan sát: Multi-AZ standby không nhận đọc; read replica có endpoint riêng để đọc.
+**Học được**: Multi-AZ = availability (sync, failover tự động), Read Replica = scale đọc (async).
+
+### Lab 7 — Serverless: Lambda + API Gateway
+**Mục tiêu**: chạy code không cần server.
+1. Lambda → **Create function** → runtime Python, viết hàm trả JSON.
+2. API Gateway → tạo **REST API** → method GET → Integration = Lambda.
+3. **Deploy** API ra stage `prod` → lấy URL → gọi thử bằng trình duyệt.
+4. (Tùy chọn) thêm **Cognito authorizer** để bảo vệ method.
+**Học được**: Lambda chạy theo event, API Gateway là HTTPS endpoint, kết hợp = serverless API.
+
+### Lab 8 — CloudFront + S3 với OAC
+**Mục tiêu**: CDN, bảo vệ bucket.
+1. Tạo bucket S3 chứa nội dung tĩnh, **KHÔNG** mở public.
+2. Tạo **CloudFront distribution**, origin = bucket S3.
+3. Tạo **Origin Access Control (OAC)** → CloudFront tự cập nhật bucket policy.
+4. Truy cập qua URL CloudFront chạy được; truy cập thẳng URL S3 bị từ chối.
+**Học được**: CloudFront cache ở edge giảm latency; OAC đảm bảo chỉ CloudFront đọc được S3.
+
+### Lab 9 — VPC Gateway Endpoint cho S3
+**Mục tiêu**: truy cập S3 riêng tư, tiết kiệm chi phí.
+1. VPC → **Endpoints → Create endpoint** → service `com.amazonaws.<region>.s3` → loại **Gateway**.
+2. Gắn endpoint vào route table của private subnet.
+3. Từ EC2 ở private subnet, chạy `aws s3 ls` — traffic đi qua endpoint, không qua NAT/Internet.
+**Học được**: Gateway endpoint miễn phí, giữ traffic trong mạng AWS, tránh phí NAT Gateway.
+
+---
+
+## XXIX. Gợi ý ôn thi
 
 1. Đọc qua tài liệu này 2–3 lượt.
 2. Xem khóa Stéphane Maarek hoặc Adrian Cantrill (lý thuyết sâu).
