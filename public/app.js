@@ -694,6 +694,65 @@ async function loadTheory() {
   return THEORY_SECTIONS;
 }
 
+const SECTION_QUIZ = [
+  { m: 'iam', kw: ['IAM role', 'IAM policy', 'IAM user', 'least privilege', ' STS', 'AssumeRole', 'permission boundary', 'service control polic'] },
+  { m: 'ec2', kw: ['EC2 instance', 'Spot Instance', 'Reserved Instance', 'Savings Plan', 'placement group', 'On-Demand Instance', 'Dedicated Host'] },
+  { m: 'ebs', kw: ['Amazon EBS', 'Amazon EFS', 'FSx', 'Elastic Block Store', 'Elastic File System', 'instance store', 'Provisioned IOPS'] },
+  { m: 'elb', kw: ['Load Balancer', 'Application Load Balancer', 'Network Load Balancer', 'Auto Scaling group', 'target group'] },
+  { m: 'vpc', kw: ['VPC', 'subnet', 'NAT gateway', 'internet gateway', 'VPC peering', 'Transit Gateway', 'VPC endpoint', 'security group', 'network ACL'] },
+  { m: 's3 (simple', kw: ['Amazon S3', 'S3 bucket', 'S3 Glacier', 'S3 Lifecycle', 'object storage', 'S3 Standard'] },
+  { m: 'cloudfront', kw: ['CloudFront', 'Global Accelerator', 'edge location', 'content delivery'] },
+  { m: 'route 53', kw: ['Route 53', 'routing policy', 'DNS', 'hosted zone', 'failover routing', 'latency routing'] },
+  { m: 'rds', kw: ['Amazon RDS', 'Amazon Aurora', 'DynamoDB', 'ElastiCache', 'read replica', 'Multi-AZ', 'database'] },
+  { m: 'serverless', kw: ['AWS Lambda', 'API Gateway', 'Step Functions', 'AppSync', 'serverless'] },
+  { m: 'containers', kw: ['Amazon ECS', 'Amazon EKS', 'Fargate', 'container', 'Amazon ECR', 'Kubernetes'] },
+  { m: 'messaging', kw: ['Amazon SQS', 'Amazon SNS', 'EventBridge', 'Kinesis', 'Amazon MQ', 'Kafka', 'MSK', 'message queue'] },
+  { m: 'migration', kw: ['DataSync', 'Storage Gateway', 'Snowball', 'Database Migration Service', 'Transfer Family', 'migrate'] },
+  { m: 'analytics', kw: ['Amazon Athena', 'AWS Glue', 'Amazon Redshift', 'Amazon EMR', 'QuickSight', 'OpenSearch', 'Lake Formation'] },
+  { m: 'bảo mật', kw: ['AWS KMS', 'Secrets Manager', 'AWS WAF', 'AWS Shield', 'GuardDuty', 'Amazon Macie', 'encrypt', 'CloudTrail', 'AWS Config', 'Amazon Inspector'] },
+  { m: 'monitoring', kw: ['CloudWatch', 'X-Ray', 'Trusted Advisor', 'metric', 'CloudWatch alarm'] },
+  { m: 'tối ưu chi phí', kw: ['cost-effective', 'Savings Plan', 'AWS Budgets', 'Cost Explorer', 'reduce cost', 'cost-optimiz'] },
+  { m: 'disaster recovery', kw: ['disaster recovery', 'RTO', 'RPO', 'pilot light', 'warm standby', 'AWS Backup', 'cross-Region'] },
+  { m: 'identity bổ sung', kw: ['Cognito', 'Directory Service', 'Active Directory', 'Resource Access Manager', 'SAML'] },
+  { m: 'compute bổ sung', kw: ['Elastic Beanstalk', 'AWS Batch', 'Outposts', 'Local Zones', 'Wavelength', 'Lightsail'] },
+  { m: 'databases chuyên biệt', kw: ['Neptune', 'DocumentDB', 'Keyspaces', 'Timestream', 'QLDB', 'MemoryDB', 'Quantum Ledger'] },
+  { m: 'ai/ml', kw: ['Rekognition', 'Comprehend', 'Textract', 'Transcribe', 'Translate', 'SageMaker', 'Forecast', 'Polly'] },
+  { m: 'management', kw: ['CloudFormation', 'Systems Manager', 'Service Catalog', 'Session Manager', 'Control Tower', 'AppConfig'] },
+  { m: 'aws backup', kw: ['AWS Backup', 'Recycle Bin', 'Data Lifecycle Manager', 'snapshot', 'backup vault', 'Object Lock'] },
+];
+
+function sampleQuestionsForSection(title) {
+  const t = title.toLowerCase();
+  const entry = SECTION_QUIZ.find(e => t.includes(e.m));
+  if (!entry || !DATA || !DATA.questions) return '';
+  const scored = [];
+  for (const q of DATA.questions) {
+    const text = (q.scenario + ' ' + q.prompt + ' ' + q.options.map(o => o.text).join(' '));
+    let score = 0;
+    for (const k of entry.kw) if (text.toLowerCase().includes(k.toLowerCase())) score++;
+    if (score > 0) scored.push({ q, score });
+  }
+  if (!scored.length) return '';
+  scored.sort((a, b) => b.score - a.score || a.q.id - b.q.id);
+  const picks = scored.slice(0, 4).map(s => s.q);
+  const cards = picks.map((q, idx) => {
+    const exp = q.correctAnswers.slice().sort();
+    const opts = q.options.map(o => {
+      const correct = exp.includes(o.letter);
+      return `<li class="${correct ? 'opt-correct' : ''}"><strong>${o.letter}.</strong> ${escapeHtml(o.text)}${correct ? ' ✓' : ''}</li>`;
+    }).join('');
+    return `<details class="card sample-q">
+      <summary>Câu hỏi mẫu ${idx + 1} <span class="muted">(Q${q.number})</span></summary>
+      <p class="scenario">${escapeHtml(q.scenario).replace(/\n/g, '<br>')}</p>
+      <p><strong>${escapeHtml(q.prompt)}</strong></p>
+      <ul class="opts">${opts}</ul>
+      <p><strong>Đáp án:</strong> ${exp.join(', ')}</p>
+      ${q.explanation ? `<p class="explanation">${escapeHtml(q.explanation).replace(/\n/g, '<br>')}</p>` : ''}
+    </details>`;
+  }).join('');
+  return `<div class="sample-block"><h3>📝 Câu hỏi mẫu từ ngân hàng 897 câu</h3>${cards}</div>`;
+}
+
 async function renderTheory(sectionId) {
   let sections;
   try { sections = await loadTheory(); }
@@ -714,6 +773,7 @@ async function renderTheory(sectionId) {
       <article class="theory-content">
         <h2>${escapeHtml(current.title)}</h2>
         ${current.html}
+        ${sampleQuestionsForSection(current.title)}
         <nav class="theory-nav">
           ${prev ? `<a href="#/theory/${prev.id}">← ${escapeHtml(prev.title)}</a>` : '<span></span>'}
           ${next ? `<a href="#/theory/${next.id}">${escapeHtml(next.title)} →</a>` : '<span></span>'}

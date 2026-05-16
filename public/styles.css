@@ -91,3 +91,7 @@ button:disabled { opacity: 0.5; cursor: not-allowed; }
   .theory { grid-template-columns: 1fr; }
   .theory-toc { position: static; max-height: none; }
 }
+.sample-block { margin-top: 1.5rem; padding-top: 1rem; border-top: 2px solid #ff9900; }
+.sample-block h3 { color: #232f3e; margin-top: 0.5rem; }
+.sample-q { margin-bottom: 0.6rem; }
+.sample-q summary { cursor: pointer; font-weight: 600; padding: 0.3rem 0; }
