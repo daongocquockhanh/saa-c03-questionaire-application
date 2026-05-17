@@ -768,6 +768,7 @@ const SECTION_QUIZ = [
   { m: 'ai/ml', kw: ['Rekognition', 'Comprehend', 'Textract', 'Transcribe', 'Translate', 'SageMaker', 'Forecast', 'Polly'] },
   { m: 'management', kw: ['CloudFormation', 'Systems Manager', 'Service Catalog', 'Session Manager', 'Control Tower', 'AppConfig'] },
   { m: 'aws backup', kw: ['AWS Backup', 'Recycle Bin', 'Data Lifecycle Manager', 'snapshot', 'backup vault', 'Object Lock'] },
+  { m: 'kiến thức bổ sung', kw: ['WorkSpaces', 'AppStream', 'Amplify', 'CodePipeline', 'CodeDeploy', 'CodeCommit', 'CodeBuild', 'Local Zone', 'Wavelength', 'CORS', 'edge location', 'multiple AWS Regions'] },
 ];
 
 function sampleQuestionsForSection(title) {
