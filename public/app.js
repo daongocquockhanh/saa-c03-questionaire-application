@@ -28,6 +28,7 @@ function route() {
   if (screen === 'test' && arg) renderRunner(Number(arg));
   else if (screen === 'result' && arg) renderResult(Number(arg));
   else if (screen === 'theory') renderTheory(arg || null);
+  else if (screen === 'sources') renderSources();
   else renderDashboard();
   updateTopbar(screen || 'dashboard');
 }
@@ -38,7 +39,55 @@ function updateTopbar(screen) {
   el.innerHTML = `
     <a href="#/dashboard" class="nav-link ${screen === 'dashboard' ? 'active' : ''}">Practice Tests</a>
     <a href="#/theory" class="nav-link ${screen === 'theory' ? 'active' : ''}">Theory</a>
+    <a href="#/sources" class="nav-link ${screen === 'sources' ? 'active' : ''}">Sources</a>
   `;
+}
+
+const SOURCES_EN = [
+  { name: 'Stéphane Maarek — AWS SAA-C03 (Udemy)', badge: 'Paid', note: 'Most popular SAA-C03 course. Concise, exam-focused. Best starting point.', url: 'https://www.udemy.com/course/aws-certified-solutions-architect-associate-saa-c03/' },
+  { name: 'Adrian Cantrill — SAA-C03', badge: 'Paid', note: 'Deepest course, lots of hands-on demos. For thorough learners.', url: 'https://learn.cantrill.io/p/aws-certified-solutions-architect-associate-saa-c03' },
+  { name: 'freeCodeCamp — AWS SAA full course (YouTube)', badge: 'Free', note: 'Free ~13-hour SAA-C03 course on YouTube.', url: 'https://www.youtube.com/c/Freecodecamp' },
+  { name: 'AWS Skill Builder — Exam Prep SAA-C03', badge: 'Free', note: 'Official AWS prep + free official practice question set.', url: 'https://skillbuilder.aws/' },
+  { name: 'Tutorials Dojo (Jon Bonso)', badge: 'Paid', note: 'Practice exams + cheat sheets. Closest to the real exam. Use in practice phase.', url: 'https://tutorialsdojo.com/aws-certified-solutions-architect-associate-saa-c03/' },
+  { name: 'AWS — official certification page', badge: 'Free', note: 'Exam guide, sample questions, booking. Read the official exam guide.', url: 'https://aws.amazon.com/certification/certified-solutions-architect-associate/' },
+];
+
+const SOURCES_VI = [
+  { name: 'VNTechies — Khoá học AWS SAA-C03', badge: 'Free', note: 'Khóa học SAA-C03 online tiếng Việt miễn phí. Điểm khởi đầu tốt.', url: 'https://vntechies.dev/courses/aws/saa/gioi-thieu' },
+  { name: 'Udemy — AWS SAA Associate (Tiếng Việt)', badge: 'Paid', note: 'Khóa video tiếng Việt đầy đủ, 200+ câu hỏi luyện thi có giải thích tiếng Việt.', url: 'https://www.udemy.com/course/aws-certified-solutions-architect-associate-tieng-viet/' },
+  { name: 'Khóa học Hạt dẻ — AWS SAA (Luu Ho Phuong)', badge: 'Paid', note: 'Khóa học tiếng Việt giá rẻ, dạy hoàn toàn bằng tiếng Việt.', url: 'https://khoahochatde.com/cua-hang/aws-certified-solutions-architect/' },
+  { name: 'VTI Academy — Ôn thi AWS SAA-C03', badge: 'Paid', note: 'Lộ trình: nền tảng → hands-on lab → tư duy kiến trúc → đề luyện thi.', url: 'https://vtiacademy.edu.vn/khoa-hoc-on-thi-aws-saa-c03.html' },
+  { name: 'CodeGym — Luyện thi chứng chỉ AWS', badge: 'Paid', note: 'Khóa luyện thi chứng chỉ AWS tiếng Việt.', url: 'https://codegym.vn/khoa-hoc/khoa-luyen-thi-chung-chi-aws/' },
+  { name: 'Viblo — Kinh nghiệm thi SAA-C03', badge: 'Free', note: 'Bài chia sẻ kinh nghiệm thi thật từ người đã pass. Đọc 2–3 bài.', url: 'https://viblo.asia/p/chia-se-kinh-nghiem-thi-saa-c03-aws-certified-solutions-architect-associate-saa-c03-5OXLAXevJGr' },
+];
+
+function sourceCard(s) {
+  return `<li class="source-item">
+    <div class="source-head">
+      <a href="${s.url}" target="_blank" rel="noopener">${escapeHtml(s.name)}</a>
+      <span class="badge ${s.badge === 'Free' ? 'pass' : 'in-progress'}">${s.badge}</span>
+    </div>
+    <p class="muted">${escapeHtml(s.note)}</p>
+  </li>`;
+}
+
+function renderSources() {
+  render(`
+    <h1>Learning Sources</h1>
+    <p class="muted">Curated courses and resources to study for the AWS SAA-C03 exam. External links — verify pricing on each site.</p>
+    <div class="sources-grid">
+      <section class="card">
+        <h2>🇬🇧 English</h2>
+        <ul class="source-list">${SOURCES_EN.map(sourceCard).join('')}</ul>
+      </section>
+      <section class="card">
+        <h2>🇻🇳 Tiếng Việt</h2>
+        <ul class="source-list">${SOURCES_VI.map(sourceCard).join('')}</ul>
+      </section>
+    </div>
+    <p class="muted">Gợi ý: học lý thuyết bằng tiếng Việt, nhưng luyện câu hỏi và làm quen với tiếng Anh — đề thi thật là tiếng Anh.</p>
+  `);
+  window.scrollTo(0, 0);
 }
 
 function renderDashboard() {
