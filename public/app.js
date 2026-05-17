@@ -1,10 +1,16 @@
+import { MODULES } from './modules.js';
+
 const STORE_KEY = 'saa-c03-progress';
 let DATA = null;
 let PROGRESS = null;
 
 function loadProgress() {
-  try { return JSON.parse(localStorage.getItem(STORE_KEY)) || { tests: {} }; }
-  catch { return { tests: {} }; }
+  let p;
+  try { p = JSON.parse(localStorage.getItem(STORE_KEY)) || {}; }
+  catch { p = {}; }
+  if (!p.tests) p.tests = {};
+  if (!p.modules) p.modules = {};
+  return p;
 }
 function saveProgress() {
   localStorage.setItem(STORE_KEY, JSON.stringify(PROGRESS));
@@ -28,6 +34,7 @@ function route() {
   if (screen === 'test' && arg) renderRunner(Number(arg));
   else if (screen === 'result' && arg) renderResult(Number(arg));
   else if (screen === 'theory') renderTheory(arg || null);
+  else if (screen === 'modules') renderModule(arg || null);
   else if (screen === 'sources') renderSources();
   else renderDashboard();
   updateTopbar(screen || 'dashboard');
@@ -38,6 +45,7 @@ function updateTopbar(screen) {
   if (!el) return;
   el.innerHTML = `
     <a href="#/dashboard" class="nav-link ${screen === 'dashboard' ? 'active' : ''}">Practice Tests</a>
+    <a href="#/modules" class="nav-link ${screen === 'modules' ? 'active' : ''}">Modules</a>
     <a href="#/theory" class="nav-link ${screen === 'theory' ? 'active' : ''}">Theory</a>
     <a href="#/sources" class="nav-link ${screen === 'sources' ? 'active' : ''}">Sources</a>
   `;
@@ -832,6 +840,221 @@ async function renderTheory(sectionId) {
     </div>
   `);
   window.scrollTo(0, 0);
+}
+
+// ---- Study Modules ----
+let MQUIZ = null;
+
+function svgShared() {
+  return `<figure class="diagram">
+    <svg viewBox="0 0 560 180" preserveAspectRatio="xMidYMid meet" role="img">
+      <rect x="10" y="14" width="265" height="152" rx="6" fill="#fdf0e6" stroke="#d9822b" stroke-width="1.5"/>
+      <text x="142" y="36" text-anchor="middle" font-size="12.5" font-weight="700" fill="#d9822b">AWS — Security OF the cloud</text>
+      <text x="24" y="62" font-size="11.5" fill="#1a2a3a">• Phần cứng, data center vật lý</text>
+      <text x="24" y="84" font-size="11.5" fill="#1a2a3a">• Network vật lý</text>
+      <text x="24" y="106" font-size="11.5" fill="#1a2a3a">• Virtualization layer</text>
+      <text x="24" y="128" font-size="11.5" fill="#1a2a3a">• Managed service infrastructure</text>
+      <rect x="285" y="14" width="265" height="152" rx="6" fill="#eef4ff" stroke="#4a8eff" stroke-width="1.5"/>
+      <text x="417" y="36" text-anchor="middle" font-size="12.5" font-weight="700" fill="#4a8eff">Khách hàng — Security IN the cloud</text>
+      <text x="299" y="62" font-size="11.5" fill="#1a2a3a">• Dữ liệu, mã hóa dữ liệu</text>
+      <text x="299" y="84" font-size="11.5" fill="#1a2a3a">• IAM / phân quyền</text>
+      <text x="299" y="106" font-size="11.5" fill="#1a2a3a">• Patch OS trên EC2</text>
+      <text x="299" y="128" font-size="11.5" fill="#1a2a3a">• Cấu hình Security Group</text>
+    </svg>
+    <figcaption>Shared Responsibility Model</figcaption>
+  </figure>`;
+}
+
+function moduleDiagrams(id) {
+  switch (id) {
+    case 'M1': return svgFlow('Hạ tầng AWS', ['Region (vùng địa lý)', 'Availability Zones (3+)', 'Data centers']) + svgShared();
+    case 'M2': return svgFlow('IAM — đánh giá quyền', ['Request', 'Mặc định: DENY', 'Explicit DENY → chặn', 'Explicit ALLOW → cho phép']);
+    case 'M3': return svgVPC();
+    case 'M4': return svgELB() + svgBars('', 'EC2 pricing: chi phí giảm dần, ràng buộc tăng dần', [['On-Demand', 1.0, 'Linh hoạt nhất', 'đắt nhất'], ['Savings Plans', 0.55, 'Cam kết $/giờ', '~ -66%'], ['Reserved (RI)', 0.5, 'Cam kết 1–3 năm', 'tới -72%'], ['Spot', 0.15, 'AWS thu hồi 2 phút', 'tới -90%']]);
+    case 'M5': return svgBars('', 'S3 storage classes: chi phí giảm dần, độ trễ lấy tăng dần', [['S3 Standard', 1.0, 'Thường xuyên', 'ms'], ['Standard-IA', 0.55, 'Ít truy cập', 'ms'], ['Glacier Instant', 0.35, 'Archive tức thời', 'ms'], ['Glacier Flexible', 0.2, 'Archive', 'phút–giờ'], ['Glacier Deep Archive', 0.1, 'Rẻ nhất', '12 giờ']]);
+    case 'M6': return svgRDS();
+    case 'M7': return svgFlow('Serverless web', ['CloudFront', 'API Gateway', 'Lambda', 'DynamoDB']);
+    case 'M8': return svgFanout();
+    case 'M9': return svgFlow('Edge delivery', ['Người dùng', 'Route 53', 'CloudFront edge', 'Origin: S3 / ALB']);
+    case 'M10': return svgFlow('Envelope encryption', ['KMS key (CMK)', 'mã hóa Data Key', 'Data Key mã hóa dữ liệu', 'Ciphertext lưu trữ']);
+    case 'M11': return svgDR();
+    case 'M12': return svgFlow('Kiến trúc 3-tier', ['Route 53 / CloudFront', 'ALB', 'Web ASG', 'App ASG', 'RDS Multi-AZ']);
+    default: return '';
+  }
+}
+
+function moduleQuestions(mod) {
+  if (!DATA || !DATA.questions) return [];
+  const scored = [];
+  for (const q of DATA.questions) {
+    const text = (q.scenario + ' ' + q.prompt + ' ' + q.options.map(o => o.text).join(' ')).toLowerCase();
+    let score = 0;
+    for (const k of mod.quizKw) if (text.includes(k.toLowerCase())) score++;
+    if (score > 0) scored.push({ q, score });
+  }
+  scored.sort((a, b) => b.score - a.score || a.q.id - b.q.id);
+  return scored.slice(0, 10).map(s => s.q);
+}
+
+function moduleProgress(id) {
+  return (PROGRESS.modules && PROGRESS.modules[id]) || {};
+}
+
+function isCorrect(q, given) {
+  const g = given.slice().sort();
+  const e = (q.correctAnswers || []).slice().sort();
+  return g.length > 0 && g.length === e.length && g.every((v, i) => v === e[i]);
+}
+
+function renderModule(arg) {
+  if (arg) { renderModuleDetail(arg); return; }
+  const done = MODULES.filter(m => moduleProgress(m.id).quizTotal).length;
+  const pct = Math.round((done / MODULES.length) * 100);
+  const cards = MODULES.map(m => {
+    const p = moduleProgress(m.id);
+    const score = p.quizTotal ? `Quiz: ${p.quizScore}/${p.quizTotal}` : 'Chưa làm quiz';
+    const badge = p.quizTotal ? '<span class="badge done">Đã học</span>' : '<span class="badge not-started">Chưa học</span>';
+    return `<a class="card module-card" href="#/modules/${m.id}">
+      <div class="test-card-header"><h3>${m.id}. ${escapeHtml(m.title)}</h3>${badge}</div>
+      <p class="muted">${score}</p>
+    </a>`;
+  }).join('');
+  render(`
+    <h1>Lộ trình 12 Module — SAA-C03</h1>
+    <div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div>
+    <p class="muted">${done}/${MODULES.length} module đã hoàn thành quiz (${pct}%)</p>
+    <div class="test-grid">${cards}</div>
+  `);
+  window.scrollTo(0, 0);
+}
+
+function renderModuleDetail(id) {
+  const idx = MODULES.findIndex(m => m.id === id);
+  if (idx < 0) { render('<p>Module not found.</p>'); return; }
+  const mod = MODULES[idx];
+  const questions = moduleQuestions(mod);
+  if (!MQUIZ || MQUIZ.moduleId !== id) {
+    MQUIZ = { moduleId: id, mode: 'review', answers: {}, checked: {}, submitted: false };
+  }
+  const prev = idx > 0 ? MODULES[idx - 1] : null;
+  const next = idx < MODULES.length - 1 ? MODULES[idx + 1] : null;
+  render(`
+    <div class="module-detail">
+      <p><a href="#/modules">← Tất cả module</a></p>
+      <h1>${mod.id}. ${escapeHtml(mod.title)}</h1>
+      <section class="card"><h2>Lý thuyết</h2>${mod.theory}</section>
+      <section class="card"><h2>Sơ đồ</h2>${moduleDiagrams(mod.id)}</section>
+      <section class="card">
+        <div class="quiz-head">
+          <h2>Câu hỏi luyện tập (${questions.length})</h2>
+          <div class="mode-toggle">
+            <button id="mode-review" class="${MQUIZ.mode === 'review' ? 'primary' : ''}">Review mode</button>
+            <button id="mode-exam" class="${MQUIZ.mode === 'exam' ? 'primary' : ''}">Exam mode</button>
+          </div>
+        </div>
+        <p class="muted">${MQUIZ.mode === 'review' ? 'Review: chọn đáp án rồi bấm Kiểm tra để xem ngay kết quả.' : 'Exam: làm hết rồi bấm Nộp bài để chấm điểm.'}</p>
+        <div id="quiz-body">${questions.map((q, i) => renderQuizItem(q, i)).join('')}</div>
+        ${MQUIZ.mode === 'exam' && !MQUIZ.submitted ? '<p><button id="quiz-submit" class="primary">Nộp bài</button></p>' : ''}
+        ${MQUIZ.submitted ? `<p class="quiz-result">Điểm: <strong>${quizScore(questions)}/${questions.length}</strong></p>` : ''}
+      </section>
+      <nav class="theory-nav">
+        ${prev ? `<a href="#/modules/${prev.id}">← ${prev.id}. ${escapeHtml(prev.title)}</a>` : '<span></span>'}
+        ${next ? `<a href="#/modules/${next.id}">${next.id}. ${escapeHtml(next.title)} →</a>` : '<span></span>'}
+      </nav>
+    </div>
+  `);
+  wireQuiz(mod, questions);
+  window.scrollTo(0, 0);
+}
+
+function renderQuizItem(q, i) {
+  const given = MQUIZ.answers[q.id] || [];
+  const revealed = MQUIZ.submitted || MQUIZ.checked[q.id];
+  const exp = (q.correctAnswers || []).slice().sort();
+  const inputType = q.isMultiSelect ? 'checkbox' : 'radio';
+  const opts = q.options.map(o => {
+    const sel = given.includes(o.letter);
+    const correct = exp.includes(o.letter);
+    let cls = 'quiz-opt';
+    if (revealed) {
+      if (correct) cls += ' opt-correct';
+      else if (sel) cls += ' opt-wrong';
+    } else if (sel) cls += ' selected';
+    return `<label class="${cls}">
+      <input type="${inputType}" name="q${q.id}" value="${o.letter}" ${sel ? 'checked' : ''} ${revealed ? 'disabled' : ''} data-qid="${q.id}" />
+      <span><strong>${o.letter}.</strong> ${escapeHtml(o.text)}${revealed && correct ? ' ✓' : ''}</span>
+    </label>`;
+  }).join('');
+  const result = revealed
+    ? `<p class="quiz-verdict ${isCorrect(q, given) ? 'ok' : 'bad'}">${isCorrect(q, given) ? '✓ Đúng' : '✗ Sai'} — Đáp án: ${exp.join(', ')}</p>
+       ${q.explanation ? `<p class="explanation">${escapeHtml(q.explanation).replace(/\n/g, '<br>')}</p>` : ''}`
+    : '';
+  const checkBtn = (MQUIZ.mode === 'review' && !revealed)
+    ? `<button class="quiz-check" data-qid="${q.id}">Kiểm tra</button>` : '';
+  return `<div class="quiz-item">
+    <p class="quiz-q"><strong>Câu ${i + 1}.</strong> ${escapeHtml(q.scenario ? q.scenario + ' ' : '')}${escapeHtml(q.prompt)}${q.isMultiSelect ? ' <em>(Chọn nhiều)</em>' : ''}</p>
+    ${opts}
+    ${checkBtn}
+    ${result}
+  </div>`;
+}
+
+function quizScore(questions) {
+  let n = 0;
+  for (const q of questions) if (isCorrect(q, MQUIZ.answers[q.id] || [])) n++;
+  return n;
+}
+
+function saveModuleResult(mod, questions) {
+  if (!PROGRESS.modules) PROGRESS.modules = {};
+  const wrong = questions.filter(q => !isCorrect(q, MQUIZ.answers[q.id] || [])).map(q => q.number);
+  PROGRESS.modules[mod.id] = {
+    quizScore: quizScore(questions),
+    quizTotal: questions.length,
+    wrong,
+    date: new Date().toISOString(),
+  };
+  saveProgress();
+}
+
+function wireQuiz(mod, questions) {
+  document.getElementById('mode-review')?.addEventListener('click', () => {
+    MQUIZ = { moduleId: mod.id, mode: 'review', answers: {}, checked: {}, submitted: false };
+    renderModuleDetail(mod.id);
+  });
+  document.getElementById('mode-exam')?.addEventListener('click', () => {
+    MQUIZ = { moduleId: mod.id, mode: 'exam', answers: {}, checked: {}, submitted: false };
+    renderModuleDetail(mod.id);
+  });
+  document.querySelectorAll('#quiz-body input').forEach(inp => {
+    inp.addEventListener('change', e => {
+      const qid = Number(e.target.dataset.qid);
+      const q = questions.find(x => x.id === qid);
+      const letter = e.target.value;
+      if (q.isMultiSelect) {
+        const set = new Set(MQUIZ.answers[qid] || []);
+        e.target.checked ? set.add(letter) : set.delete(letter);
+        MQUIZ.answers[qid] = [...set].sort();
+      } else {
+        MQUIZ.answers[qid] = [letter];
+      }
+    });
+  });
+  document.querySelectorAll('.quiz-check').forEach(btn => {
+    btn.addEventListener('click', () => {
+      MQUIZ.checked[Number(btn.dataset.qid)] = true;
+      if (questions.length && questions.every(q => MQUIZ.checked[q.id]) && !MQUIZ.submitted) {
+        MQUIZ.submitted = true;
+        saveModuleResult(mod, questions);
+      }
+      renderModuleDetail(mod.id);
+    });
+  });
+  document.getElementById('quiz-submit')?.addEventListener('click', () => {
+    MQUIZ.submitted = true;
+    saveModuleResult(mod, questions);
+    renderModuleDetail(mod.id);
+  });
 }
 
 window.addEventListener('hashchange', route);
