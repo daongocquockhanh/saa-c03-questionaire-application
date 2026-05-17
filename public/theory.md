@@ -699,7 +699,42 @@ Công cụ: **AWS Backup**, **AWS Elastic Disaster Recovery (DRS)**, RDS snapsho
 
 ---
 
-## XXVIII. Hands-on Labs (thực hành trên AWS Free Tier)
+## XXVIII. Kiến thức bổ sung (Global Infrastructure & dịch vụ khác)
+
+### AWS Global Infrastructure
+- **Region**: vùng địa lý độc lập (vd `us-east-1`, `ap-southeast-1`). Mỗi Region tách biệt, dữ liệu không tự rời Region.
+- **Availability Zone (AZ)**: 1 hoặc nhiều data center trong 1 Region, cách ly lỗi nhau, nối bằng mạng latency thấp. Mỗi Region có **3+ AZ**. Triển khai multi-AZ = HA.
+- **Edge Location / Point of Presence**: điểm CDN (CloudFront, Route 53, Global Accelerator) — hàng trăm, gần người dùng hơn Region.
+- **Local Zones / Wavelength / Outposts**: hạ tầng AWS đặt gần người dùng hoặc on-prem (đã nêu mục XXIII).
+- **Chọn Region dựa trên**:
+  1. **Compliance** — luật yêu cầu dữ liệu nằm trong quốc gia.
+  2. **Latency** — gần người dùng cuối.
+  3. **Service availability** — không phải Region nào cũng có đủ service mới.
+  4. **Pricing** — giá khác nhau giữa các Region.
+
+### S3 CORS (Cross-Origin Resource Sharing)
+- Cho phép web ở **origin (domain) này** gọi tài nguyên S3 ở **origin khác**.
+- Cấu hình bằng **CORS rule** (JSON) trên bucket: allowed origins, methods, headers.
+- Tình huống thi: trang web tải asset (font, ảnh, JS) từ S3 bucket khác domain → bị trình duyệt chặn → **bật CORS trên bucket S3**.
+
+### End-User Computing
+- **Amazon WorkSpaces**: Desktop-as-a-Service — máy ảo Windows/Linux trên cloud cho nhân viên truy cập từ xa.
+- **Amazon AppStream 2.0**: stream **ứng dụng** (không phải cả desktop) tới trình duyệt người dùng.
+- **Amazon WorkDocs**: lưu trữ và chia sẻ tài liệu (đã ngừng nhận khách mới — ít gặp trong đề mới).
+
+### Developer & CI/CD
+- **AWS Amplify**: nền tảng build + host **web/mobile app full-stack** nhanh (frontend hosting, auth qua Cognito, API, CI/CD tích hợp).
+- **AWS CodeCommit**: Git repo managed (đang dần ngừng cho khách mới).
+- **AWS CodeBuild**: build và test code managed.
+- **AWS CodeDeploy**: tự động deploy lên EC2/Lambda/ECS.
+- **AWS CodePipeline**: orchestrate pipeline CI/CD (source → build → deploy).
+- **AWS SAM (Serverless Application Model)**: framework + CLI để định nghĩa và deploy ứng dụng **serverless** (mở rộng của CloudFormation, cú pháp ngắn gọn cho Lambda/API Gateway/DynamoDB).
+
+> Các dịch vụ mục này có **trọng số thấp** trong SAA-C03 — biết khái niệm và use case là đủ, không cần đi sâu.
+
+---
+
+## XXIX. Hands-on Labs (thực hành trên AWS Free Tier)
 
 > Làm tay từng lab giúp nhớ lâu hơn đọc lý thuyết. Mỗi lab nêu **mục tiêu → các bước → học được gì**.
 
@@ -777,7 +812,7 @@ Công cụ: **AWS Backup**, **AWS Elastic Disaster Recovery (DRS)**, RDS snapsho
 
 ---
 
-## XXIX. Gợi ý ôn thi
+## XXX. Gợi ý ôn thi
 
 1. Đọc qua tài liệu này 2–3 lượt.
 2. Xem khóa Stéphane Maarek hoặc Adrian Cantrill (lý thuyết sâu).
