@@ -845,6 +845,80 @@ async function renderTheory(sectionId) {
 // ---- Study Modules ----
 let MQUIZ = null;
 
+const MODULE_TIPS = {
+  M1: [
+    'Câu hỏi "vẫn chạy khi 1 data center hỏng" → nhiều <strong>AZ</strong>. Câu "DR / thảm họa toàn vùng" → nhiều <strong>Region</strong>.',
+    'Edge Location chỉ để <strong>CDN</strong> — không bao giờ là nơi "chạy ứng dụng".',
+    'Shared Responsibility: thấy "patch OS", "cấu hình", "mã hóa dữ liệu" → trách nhiệm <strong>khách hàng</strong>.',
+  ],
+  M2: [
+    'Mẹo vàng: <strong>Explicit Deny luôn thắng</strong>. Thấy đáp án có Deny rõ ràng → cân nhắc kỹ.',
+    'Permission Boundary và SCP <strong>chỉ giới hạn, không cấp quyền</strong>. Đáp án nói "dùng SCP để cấp quyền" → sai.',
+    'Cross-account / service truy cập → luôn là <strong>IAM Role</strong> (không phải user, không phải access key).',
+    'Hàng trăm/nghìn người dùng doanh nghiệp → <strong>federation/IAM Identity Center</strong>, đừng tạo IAM user thủ công.',
+  ],
+  M3: [
+    '"Truy cập S3/DynamoDB riêng tư, rẻ" → <strong>Gateway Endpoint</strong> (miễn phí). Service khác → Interface Endpoint.',
+    'NAT Gateway nằm trong 1 AZ → muốn HA phải đặt <strong>mỗi AZ một cái</strong>.',
+    'Cần rule <strong>Deny</strong> theo IP → chỉ <strong>NACL</strong> làm được, Security Group không.',
+    '"Nhanh, tạm thời" → VPN. "Ổn định, latency thấp, lâu dài" → Direct Connect (nhớ: setup vài tuần).',
+  ],
+  M4: [
+    'Traffic <strong>UDP/TCP</strong> hoặc cần <strong>static IP</strong> → NLB. Routing theo path/host HTTP → ALB.',
+    'Workload chịu gián đoạn (batch) → <strong>Spot</strong>. Ổn định liên tục → Reserved/Savings Plans. Ngắn hạn linh hoạt → On-Demand.',
+    'ALB <strong>không</strong> có static IP — cần thì đặt Global Accelerator phía trước.',
+    'Tải tăng theo lịch cố định → <strong>Scheduled scaling</strong>. Tải khó đoán → Target Tracking / Predictive.',
+  ],
+  M5: [
+    'Nhiều EC2 cùng đọc/ghi, Linux → <strong>EFS</strong>. Windows/SMB → FSx for Windows. 1 EC2 → EBS.',
+    '"Phải lấy ngay lập tức (milliseconds)" → loại Glacier Flexible/Deep Archive.',
+    'EBS bound trong 1 AZ → muốn chuyển AZ phải qua <strong>snapshot</strong>.',
+    'Cross-Region Replication → bắt buộc bật <strong>Versioning ở cả 2 bucket</strong>.',
+  ],
+  M6: [
+    'Bẫy kinh điển: <strong>Multi-AZ = HA, KHÔNG scale read</strong>. Scale read = <strong>Read Replica</strong>.',
+    '"Sub-millisecond / microsecond" → ElastiCache hoặc DAX. DAX chỉ dùng cho <strong>DynamoDB</strong>.',
+    'DR cross-region cho database quan hệ, RTO thấp → <strong>Aurora Global Database</strong>.',
+    'Tải khó đoán, lúc cao lúc thấp → DynamoDB on-demand hoặc <strong>Aurora Serverless</strong>.',
+  ],
+  M7: [
+    'Tác vụ chạy <strong>quá 15 phút</strong> → KHÔNG dùng Lambda → ECS Fargate / AWS Batch.',
+    'Lambda kết nối RDS bị quá tải connection → <strong>RDS Proxy</strong>.',
+    'Cold start là vấn đề → <strong>Provisioned Concurrency</strong> (hoặc SnapStart cho Java/Python/.NET).',
+    'Cần điều phối nhiều bước có thứ tự, retry, trạng thái → <strong>Step Functions</strong>.',
+  ],
+  M8: [
+    '"Đúng thứ tự / exactly-once" → <strong>SQS FIFO</strong> hoặc Kinesis (partition key).',
+    '"1 nguồn → nhiều đích" (fan-out) → <strong>SNS</strong> (thường SNS → nhiều SQS).',
+    '"Tách rời / decouple / chịu tải đột biến / không mất việc" → <strong>SQS</strong>.',
+    'Throughput rất cao + cần thứ tự + retention → <strong>Kinesis Data Streams</strong> (FIFO giới hạn 300 msg/s).',
+  ],
+  M9: [
+    'Static toàn cầu + bucket S3 phải private → <strong>CloudFront + OAC</strong>.',
+    'Ứng dụng <strong>non-HTTP</strong> (gaming, UDP) cần tăng tốc toàn cầu + static IP → <strong>Global Accelerator</strong>.',
+    'Cần failover DNS giữa primary/secondary → Route 53 <strong>Failover routing + health check</strong>.',
+    'Trả về region gần nhất theo độ trễ → <strong>Latency routing</strong>.',
+  ],
+  M10: [
+    'Phát hiện <strong>PII trong S3</strong> → Macie. Phát hiện mối đe dọa chung → GuardDuty. Quét lỗ hổng → Inspector.',
+    'Chặn <strong>SQLi/XSS</strong> tầng web → WAF. Chống <strong>DDoS</strong> → Shield.',
+    '"Tự động xoay (rotate) mật khẩu/secret" → <strong>Secrets Manager</strong> (Parameter Store không tự rotate).',
+    '"Ai đã gọi API gì" → CloudTrail. "Cấu hình resource thay đổi gì" → AWS Config.',
+  ],
+  M11: [
+    'Deadline gấp + băng thông mạng thấp + dữ liệu lớn → <strong>Snowball</strong> (đừng chọn truyền qua mạng).',
+    'DR: RTO/RPO gần 0 → Multi-Site. Rẻ nhất, RTO hàng giờ → Backup & Restore.',
+    'Thấy cụm từ <strong>"LEAST operational overhead"</strong> → ưu tiên dịch vụ managed/serverless.',
+    'On-prem cần truy cập file liên tục vào S3 → <strong>Storage Gateway</strong>, không phải DataSync (DataSync = chuyển định kỳ).',
+  ],
+  M12: [
+    'ĐỌC KỸ từ khóa định tính: "MOST cost-effective", "LEAST operational overhead", "MOST secure" — nó quyết định đáp án.',
+    'Kỹ thuật loại trừ: gạch đáp án vi phạm luật bất biến (EBS 1 AZ, Lambda 15 phút, SG không Deny...).',
+    'Nhiều đáp án "đúng về kỹ thuật" — chọn cái khớp <strong>đúng từ khóa định tính</strong> của đề.',
+    'Câu HA cho database → gần như luôn là <strong>Multi-AZ</strong>; câu scale read → Read Replica.',
+  ],
+};
+
 function svgShared() {
   return `<figure class="diagram">
     <svg viewBox="0 0 560 180" preserveAspectRatio="xMidYMid meet" role="img">
@@ -928,7 +1002,8 @@ function renderModule(arg) {
   window.scrollTo(0, 0);
 }
 
-function renderModuleDetail(id) {
+function renderModuleDetail(id, keepScroll) {
+  const scrollY = window.scrollY;
   const idx = MODULES.findIndex(m => m.id === id);
   if (idx < 0) { render('<p>Module not found.</p>'); return; }
   const mod = MODULES[idx];
@@ -957,6 +1032,10 @@ function renderModuleDetail(id) {
         ${MQUIZ.mode === 'exam' && !MQUIZ.submitted ? '<p><button id="quiz-submit" class="primary">Nộp bài</button></p>' : ''}
         ${MQUIZ.submitted ? `<p class="quiz-result">Điểm: <strong>${quizScore(questions)}/${questions.length}</strong></p>` : ''}
       </section>
+      ${MQUIZ.submitted ? `<section class="card tips-card">
+        <h2>💡 Mẹo ghi nhớ &amp; cách làm dạng câu này</h2>
+        <ul>${(MODULE_TIPS[mod.id] || []).map(t => `<li>${t}</li>`).join('')}</ul>
+      </section>` : ''}
       <nav class="theory-nav">
         ${prev ? `<a href="#/modules/${prev.id}">← ${prev.id}. ${escapeHtml(prev.title)}</a>` : '<span></span>'}
         ${next ? `<a href="#/modules/${next.id}">${next.id}. ${escapeHtml(next.title)} →</a>` : '<span></span>'}
@@ -964,7 +1043,7 @@ function renderModuleDetail(id) {
     </div>
   `);
   wireQuiz(mod, questions);
-  window.scrollTo(0, 0);
+  window.scrollTo(0, keepScroll ? scrollY : 0);
 }
 
 function renderQuizItem(q, i) {
@@ -1047,13 +1126,13 @@ function wireQuiz(mod, questions) {
         MQUIZ.submitted = true;
         saveModuleResult(mod, questions);
       }
-      renderModuleDetail(mod.id);
+      renderModuleDetail(mod.id, true);
     });
   });
   document.getElementById('quiz-submit')?.addEventListener('click', () => {
     MQUIZ.submitted = true;
     saveModuleResult(mod, questions);
-    renderModuleDetail(mod.id);
+    renderModuleDetail(mod.id, true);
   });
 }
 

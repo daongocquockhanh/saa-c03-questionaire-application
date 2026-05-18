@@ -128,3 +128,7 @@ button:disabled { opacity: 0.5; cursor: not-allowed; }
 .quiz-verdict.ok { color: #1b7f3b; }
 .quiz-verdict.bad { color: #c7253e; }
 .quiz-result { font-size: 1.1rem; padding: 0.6rem; background: #fff8ee; border-radius: 6px; }
+.tips-card { background: #fff8ee; border-color: #ff9900; }
+.tips-card h2 { color: #b8730a; }
+.tips-card ul { padding-left: 1.2rem; }
+.tips-card li { margin: 0.4rem 0; line-height: 1.45; }
