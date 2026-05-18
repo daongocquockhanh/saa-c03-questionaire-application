@@ -393,6 +393,7 @@ function renderResult(testId) {
         <ul class="opts">${optHtml}</ul>
         <p><strong>Your answer:</strong> ${given.join(', ') || '—'} <strong>Correct:</strong> ${exp.join(', ') || 'N/A'}</p>
         ${q.explanation ? `<p class="explanation">${escapeHtml(q.explanation).replace(/\n/g, '<br>')}</p>` : ''}
+        ${principlesBlock(q)}
         ${refs ? `<ul class="refs">${refs}</ul>` : ''}
       </details>`;
   }).join('');
@@ -806,6 +807,7 @@ function sampleQuestionsForSection(title) {
       <ul class="opts">${opts}</ul>
       <p><strong>Đáp án:</strong> ${exp.join(', ')}</p>
       ${q.explanation ? `<p class="explanation">${escapeHtml(q.explanation).replace(/\n/g, '<br>')}</p>` : ''}
+      ${principlesBlock(q)}
     </details>`;
   }).join('');
   return `<div class="sample-block"><h3>📝 Câu hỏi mẫu từ ngân hàng 897 câu</h3>${cards}</div>`;
@@ -939,6 +941,39 @@ function svgShared() {
   </figure>`;
 }
 
+const PRINCIPLES = [
+  { kw: ['highly available', 'high availability', 'highest availability', 'fault tolerant', 'fault-tolerant'], text: 'High availability = triển khai trên <strong>nhiều AZ</strong> trong cùng 1 Region (compute ≥2 AZ, database Multi-AZ).' },
+  { kw: ['disaster recovery', 'second region', 'another aws region', 'multiple aws regions', 'failover region', 'cross-region'], text: 'Chịu lỗi cấp vùng / DR = dùng <strong>nhiều Region</strong>. Chọn chiến lược theo RTO/RPO (Backup&Restore → Pilot Light → Warm Standby → Multi-Site).' },
+  { kw: ['activemq', 'rabbitmq', 'running on an amazon ec2', 'runs on an amazon ec2', 'runs on amazon ec2', 'database that runs on an amazon ec2', 'self-managed', 'self-hosted', 'hosted on a single amazon ec2'], text: 'Dấu hiệu "dịch vụ tự quản chạy trên EC2" → đáp án đúng thường là <strong>migrate sang dịch vụ managed</strong> tương đương (ActiveMQ→Amazon MQ, MySQL→RDS, Redis→ElastiCache).' },
+  { kw: ['least operational overhead', 'low operational complexity', 'minimal operational', 'minimize operational', 'fully managed', 'least amount of operational', 'least management'], text: 'Thấy "least operational overhead / low complexity" → ưu tiên dịch vụ <strong>managed/serverless</strong>; loại đáp án phải tự cài đặt, tự vận hành.' },
+  { kw: ['decouple', 'decoupl', 'tightly coupled', 'traffic spike', 'sudden increase in traffic', 'must not be lost', 'without losing'], text: 'Tách rời thành phần / hấp thụ tải đột biến / không mất việc → đặt <strong>hàng đợi SQS</strong> vào giữa producer và consumer.' },
+  { kw: ['in the same order', 'exactly once', 'exactly-once', 'in the order', 'duplicate order', 'process the messages in order', 'order of receipt'], text: 'Cần đúng <strong>thứ tự</strong> hoặc <strong>không trùng lặp</strong> → SQS FIFO queue, hoặc Kinesis Data Streams với partition key.' },
+  { kw: ['read replica', 'read-heavy', 'read traffic', 'reporting queries', 'heavy read', 'scale read', 'reports on the'], text: 'Multi-AZ = chỉ để HA, KHÔNG scale đọc. Tải <strong>đọc</strong> cao / chạy báo cáo → dùng <strong>Read Replica</strong>.' },
+  { kw: ['sub-millisecond', 'microsecond', 'reduce the load on the database', 'in-memory', 'frequently read', 'caching'], text: 'Cần sub-millisecond / giảm tải đọc DB → <strong>ElastiCache</strong> (hoặc DAX — chỉ dùng cho DynamoDB).' },
+  { kw: ['users around the world', 'global user', 'worldwide', 'geographically dispersed', 'global audience'], text: 'Người dùng toàn cầu + nội dung tĩnh/HTTP → <strong>CloudFront</strong>. Ứng dụng non-HTTP (TCP/UDP) toàn cầu → <strong>Global Accelerator</strong>.' },
+  { kw: ['most cost-effective', 'cost-effective', 'reduce cost', 'minimize cost', 'lowest cost', 'reduce the cost', 'optimize cost'], text: 'Tối ưu chi phí: Spot cho batch chịu gián đoạn, S3 Lifecycle/IA/Glacier cho data ít dùng, Savings Plans cho workload ổn định, Gateway Endpoint thay NAT.' },
+  { kw: ['not traverse the internet', 'without using the internet', 'not be exposed to the public internet', 'private connection', 'must not go over the internet', 'no internet'], text: 'Traffic KHÔNG đi qua Internet → <strong>VPC Endpoint</strong> (S3/DynamoDB = Gateway endpoint, miễn phí), PrivateLink, hoặc Direct Connect.' },
+  { kw: ['snowball', 'petabytes', 'limited bandwidth', 'within the next month', 'migrate ', 'on-premises data center'], text: 'Khối lượng dữ liệu lớn + băng thông mạng hạn chế + deadline → <strong>AWS Snowball</strong>; đừng chọn truyền qua mạng/VPN.' },
+  { kw: ['takes up to', 'long-running', 'run for', 'hours to complete', 'batch processing', 'batch job'], text: 'Tác vụ chạy lâu (> 15 phút) → KHÔNG dùng Lambda → <strong>ECS Fargate</strong> hoặc <strong>AWS Batch</strong>.' },
+  { kw: ['personally identifiable', 'pii', 'sensitive data', 'protected health'], text: 'Phát hiện/phân loại PII, dữ liệu nhạy cảm trong S3 → <strong>Amazon Macie</strong>.' },
+  { kw: ['sql injection', 'cross-site scripting', 'web exploit', 'common web'], text: 'Chặn SQL injection / XSS / khai thác web tầng 7 → <strong>AWS WAF</strong> (gắn vào ALB/CloudFront/API Gateway).' },
+  { kw: ['ddos', 'denial of service'], text: 'Chống tấn công DDoS → <strong>AWS Shield</strong> (Advanced cho tầng 7, cost protection, đội DRT).' },
+  { kw: ['rotate the', 'rotation', 'rotating', 'database credentials'], text: 'Tự động xoay (rotate) mật khẩu/secret → <strong>AWS Secrets Manager</strong> (Parameter Store không tự rotate).' },
+  { kw: ['authenticate', 'user pool', 'sign in', 'mobile app', 'web application users'], text: 'Xác thực người dùng web/mobile → <strong>Amazon Cognito</strong>. Nhiều người dùng doanh nghiệp → IAM Identity Center / federation.' },
+  { kw: ['no programming', 'without managing', 'without provisioning', 'serverless'], text: 'Ưu tiên kiến trúc serverless (Lambda, Fargate, API Gateway, DynamoDB) khi đề nhấn "không quản lý hạ tầng".' },
+];
+
+function principlesBlock(q) {
+  const text = (q.scenario + ' ' + q.prompt + ' ' + q.options.map(o => o.text).join(' ')).toLowerCase();
+  const hits = [];
+  for (const p of PRINCIPLES) {
+    if (p.kw.some(k => text.includes(k))) hits.push(p.text);
+    if (hits.length >= 3) break;
+  }
+  if (!hits.length) return '';
+  return `<div class="principles"><strong>🎯 Nguyên tắc cần nhớ</strong><ul>${hits.map(h => `<li>${h}</li>`).join('')}</ul></div>`;
+}
+
 function moduleDiagrams(id) {
   switch (id) {
     case 'M1': return svgFlow('Hạ tầng AWS', ['Region (vùng địa lý)', 'Availability Zones (3+)', 'Data centers']) + svgShared();
@@ -967,7 +1002,7 @@ function moduleQuestions(mod) {
     if (score > 0) scored.push({ q, score });
   }
   scored.sort((a, b) => b.score - a.score || a.q.id - b.q.id);
-  return scored.slice(0, 10).map(s => s.q);
+  return scored.slice(0, 20).map(s => s.q);
 }
 
 function moduleProgress(id) {
@@ -1066,7 +1101,8 @@ function renderQuizItem(q, i) {
   }).join('');
   const result = revealed
     ? `<p class="quiz-verdict ${isCorrect(q, given) ? 'ok' : 'bad'}">${isCorrect(q, given) ? '✓ Đúng' : '✗ Sai'} — Đáp án: ${exp.join(', ')}</p>
-       ${q.explanation ? `<p class="explanation">${escapeHtml(q.explanation).replace(/\n/g, '<br>')}</p>` : ''}`
+       ${q.explanation ? `<p class="explanation">${escapeHtml(q.explanation).replace(/\n/g, '<br>')}</p>` : ''}
+       ${principlesBlock(q)}`
     : '';
   const checkBtn = (MQUIZ.mode === 'review' && !revealed)
     ? `<button class="quiz-check" data-qid="${q.id}">Kiểm tra</button>` : '';
