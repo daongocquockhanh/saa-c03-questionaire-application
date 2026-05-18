@@ -812,7 +812,78 @@ Công cụ: **AWS Backup**, **AWS Elastic Disaster Recovery (DRS)**, RDS snapsho
 
 ---
 
-## XXX. Gợi ý ôn thi
+## XXX. Câu thần chú & chiến thuật phòng thi
+
+> Học thuộc các "câu thần chú" này một lần — vào phòng thi nhận diện từ khóa là bật ra đáp án.
+
+### 1. Thấy chữ này → Nghĩ ngay tới dịch vụ này
+
+| Đề nói… | Bật ra |
+|---|---|
+| highly available | nhiều AZ / Multi-AZ |
+| disaster recovery, another Region | nhiều Region |
+| least operational overhead | managed / serverless |
+| decouple, traffic spike | SQS |
+| in order, exactly once | SQS FIFO / Kinesis |
+| one event → many targets | SNS (fan-out) |
+| sub-millisecond, cache | ElastiCache / DAX |
+| scale read, reporting queries | Read Replica |
+| users worldwide + static | CloudFront |
+| non-HTTP global (game/UDP) | Global Accelerator |
+| not traverse the internet | VPC Endpoint |
+| big data + low bandwidth + deadline | Snowball |
+| run > 15 minutes | Fargate / Batch (không phải Lambda) |
+| PII in S3 | Macie |
+| SQL injection / XSS | WAF |
+| DDoS | Shield |
+| rotate credentials | Secrets Manager |
+| authenticate web/mobile users | Cognito |
+| shared file, Linux | EFS |
+| shared file, Windows | FSx for Windows |
+
+### 2. Câu thần chú dễ nhớ (mnemonics)
+
+- **AZ = Availability. Region = Recovery.** — HA thì nhiều AZ; DR thì nhiều Region.
+- **Multi-AZ ngủ, Read Replica cày.** — Standby chỉ chờ failover, không phục vụ đọc.
+- **EC2 tự quản = cái bẫy.** — Thấy ActiveMQ/MySQL/Redis tự cài trên EC2 → đáp án là bản managed.
+- **Lười là đúng.** — "Least operational overhead" → chọn cái ít phải động tay nhất.
+- **FIFO = thứ tự, Standard = tốc độ.**
+- **Hàng đợi = tấm đệm.** — SQS hấp thụ tải đột biến, decouple.
+- **Web → CloudFront, không-web → Global Accelerator.**
+- **Batch rẻ = Spot. Data nguội = Glacier.**
+- **Riêng tư = Endpoint, không phải NAT.**
+- **Data to + mạng yếu = ship ổ cứng (Snowball).**
+- **Lambda chỉ sống 15 phút.**
+- **Gateway endpoint: chỉ S3 + DynamoDB, và miễn phí.**
+- **Encrypted snapshot đi đâu, KMS key theo đó.**
+
+### 3. Kỹ thuật loại trừ (quan trọng nhất)
+
+Đề SAA thường có **2 đáp án sai rõ** và **2 đáp án "đúng kỹ thuật"**. Cách xử lý:
+
+1. **Gạch ngay** đáp án vi phạm luật bất biến: EBS nhảy cross-AZ không cần snapshot, ALB có static IP, Security Group có rule Deny, Gateway endpoint cho dịch vụ ngoài S3/DynamoDB, Lambda chạy 1 tiếng… → đều SAI.
+2. Còn 2 đáp án → đọc lại **từ khóa định tính** của đề (MOST cost-effective? LEAST overhead? MOST secure?).
+3. Chọn đáp án khớp đúng từ khóa đó. Cả hai có thể "chạy được", nhưng chỉ một khớp yêu cầu.
+
+### 4. Bẫy ngôn ngữ — khoanh tròn trước khi đọc đáp án
+
+- **MOST cost-effective** → rẻ nhất thắng, kể cả phức tạp hơn chút.
+- **LEAST operational overhead** → managed/serverless thắng, kể cả đắt hơn chút.
+- **MOST secure** → bảo mật chặt nhất thắng.
+- **MINIMAL changes / FEWEST changes** → giải pháp ít sửa code/kiến trúc nhất thắng.
+- **immediately / real-time** → loại Glacier, loại batch.
+- **eventually** → cho phép async, eventually consistent.
+
+### 5. Quản lý thời gian
+
+- 65 câu / 130 phút ≈ **2 phút/câu**.
+- Câu dài khó → đánh dấu (flag), bỏ qua, quay lại sau. Đừng kẹt.
+- Lượt 1: làm câu dễ, ăn điểm chắc. Lượt 2: câu đã flag. Lượt 3: rà soát.
+- Đọc **câu hỏi cuối** trước, rồi mới đọc đoạn scenario dài — biết cần tìm gì.
+
+---
+
+## XXXI. Gợi ý ôn thi
 
 1. Đọc qua tài liệu này 2–3 lượt.
 2. Xem khóa Stéphane Maarek hoặc Adrian Cantrill (lý thuyết sâu).
