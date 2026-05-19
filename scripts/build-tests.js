@@ -75,6 +75,7 @@ if (invoked) {
       explanation: q.explanation,
       references: q.references,
       domain: q.domain,
+      tip: q.tip,
     })),
   };
   mkdirSync(dirname(OUT_PATH), { recursive: true });

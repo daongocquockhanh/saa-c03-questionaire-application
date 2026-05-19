@@ -964,6 +964,12 @@ const PRINCIPLES = [
 ];
 
 function principlesBlock(q) {
+  if (q.tip) {
+    return `<div class="principles">
+      <span class="principle-hook">💡 Mẹo nhận biết</span>
+      <span class="principle-rule">${escapeHtml(q.tip)}</span>
+    </div>`;
+  }
   const text = (q.scenario + ' ' + q.prompt + ' ' + q.options.map(o => o.text).join(' ')).toLowerCase();
   const p = PRINCIPLES.find(pr => pr.kw.some(k => text.includes(k)));
   if (!p) return '';
