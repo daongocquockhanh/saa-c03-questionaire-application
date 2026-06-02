@@ -1,8 +1,15 @@
 import { MODULES } from './modules.js';
+import { scoreQuestion, verdict } from './scoring.js';
 
 const STORE_KEY = 'saa-c03-progress';
 let DATA = null;
 let PROGRESS = null;
+
+// Scores can be fractional now (partial credit). Show 1 decimal, drop ".0".
+function fmtScore(n) {
+  const r = Math.round(n * 10) / 10;
+  return Number.isInteger(r) ? String(r) : r.toFixed(1);
+}
 
 function loadProgress() {
   let p;
@@ -103,7 +110,7 @@ function renderDashboard() {
   const cards = DATA.tests.map(t => {
     const p = PROGRESS.tests[t.id] || { status: 'not-started' };
     const status = p.status || 'not-started';
-    const score = p.bestScore != null ? `Best: ${p.bestScore}/${t.questionIds.length} (${p.bestPercent}%)` : 'No attempts yet';
+    const score = p.bestScore != null ? `Best: ${fmtScore(p.bestScore)}/${t.questionIds.length} (${p.bestPercent}%)` : 'No attempts yet';
     const passBadge = p.bestPercent >= DATA.passPercent
       ? '<span class="badge pass">Pass ✓</span>'
       : p.bestPercent != null ? '<span class="badge fail">Fail ✗</span>' : '';
@@ -307,9 +314,7 @@ function submitTest() {
   let correct = 0;
   for (const id of test.questionIds) {
     const q = getQuestion(id);
-    const given = (RUNNER.answers[id] || []).slice().sort();
-    const exp = (q.correctAnswers || []).slice().sort();
-    if (given.length && given.length === exp.length && given.every((v, i) => v === exp[i])) correct++;
+    correct += scoreQuestion(q.correctAnswers, RUNNER.answers[id]);
   }
   const total = test.questionIds.length;
   const pct = Math.round((correct / total) * 100);
@@ -349,17 +354,14 @@ function renderResult(testId) {
   const byDomain = { 1: { correct: 0, total: 0 }, 2: { correct: 0, total: 0 }, 3: { correct: 0, total: 0 }, 4: { correct: 0, total: 0 } };
   for (const id of test.questionIds) {
     const q = getQuestion(id);
-    const given = (r.answers[id] || []).slice().sort();
-    const exp = q.correctAnswers.slice().sort();
-    const isRight = given.length && given.length === exp.length && given.every((v, i) => v === exp[i]);
     byDomain[q.domain].total++;
-    if (isRight) byDomain[q.domain].correct++;
+    byDomain[q.domain].correct += scoreQuestion(q.correctAnswers, r.answers[id]);
   }
 
   const domainNames = { 1: 'Secure', 2: 'Resilient', 3: 'High-Performing', 4: 'Cost-Optimized' };
   const domainBars = Object.entries(byDomain).map(([d, v]) => {
     const pct = v.total ? Math.round((v.correct / v.total) * 100) : 0;
-    return `<div class="domain-row"><span>D${d} ${domainNames[d]}</span><div class="bar"><div class="bar-fill" style="width:${pct}%"></div></div><span>${v.correct}/${v.total} (${pct}%)</span></div>`;
+    return `<div class="domain-row"><span>D${d} ${domainNames[d]}</span><div class="bar"><div class="bar-fill" style="width:${pct}%"></div></div><span>${fmtScore(v.correct)}/${v.total} (${pct}%)</span></div>`;
   }).join('');
 
   const filters = `
@@ -373,7 +375,8 @@ function renderResult(testId) {
     const q = getQuestion(id);
     const given = (r.answers[id] || []).slice().sort();
     const exp = q.correctAnswers.slice().sort();
-    const isRight = given.length && given.length === exp.length && given.every((v, i) => v === exp[i]);
+    const sc = scoreQuestion(q.correctAnswers, r.answers[id]);
+    const isRight = sc === 1;
     const flagged = r.flags && r.flags[id];
     const optHtml = q.options.map(o => {
       const isGiven = given.includes(o.letter);
@@ -385,7 +388,7 @@ function renderResult(testId) {
     return `
       <details class="card result-q" data-wrong="${!isRight}" data-flagged="${!!flagged}">
         <summary>
-          Q${idx + 1} — ${isRight ? '<span class="badge pass">Correct</span>' : '<span class="badge fail">Incorrect</span>'}
+          Q${idx + 1} — ${sc === 1 ? '<span class="badge pass">Correct</span>' : sc === 0 ? '<span class="badge fail">Incorrect</span>' : `<span class="badge partial">Partial ${fmtScore(sc)}/1</span>`}
           ${flagged ? '★' : ''} <span class="muted">D${q.domain} ${domainNames[q.domain]}</span>
         </summary>
         <p class="scenario">${escapeHtml(q.scenario).replace(/\n/g, '<br>')}</p>
@@ -401,7 +404,7 @@ function renderResult(testId) {
   render(`
     <h1>${escapeHtml(test.title)} — Result</h1>
     <div class="card result-summary">
-      <div class="score"><strong>${r.score} / ${r.total}</strong> (${r.percent}%)</div>
+      <div class="score"><strong>${fmtScore(r.score)} / ${r.total}</strong> (${r.percent}%)</div>
       <div>${pass ? '<span class="badge pass">Pass ✓</span>' : '<span class="badge fail">Fail ✗</span>'}</div>
       <div class="muted">Time taken: ${durationMin} min</div>
     </div>
@@ -1014,19 +1017,13 @@ function moduleProgress(id) {
   return (PROGRESS.modules && PROGRESS.modules[id]) || {};
 }
 
-function isCorrect(q, given) {
-  const g = given.slice().sort();
-  const e = (q.correctAnswers || []).slice().sort();
-  return g.length > 0 && g.length === e.length && g.every((v, i) => v === e[i]);
-}
-
 function renderModule(arg) {
   if (arg) { renderModuleDetail(arg); return; }
   const done = MODULES.filter(m => moduleProgress(m.id).quizTotal).length;
   const pct = Math.round((done / MODULES.length) * 100);
   const cards = MODULES.map(m => {
     const p = moduleProgress(m.id);
-    const score = p.quizTotal ? `Quiz: ${p.quizScore}/${p.quizTotal}` : 'Chưa làm quiz';
+    const score = p.quizTotal ? `Quiz: ${fmtScore(p.quizScore)}/${p.quizTotal}` : 'Chưa làm quiz';
     const badge = p.quizTotal ? '<span class="badge done">Đã học</span>' : '<span class="badge not-started">Chưa học</span>';
     return `<a class="card module-card" href="#/modules/${m.id}">
       <div class="test-card-header"><h3>${m.id}. ${escapeHtml(m.title)}</h3>${badge}</div>
@@ -1070,7 +1067,7 @@ function renderModuleDetail(id, keepScroll) {
         <p class="muted">${MQUIZ.mode === 'review' ? 'Review: chọn đáp án rồi bấm Kiểm tra để xem ngay kết quả.' : 'Exam: làm hết rồi bấm Nộp bài để chấm điểm.'}</p>
         <div id="quiz-body">${questions.map((q, i) => renderQuizItem(q, i)).join('')}</div>
         ${MQUIZ.mode === 'exam' && !MQUIZ.submitted ? '<p><button id="quiz-submit" class="primary">Nộp bài</button></p>' : ''}
-        ${MQUIZ.submitted ? `<p class="quiz-result">Điểm: <strong>${quizScore(questions)}/${questions.length}</strong></p>` : ''}
+        ${MQUIZ.submitted ? `<p class="quiz-result">Điểm: <strong>${fmtScore(quizScore(questions))}/${questions.length}</strong></p>` : ''}
       </section>
       ${MQUIZ.submitted ? `<section class="card tips-card">
         <h2>💡 Mẹo ghi nhớ &amp; cách làm dạng câu này</h2>
@@ -1104,8 +1101,13 @@ function renderQuizItem(q, i) {
       <span><strong>${o.letter}.</strong> ${escapeHtml(o.text)}${revealed && correct ? ' ✓' : ''}</span>
     </label>`;
   }).join('');
+  const vd = revealed ? verdict(q.correctAnswers, given) : null;
+  const vdClass = vd === 'correct' ? 'ok' : vd === 'partial' ? 'mid' : 'bad';
+  const vdLabel = vd === 'correct' ? '✓ Đúng'
+    : vd === 'partial' ? `◐ Đúng một phần (${fmtScore(scoreQuestion(q.correctAnswers, given))}/1)`
+    : '✗ Sai';
   const result = revealed
-    ? `<p class="quiz-verdict ${isCorrect(q, given) ? 'ok' : 'bad'}">${isCorrect(q, given) ? '✓ Đúng' : '✗ Sai'} — Đáp án: ${exp.join(', ')}</p>
+    ? `<p class="quiz-verdict ${vdClass}">${vdLabel} — Đáp án: ${exp.join(', ')}</p>
        ${q.explanation ? `<p class="explanation">${escapeHtml(q.explanation).replace(/\n/g, '<br>')}</p>` : ''}
        ${principlesBlock(q)}`
     : '';
@@ -1121,13 +1123,13 @@ function renderQuizItem(q, i) {
 
 function quizScore(questions) {
   let n = 0;
-  for (const q of questions) if (isCorrect(q, MQUIZ.answers[q.id] || [])) n++;
+  for (const q of questions) n += scoreQuestion(q.correctAnswers, MQUIZ.answers[q.id] || []);
   return n;
 }
 
 function saveModuleResult(mod, questions) {
   if (!PROGRESS.modules) PROGRESS.modules = {};
-  const wrong = questions.filter(q => !isCorrect(q, MQUIZ.answers[q.id] || [])).map(q => q.number);
+  const wrong = questions.filter(q => verdict(q.correctAnswers, MQUIZ.answers[q.id] || []) !== 'correct').map(q => q.number);
   PROGRESS.modules[mod.id] = {
     quizScore: quizScore(questions),
     quizTotal: questions.length,

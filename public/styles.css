@@ -13,6 +13,7 @@ button:disabled { opacity: 0.5; cursor: not-allowed; }
 .badge.not-started { background: #e2e3e5; color: #383d41; }
 .badge.pass { background: #d4edda; color: #155724; }
 .badge.fail { background: #f8d7da; color: #721c24; }
+.badge.partial { background: #fff3cd; color: #856404; }
 .timer { font-variant-numeric: tabular-nums; font-weight: 600; }
 .timer.warning { color: #d9534f; }
 .test-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 1rem; }
@@ -127,6 +128,7 @@ button:disabled { opacity: 0.5; cursor: not-allowed; }
 .quiz-verdict { font-weight: 600; margin: 0.5rem 0 0.3rem; }
 .quiz-verdict.ok { color: #1b7f3b; }
 .quiz-verdict.bad { color: #c7253e; }
+.quiz-verdict.mid { color: #b8860b; }
 .quiz-result { font-size: 1.1rem; padding: 0.6rem; background: #fff8ee; border-radius: 6px; }
 .tips-card { background: #fff8ee; border-color: #ff9900; }
 .tips-card h2 { color: #b8730a; }
