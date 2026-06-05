@@ -14,6 +14,7 @@ button:disabled { opacity: 0.5; cursor: not-allowed; }
 .badge.pass { background: #d4edda; color: #155724; }
 .badge.fail { background: #f8d7da; color: #721c24; }
 .badge.partial { background: #fff3cd; color: #856404; }
+.badge.unscored { background: #e2e3e5; color: #383d41; }
 .timer { font-variant-numeric: tabular-nums; font-weight: 600; }
 .timer.warning { color: #d9534f; }
 .test-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 1rem; }
@@ -117,6 +118,8 @@ button:disabled { opacity: 0.5; cursor: not-allowed; }
 .quiz-head { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem; }
 .mode-toggle { display: flex; gap: 0.4rem; }
 .mode-toggle button { font-size: 0.85rem; padding: 0.35rem 0.7rem; }
+.revise-tabs { display: flex; gap: 0.5rem; margin: 0.5rem 0; flex-wrap: wrap; }
+.star-btn { background: none; border: none; cursor: pointer; font-size: 1.15rem; color: #d4a017; padding: 0 0.3rem; line-height: 1; }
 .quiz-item { padding: 0.9rem 0; border-bottom: 1px solid #eee; }
 .quiz-item:last-child { border-bottom: none; }
 .quiz-q { margin: 0 0 0.6rem; }

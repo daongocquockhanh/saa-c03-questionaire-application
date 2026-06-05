@@ -26,3 +26,28 @@ export function verdict(correctAnswers, given) {
   if (s === 0) return 'wrong';
   return 'partial';
 }
+
+// Small seeded PRNG (mulberry32) so unscored picks are deterministic per seed.
+function mulberry32(seed) {
+  let a = seed >>> 0 || 1;
+  return function () {
+    a = (a + 0x6d2b79f5) | 0;
+    let t = Math.imul(a ^ (a >>> 15), 1 | a);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+// Real SAA-C03 scores only 50 of 65 questions; 15 are unscored (experimental).
+// Returns `count` question ids that DON'T count, chosen by a seeded shuffle so
+// the set is stable per `seed` (use the test id) but spread across the exam.
+export function pickUnscored(questionIds, seed, count) {
+  const ids = (questionIds || []).slice();
+  const n = Math.min(count, ids.length);
+  const rand = mulberry32(seed);
+  for (let i = ids.length - 1; i > 0; i--) {
+    const j = Math.floor(rand() * (i + 1));
+    [ids[i], ids[j]] = [ids[j], ids[i]];
+  }
+  return ids.slice(0, n);
+}

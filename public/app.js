@@ -1,5 +1,9 @@
 import { MODULES } from './modules.js';
-import { scoreQuestion, verdict } from './scoring.js';
+import { scoreQuestion, verdict, pickUnscored } from './scoring.js';
+import { wrongPool, normalizeFlagList, toggleInList } from './review.js';
+
+// Real SAA-C03 leaves 15 of 65 questions unscored. Practice Tests mirror that.
+const UNSCORED_PER_TEST = 15;
 
 const STORE_KEY = 'saa-c03-progress';
 let DATA = null;
@@ -17,10 +21,62 @@ function loadProgress() {
   catch { p = {}; }
   if (!p.tests) p.tests = {};
   if (!p.modules) p.modules = {};
+  if (!p.questionStats) p.questionStats = {};
+  if (!p.flaggedQuestions) p.flaggedQuestions = [];
+  if (!p.flaggedTests) p.flaggedTests = [];
   return p;
 }
 function saveProgress() {
   localStorage.setItem(STORE_KEY, JSON.stringify(PROGRESS));
+}
+
+// --- Review / Redo: per-question stats + flag helpers ---
+
+// Record the outcome of answering one question (anywhere it gets graded).
+function recordQuestionStat(qId, given) {
+  const q = getQuestion(qId);
+  if (!q) return;
+  PROGRESS.questionStats[qId] = {
+    verdict: verdict(q.correctAnswers, given || []),
+    given: (given || []).slice(),
+  };
+}
+
+// Keep the global flagged-questions list in sync with a flag on/off action.
+function syncFlag(qId, on) {
+  const list = normalizeFlagList(PROGRESS.flaggedQuestions);
+  const has = list.includes(Number(qId));
+  if (on && !has) PROGRESS.flaggedQuestions = [...list, Number(qId)];
+  else if (!on && has) PROGRESS.flaggedQuestions = list.filter((x) => x !== Number(qId));
+  saveProgress();
+}
+
+// One-time migration: seed questionStats + flaggedQuestions from existing history.
+function backfillStats() {
+  if (PROGRESS.__statsBackfilled) return;
+  const numToId = {};
+  for (const q of DATA.questions) numToId[q.number] = q.id;
+  for (const prog of Object.values(PROGRESS.tests || {})) {
+    const r = prog && prog.lastResult;
+    if (!r || !r.answers) continue;
+    for (const [id, given] of Object.entries(r.answers)) {
+      if (given && given.length) recordQuestionStat(Number(id), given);
+    }
+    for (const [id, on] of Object.entries(r.flags || {})) {
+      if (on) PROGRESS.flaggedQuestions.push(Number(id));
+    }
+  }
+  for (const m of Object.values(PROGRESS.modules || {})) {
+    for (const num of (m && m.wrong) || []) {
+      const id = numToId[num];
+      if (id != null && !PROGRESS.questionStats[id]) {
+        PROGRESS.questionStats[id] = { verdict: 'wrong', given: [] };
+      }
+    }
+  }
+  PROGRESS.flaggedQuestions = normalizeFlagList(PROGRESS.flaggedQuestions);
+  PROGRESS.__statsBackfilled = true;
+  saveProgress();
 }
 
 async function loadData() {
@@ -43,6 +99,7 @@ function route() {
   else if (screen === 'theory') renderTheory(arg || null);
   else if (screen === 'modules') renderModule(arg || null);
   else if (screen === 'sources') renderSources();
+  else if (screen === 'review') renderRevise();
   else renderDashboard();
   updateTopbar(screen || 'dashboard');
 }
@@ -52,6 +109,7 @@ function updateTopbar(screen) {
   if (!el) return;
   el.innerHTML = `
     <a href="#/dashboard" class="nav-link ${screen === 'dashboard' ? 'active' : ''}">Practice Tests</a>
+    <a href="#/review" class="nav-link ${screen === 'review' ? 'active' : ''}">Review</a>
     <a href="#/modules" class="nav-link ${screen === 'modules' ? 'active' : ''}">Modules</a>
     <a href="#/theory" class="nav-link ${screen === 'theory' ? 'active' : ''}">Theory</a>
     <a href="#/sources" class="nav-link ${screen === 'sources' ? 'active' : ''}">Sources</a>
@@ -105,21 +163,28 @@ function renderSources() {
   window.scrollTo(0, 0);
 }
 
+let DASH_FILTER = 'all';
+
 function renderDashboard() {
   const totalPassed = Object.values(PROGRESS.tests).filter(t => t.bestPercent >= DATA.passPercent).length;
-  const cards = DATA.tests.map(t => {
+  const flaggedTests = normalizeFlagList(PROGRESS.flaggedTests);
+  const tests = DASH_FILTER === 'flagged' ? DATA.tests.filter(t => flaggedTests.includes(t.id)) : DATA.tests;
+  const cards = tests.map(t => {
     const p = PROGRESS.tests[t.id] || { status: 'not-started' };
     const status = p.status || 'not-started';
-    const score = p.bestScore != null ? `Best: ${fmtScore(p.bestScore)}/${t.questionIds.length} (${p.bestPercent}%)` : 'No attempts yet';
+    const scoredCount = t.questionIds.length > UNSCORED_PER_TEST ? t.questionIds.length - UNSCORED_PER_TEST : t.questionIds.length;
+    const score = p.bestScore != null ? `Best: ${fmtScore(p.bestScore)}/${scoredCount} (${p.bestPercent}%)` : 'No attempts yet';
     const passBadge = p.bestPercent >= DATA.passPercent
       ? '<span class="badge pass">Pass ✓</span>'
       : p.bestPercent != null ? '<span class="badge fail">Fail ✗</span>' : '';
     const last = p.lastAttempt ? `Last: ${new Date(p.lastAttempt).toLocaleDateString()}` : '';
     const action = status === 'in-progress' ? 'Resume' : status === 'done' ? 'Retake' : 'Start';
+    const starred = flaggedTests.includes(t.id);
     return `
       <div class="card test-card">
         <div class="test-card-header">
           <h3>${t.title}</h3>
+          <button class="star-btn" data-test="${t.id}" title="Flag this test">${starred ? '★' : '☆'}</button>
           <span class="badge ${status}">${status.replace('-', ' ')}</span>
         </div>
         <p>${score} ${passBadge}</p>
@@ -128,16 +193,32 @@ function renderDashboard() {
       </div>
     `;
   }).join('');
+  const emptyFlagged = DASH_FILTER === 'flagged' && !tests.length
+    ? '<p class="muted">Chưa gắn cờ bài test nào. Bấm ☆ trên một bài để đánh dấu.</p>' : '';
   render(`
     <h1>Practice Tests</h1>
     <p>${totalPassed} of ${DATA.totalTests} tests passed.</p>
+    <div class="revise-tabs">
+      <button id="dash-all" class="${DASH_FILTER === 'all' ? 'primary' : ''}">All</button>
+      <button id="dash-flagged" class="${DASH_FILTER === 'flagged' ? 'primary' : ''}">★ Flagged (${flaggedTests.length})</button>
+    </div>
     <div class="test-grid">${cards}</div>
+    ${emptyFlagged}
     <p><a href="#" id="reset-link">Reset all progress</a></p>
   `);
+  document.querySelectorAll('.star-btn').forEach(btn => btn.addEventListener('click', e => {
+    e.preventDefault();
+    const id = Number(btn.dataset.test);
+    PROGRESS.flaggedTests = toggleInList(normalizeFlagList(PROGRESS.flaggedTests), id);
+    saveProgress();
+    renderDashboard();
+  }));
+  document.getElementById('dash-all')?.addEventListener('click', () => { DASH_FILTER = 'all'; renderDashboard(); });
+  document.getElementById('dash-flagged')?.addEventListener('click', () => { DASH_FILTER = 'flagged'; renderDashboard(); });
   document.getElementById('reset-link').addEventListener('click', e => {
     e.preventDefault();
     if (confirm('Erase all progress?')) {
-      PROGRESS = { tests: {} };
+      PROGRESS = { tests: {}, modules: {}, questionStats: {}, flaggedQuestions: [], flaggedTests: [] };
       saveProgress();
       route();
     }
@@ -266,6 +347,7 @@ function renderRunner(testId) {
   document.getElementById('next').addEventListener('click', () => { RUNNER.current++; persistRunnerState(); renderRunner(testId); });
   document.getElementById('flag').addEventListener('click', () => {
     RUNNER.flags[qId] = !RUNNER.flags[qId];
+    syncFlag(qId, RUNNER.flags[qId]);
     persistRunnerState();
     renderRunner(testId);
   });
@@ -278,7 +360,7 @@ function renderRunner(testId) {
     if (e.target.tagName === 'INPUT') return;
     if (e.key === 'ArrowLeft' && RUNNER && RUNNER.current > 0) { RUNNER.current--; persistRunnerState(); renderRunner(testId); }
     if (e.key === 'ArrowRight' && RUNNER && RUNNER.current < test.questionIds.length - 1) { RUNNER.current++; persistRunnerState(); renderRunner(testId); }
-    if (e.key === 'f' && RUNNER) { RUNNER.flags[qId] = !RUNNER.flags[qId]; persistRunnerState(); renderRunner(testId); }
+    if (e.key === 'f' && RUNNER) { RUNNER.flags[qId] = !RUNNER.flags[qId]; syncFlag(qId, RUNNER.flags[qId]); persistRunnerState(); renderRunner(testId); }
   };
   window.__KEY_HANDLER__ = keyHandler;
   document.addEventListener('keydown', keyHandler);
@@ -311,19 +393,29 @@ function renderReview(testId) {
 
 function submitTest() {
   const test = DATA.tests.find(t => t.id === RUNNER.testId);
+  const unscored = pickUnscored(test.questionIds, test.id, test.questionIds.length > UNSCORED_PER_TEST ? UNSCORED_PER_TEST : 0);
+  const unscoredSet = new Set(unscored);
   let correct = 0;
+  let total = 0;
   for (const id of test.questionIds) {
+    if (unscoredSet.has(id)) continue;
     const q = getQuestion(id);
     correct += scoreQuestion(q.correctAnswers, RUNNER.answers[id]);
+    total++;
   }
-  const total = test.questionIds.length;
   const pct = Math.round((correct / total) * 100);
+  // Feed the global review pool: record every answered question (scored or not).
+  for (const id of test.questionIds) {
+    const given = RUNNER.answers[id];
+    if (given && given.length) recordQuestionStat(id, given);
+  }
   const attempt = {
     score: correct,
     total,
     percent: pct,
     answers: RUNNER.answers,
     flags: RUNNER.flags,
+    unscored,
     startedAt: RUNNER.startedAt,
     finishedAt: Date.now(),
   };
@@ -351,8 +443,10 @@ function renderResult(testId) {
   const pass = r.percent >= DATA.passPercent;
   const durationMin = Math.round((r.finishedAt - r.startedAt) / 60000);
 
+  const unscoredSet = new Set(r.unscored || pickUnscored(test.questionIds, test.id, test.questionIds.length > UNSCORED_PER_TEST ? UNSCORED_PER_TEST : 0));
   const byDomain = { 1: { correct: 0, total: 0 }, 2: { correct: 0, total: 0 }, 3: { correct: 0, total: 0 }, 4: { correct: 0, total: 0 } };
   for (const id of test.questionIds) {
+    if (unscoredSet.has(id)) continue;
     const q = getQuestion(id);
     byDomain[q.domain].total++;
     byDomain[q.domain].correct += scoreQuestion(q.correctAnswers, r.answers[id]);
@@ -376,6 +470,7 @@ function renderResult(testId) {
     const given = (r.answers[id] || []).slice().sort();
     const exp = q.correctAnswers.slice().sort();
     const sc = scoreQuestion(q.correctAnswers, r.answers[id]);
+    const unscored = unscoredSet.has(id);
     const isRight = sc === 1;
     const flagged = r.flags && r.flags[id];
     const optHtml = q.options.map(o => {
@@ -386,9 +481,9 @@ function renderResult(testId) {
     }).join('');
     const refs = (q.references || []).map(u => `<li><a href="${u}" target="_blank" rel="noopener">${u}</a></li>`).join('');
     return `
-      <details class="card result-q" data-wrong="${!isRight}" data-flagged="${!!flagged}">
+      <details class="card result-q" data-wrong="${!unscored && !isRight}" data-flagged="${!!flagged}">
         <summary>
-          Q${idx + 1} — ${sc === 1 ? '<span class="badge pass">Correct</span>' : sc === 0 ? '<span class="badge fail">Incorrect</span>' : `<span class="badge partial">Partial ${fmtScore(sc)}/1</span>`}
+          Q${idx + 1} — ${unscored ? '<span class="badge unscored">Unscored</span>' : sc === 1 ? '<span class="badge pass">Correct</span>' : sc === 0 ? '<span class="badge fail">Incorrect</span>' : `<span class="badge partial">Partial ${fmtScore(sc)}/1</span>`}
           ${flagged ? '★' : ''} <span class="muted">D${q.domain} ${domainNames[q.domain]}</span>
         </summary>
         <p class="scenario">${escapeHtml(q.scenario).replace(/\n/g, '<br>')}</p>
@@ -405,6 +500,7 @@ function renderResult(testId) {
     <h1>${escapeHtml(test.title)} — Result</h1>
     <div class="card result-summary">
       <div class="score"><strong>${fmtScore(r.score)} / ${r.total}</strong> (${r.percent}%)</div>
+      <div class="muted">Scored ${r.total} of ${test.questionIds.length} — ${test.questionIds.length - r.total} unscored (like the real exam)</div>
       <div>${pass ? '<span class="badge pass">Pass ✓</span>' : '<span class="badge fail">Fail ✗</span>'}</div>
       <div class="muted">Time taken: ${durationMin} min</div>
     </div>
@@ -1129,6 +1225,10 @@ function quizScore(questions) {
 
 function saveModuleResult(mod, questions) {
   if (!PROGRESS.modules) PROGRESS.modules = {};
+  for (const q of questions) {
+    const given = MQUIZ.answers[q.id];
+    if (given && given.length) recordQuestionStat(q.id, given);
+  }
   const wrong = questions.filter(q => verdict(q.correctAnswers, MQUIZ.answers[q.id] || []) !== 'correct').map(q => q.number);
   PROGRESS.modules[mod.id] = {
     quizScore: quizScore(questions),
@@ -1179,12 +1279,95 @@ function wireQuiz(mod, questions) {
   });
 }
 
+let REVISE = { filter: 'wrong', mode: 'read', ids: null };
+
+function renderRevise(recompute = true) {
+  if (recompute || !REVISE.ids) {
+    const ids = REVISE.filter === 'wrong'
+      ? wrongPool(PROGRESS.questionStats)
+      : normalizeFlagList(PROGRESS.flaggedQuestions);
+    REVISE.ids = ids.filter(id => getQuestion(id));
+  }
+  const questions = REVISE.ids.map(getQuestion).filter(Boolean);
+  const wrongCount = wrongPool(PROGRESS.questionStats).length;
+  const flaggedCount = normalizeFlagList(PROGRESS.flaggedQuestions).filter(id => getQuestion(id)).length;
+
+  if (REVISE.mode === 'read') {
+    // Study-card view: show your past answer if any, else the correct answer.
+    MQUIZ = {
+      moduleId: '__revise__', mode: 'review', submitted: true,
+      answers: Object.fromEntries(questions.map(q => {
+        const g = PROGRESS.questionStats[q.id]?.given;
+        return [q.id, (g && g.length) ? g.slice() : q.correctAnswers.slice()];
+      })),
+      checked: Object.fromEntries(questions.map(q => [q.id, true])),
+    };
+  } else {
+    MQUIZ = { moduleId: '__revise__', mode: 'review', answers: {}, checked: {}, submitted: false };
+  }
+
+  const body = questions.length
+    ? questions.map((q, i) => renderQuizItem(q, i)).join('')
+    : `<p class="muted">${REVISE.filter === 'wrong'
+        ? 'Chưa có câu sai nào. Làm vài bài đi! 🎉'
+        : 'Chưa gắn cờ câu nào. Bấm ☆ Flag khi làm bài.'}</p>`;
+
+  render(`
+    <h1>Review &amp; Redo</h1>
+    <div class="revise-tabs">
+      <button id="rv-wrong" class="${REVISE.filter === 'wrong' ? 'primary' : ''}">Câu sai (${wrongCount})</button>
+      <button id="rv-flagged" class="${REVISE.filter === 'flagged' ? 'primary' : ''}">Đã gắn cờ (${flaggedCount})</button>
+    </div>
+    <div class="mode-toggle">
+      <button id="rv-read" class="${REVISE.mode === 'read' ? 'primary' : ''}">Read</button>
+      <button id="rv-redo" class="${REVISE.mode === 'redo' ? 'primary' : ''}">Redo</button>
+    </div>
+    <p class="muted">${REVISE.mode === 'read'
+      ? 'Đọc lại đáp án đúng và giải thích.'
+      : 'Tự làm lại rồi bấm Kiểm tra. Làm đúng → lần sau câu rời danh sách.'}</p>
+    <div id="quiz-body">${body}</div>
+  `);
+  window.scrollTo(0, 0);
+  wireRevise(questions);
+}
+
+function wireRevise(questions) {
+  document.getElementById('rv-wrong')?.addEventListener('click', () => { REVISE.filter = 'wrong'; renderRevise(true); });
+  document.getElementById('rv-flagged')?.addEventListener('click', () => { REVISE.filter = 'flagged'; renderRevise(true); });
+  document.getElementById('rv-read')?.addEventListener('click', () => { REVISE.mode = 'read'; renderRevise(true); });
+  document.getElementById('rv-redo')?.addEventListener('click', () => { REVISE.mode = 'redo'; renderRevise(true); });
+  document.querySelectorAll('#quiz-body input').forEach(inp => {
+    inp.addEventListener('change', e => {
+      const qid = Number(e.target.dataset.qid);
+      const q = questions.find(x => x.id === qid);
+      const letter = e.target.value;
+      if (q.isMultiSelect) {
+        const set = new Set(MQUIZ.answers[qid] || []);
+        e.target.checked ? set.add(letter) : set.delete(letter);
+        MQUIZ.answers[qid] = [...set].sort();
+      } else {
+        MQUIZ.answers[qid] = [letter];
+      }
+    });
+  });
+  document.querySelectorAll('.quiz-check').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const qid = Number(btn.dataset.qid);
+      MQUIZ.checked[qid] = true;
+      recordQuestionStat(qid, MQUIZ.answers[qid] || []);
+      saveProgress();
+      renderRevise(false); // keep the current list so the revealed answer stays visible
+    });
+  });
+}
+
 window.addEventListener('hashchange', route);
 window.addEventListener('DOMContentLoaded', async () => {
   initSplash();
   try {
     DATA = await loadData();
     PROGRESS = loadProgress();
+    backfillStats();
     route();
   } catch (e) {
     render(`<p>Error: ${e.message}</p>`);

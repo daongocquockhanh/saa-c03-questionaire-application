@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { scoreQuestion, verdict } from '../public/scoring.js';
+import { scoreQuestion, verdict, pickUnscored } from '../public/scoring.js';
 
 // Single-answer questions: unchanged all-or-nothing.
 test('single-answer: correct pick scores 1', () => {
@@ -67,4 +67,29 @@ test('verdict: zero correct → wrong', () => {
 // option is still shown with ✗ styling in the UI.
 test('verdict: all correct found, extra wrong pick → still correct (lenient)', () => {
   assert.equal(verdict(['A', 'B'], ['A', 'B', 'C']), 'correct');
+});
+
+// pickUnscored: choose which questions don't count (real exam has 15 of 65).
+const ids65 = Array.from({ length: 65 }, (_, i) => i + 1);
+
+test('pickUnscored returns the requested count', () => {
+  assert.equal(pickUnscored(ids65, 1, 15).length, 15);
+});
+
+test('pickUnscored picks only real ids with no duplicates', () => {
+  const got = pickUnscored(ids65, 1, 15);
+  assert.equal(new Set(got).size, 15);
+  for (const id of got) assert.ok(ids65.includes(id));
+});
+
+test('pickUnscored is deterministic for the same seed', () => {
+  assert.deepEqual(pickUnscored(ids65, 7, 15), pickUnscored(ids65, 7, 15));
+});
+
+test('pickUnscored varies by seed (different test → different unscored set)', () => {
+  assert.notDeepEqual(pickUnscored(ids65, 1, 15), pickUnscored(ids65, 2, 15));
+});
+
+test('pickUnscored caps at the number of available ids', () => {
+  assert.equal(pickUnscored([1, 2, 3], 1, 15).length, 3);
 });
