@@ -1,83 +1,72 @@
-# Review + Redo mode + test-level flagging — design
+# Per-test Review + Redo + test-level flagging — design
 
-Date: 2026-06-05
+Date: 2026-06-05 (revised through 2026-06-06)
 
 ## Goal
 
-Let the learner revisit the questions they got wrong or flagged, across *all*
-practice tests and module quizzes, and redo them (active recall). Add a
-whole-test flag (bookmark), parallel to the existing per-question flag.
+For each practice test, let the learner review and redo the questions they got
+**wrong or left unanswered** (and the ones they flagged) — active recall scoped
+to that test. Plus a whole-test flag (bookmark) on the dashboard.
 
-Per-test result filters (`Wrong only` / `Flagged only`) already exist on the
-result page. This feature adds the missing **global** + **redo** + **test-flag**
-pieces.
+Review is a **sub-page of each practice test**, not a separate top-nav section.
+Source is practice tests only (module quizzes are excluded).
 
-## Data model (localStorage, under existing `saa-c03-progress`)
+## Data model (localStorage, under `saa-c03-progress`)
 
 ```
-PROGRESS.questionStats   = { [questionId]: { verdict, given } }
-                           verdict ∈ 'correct' | 'partial' | 'wrong'
-                           given   = last selected letters, e.g. ['A','C']
-PROGRESS.flaggedQuestions = [ questionId, ... ]   // global, persistent
-PROGRESS.flaggedTests     = [ testId, ... ]       // NEW: whole-test bookmark
+PROGRESS.tests[testId].lastResult.answers  // existing: { [id]: [letters] }
+PROGRESS.tests[testId].lastResult.flags    // existing: { [id]: bool }
+PROGRESS.tests[testId].reviewFixed         // NEW: [ids] corrected during redo
+PROGRESS.flaggedTests                      // NEW: [testId] whole-test bookmark
 ```
 
-- Defaults created in `loadProgress()`.
-- **Backfill once** (when `questionStats` is absent): walk each test's latest
-  attempt (`lastResult.answers`) → `verdict(correctAnswers, given)`; mark module
-  `wrong` lists as `{verdict:'wrong', given:[]}` (mapped number→id); seed
-  `flaggedQuestions` from attempt `flags`.
-- Updated on every submit/check: practice test (`submitTest`), module quiz
-  (`saveModuleResult`), redo (per-question check).
+No global per-question store. Each test's review set is derived on the fly from
+that test's saved attempt, so there is nothing to migrate.
 
-## Pools
+## Per-test derivation (`testReviewData(testId)`)
 
-- **Wrong pool** = ids where `questionStats[id].verdict !== 'correct'`.
-- **Flagged pool** = `flaggedQuestions` (still-existing ids).
-- Getting a question fully right later overwrites its verdict → it leaves the
-  wrong pool. Pool shrinks as you improve.
+- `answers`/`flags` from `lastResult`.
+- **To review/redo** = `questionIds` where `verdict(correctAnswers, answers[id] || [])
+  !== 'correct'` (wrong-answered, partial, or unanswered), **minus** `reviewFixed`.
+- **Flagged** = `questionIds` where `flags[id]`.
+
+## Redo
+
+- Answerable list; on check, compute `verdict`. If fully correct → add id to
+  `reviewFixed` (leaves the review set); if not → remove it. **Recorded test
+  score/percent never changes.**
+- The on-screen list stays frozen after a check (so the revealed answer remains
+  visible); counts update live; the item is gone on the next fresh visit.
 
 ## UI
 
-### Review page — `#/review` → `renderRevise()` (new nav item "Review")
+- **No top-nav entry.** Reached from each test:
+  - Dashboard test card shows a `Review & Redo` button when the test has an attempt.
+  - Result page shows a `Review & Redo wrong/unanswered` button.
+- Route: `#/review/<testId>` → `renderReviseTest(testId)`.
+- Tabs: **Sai & chưa trả lời (N)** (wrong + unanswered) | **Đã gắn cờ (N)** (flagged).
+- Modes: **Read** (shows your actual answer — blank for unanswered, marked ✗ —
+  plus correct answer + explanation) | **Redo** (answer, then check).
+- Reuses `renderQuizItem` via a synthetic `MQUIZ` (`moduleId:'__revise__'`).
+- Read mode does NOT pre-fill unanswered questions with the correct answer (that
+  earlier made blanks look like ✓ "correct").
 
-- Filter tabs: **Wrong (N)** | **Flagged (N)**.
-- Mode toggle: **Read** (answers + explanation shown) | **Redo** (answer, then
-  check). Both reuse `renderQuizItem` via a synthetic `MQUIZ` (`moduleId:'__revise__'`).
-- Empty state when a pool is empty.
+## Test-level flag (dashboard)
 
-### Redo
-
-- Same question set, answerable. On check → compute `verdict`, write
-  `questionStats[id]`, `saveProgress()`, re-render. No test/module progress
-  written; no 15-unscored (that is only for full 65-question exams).
-
-### Test-level flag
-
-- ⭐ toggle button on each dashboard test card → toggles `flaggedTests`.
+- ⭐ toggle on each test card → `flaggedTests`.
 - Dashboard filter: **All | Flagged** tests.
-
-### Per-question flag → global
-
-- In-test flag handlers also update `flaggedQuestions` (so the Review flagged
-  pool fills immediately, persists without submitting).
 
 ## Pure, unit-tested core (`public/review.js`)
 
-- `wrongPool(questionStats)` → sorted ids with verdict ≠ 'correct'.
 - `normalizeFlagList(arr)` → deduped, sorted.
-- `toggleInList(arr, id)` → add/remove id, returns new array.
+- `toggleInList(arr, id)` → add/remove id, new array.
+- `subtractIds(ids, remove)` → ids minus remove, order preserved (wrong minus fixed).
 
-Backfill, rendering, and wiring live in `app.js` and are browser-verified.
-
-## Testing
-
-- TDD the three pure functions in `scripts/review.test.js`.
-- Browser-verify: Review page lists wrong/flagged, Redo updates pool, test star
-  toggles + filter, in-test flag reaches Review.
+Derivation, rendering, and wiring live in `app.js` and are browser-verified.
 
 ## Out of scope
 
-- Spaced-repetition scheduling / SM-2.
-- Cross-device sync.
+- Spaced-repetition scheduling.
+- Cross-device sync (localStorage is per-device).
 - Reverting partial credit or the 15-unscored behavior.
+- Review sourced from module quizzes.

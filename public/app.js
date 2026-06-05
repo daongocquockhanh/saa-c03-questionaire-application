@@ -1,6 +1,6 @@
 import { MODULES } from './modules.js';
 import { scoreQuestion, verdict, pickUnscored } from './scoring.js';
-import { wrongPool, normalizeFlagList, toggleInList } from './review.js';
+import { normalizeFlagList, toggleInList, subtractIds } from './review.js';
 
 // Real SAA-C03 leaves 15 of 65 questions unscored. Practice Tests mirror that.
 const UNSCORED_PER_TEST = 15;
@@ -21,62 +21,11 @@ function loadProgress() {
   catch { p = {}; }
   if (!p.tests) p.tests = {};
   if (!p.modules) p.modules = {};
-  if (!p.questionStats) p.questionStats = {};
-  if (!p.flaggedQuestions) p.flaggedQuestions = [];
   if (!p.flaggedTests) p.flaggedTests = [];
   return p;
 }
 function saveProgress() {
   localStorage.setItem(STORE_KEY, JSON.stringify(PROGRESS));
-}
-
-// --- Review / Redo: per-question stats + flag helpers ---
-
-// Record the outcome of answering one question (anywhere it gets graded).
-function recordQuestionStat(qId, given) {
-  const q = getQuestion(qId);
-  if (!q) return;
-  PROGRESS.questionStats[qId] = {
-    verdict: verdict(q.correctAnswers, given || []),
-    given: (given || []).slice(),
-  };
-}
-
-// Keep the global flagged-questions list in sync with a flag on/off action.
-function syncFlag(qId, on) {
-  const list = normalizeFlagList(PROGRESS.flaggedQuestions);
-  const has = list.includes(Number(qId));
-  if (on && !has) PROGRESS.flaggedQuestions = [...list, Number(qId)];
-  else if (!on && has) PROGRESS.flaggedQuestions = list.filter((x) => x !== Number(qId));
-  saveProgress();
-}
-
-// One-time migration: seed questionStats + flaggedQuestions from existing history.
-function backfillStats() {
-  if (PROGRESS.__statsBackfilled) return;
-  const numToId = {};
-  for (const q of DATA.questions) numToId[q.number] = q.id;
-  for (const prog of Object.values(PROGRESS.tests || {})) {
-    const r = prog && prog.lastResult;
-    if (!r || !r.answers) continue;
-    for (const [id, given] of Object.entries(r.answers)) {
-      if (given && given.length) recordQuestionStat(Number(id), given);
-    }
-    for (const [id, on] of Object.entries(r.flags || {})) {
-      if (on) PROGRESS.flaggedQuestions.push(Number(id));
-    }
-  }
-  for (const m of Object.values(PROGRESS.modules || {})) {
-    for (const num of (m && m.wrong) || []) {
-      const id = numToId[num];
-      if (id != null && !PROGRESS.questionStats[id]) {
-        PROGRESS.questionStats[id] = { verdict: 'wrong', given: [] };
-      }
-    }
-  }
-  PROGRESS.flaggedQuestions = normalizeFlagList(PROGRESS.flaggedQuestions);
-  PROGRESS.__statsBackfilled = true;
-  saveProgress();
 }
 
 async function loadData() {
@@ -99,7 +48,7 @@ function route() {
   else if (screen === 'theory') renderTheory(arg || null);
   else if (screen === 'modules') renderModule(arg || null);
   else if (screen === 'sources') renderSources();
-  else if (screen === 'review') renderRevise();
+  else if (screen === 'review' && arg) renderReviseTest(Number(arg));
   else renderDashboard();
   updateTopbar(screen || 'dashboard');
 }
@@ -109,7 +58,6 @@ function updateTopbar(screen) {
   if (!el) return;
   el.innerHTML = `
     <a href="#/dashboard" class="nav-link ${screen === 'dashboard' ? 'active' : ''}">Practice Tests</a>
-    <a href="#/review" class="nav-link ${screen === 'review' ? 'active' : ''}">Review</a>
     <a href="#/modules" class="nav-link ${screen === 'modules' ? 'active' : ''}">Modules</a>
     <a href="#/theory" class="nav-link ${screen === 'theory' ? 'active' : ''}">Theory</a>
     <a href="#/sources" class="nav-link ${screen === 'sources' ? 'active' : ''}">Sources</a>
@@ -190,6 +138,7 @@ function renderDashboard() {
         <p>${score} ${passBadge}</p>
         <p class="muted">${last}</p>
         <a href="#/test/${t.id}"><button class="primary">${action}</button></a>
+        ${p.lastResult ? `<a href="#/review/${t.id}"><button>Review &amp; Redo</button></a>` : ''}
       </div>
     `;
   }).join('');
@@ -218,7 +167,7 @@ function renderDashboard() {
   document.getElementById('reset-link').addEventListener('click', e => {
     e.preventDefault();
     if (confirm('Erase all progress?')) {
-      PROGRESS = { tests: {}, modules: {}, questionStats: {}, flaggedQuestions: [], flaggedTests: [] };
+      PROGRESS = { tests: {}, modules: {}, flaggedTests: [] };
       saveProgress();
       route();
     }
@@ -347,7 +296,6 @@ function renderRunner(testId) {
   document.getElementById('next').addEventListener('click', () => { RUNNER.current++; persistRunnerState(); renderRunner(testId); });
   document.getElementById('flag').addEventListener('click', () => {
     RUNNER.flags[qId] = !RUNNER.flags[qId];
-    syncFlag(qId, RUNNER.flags[qId]);
     persistRunnerState();
     renderRunner(testId);
   });
@@ -360,7 +308,7 @@ function renderRunner(testId) {
     if (e.target.tagName === 'INPUT') return;
     if (e.key === 'ArrowLeft' && RUNNER && RUNNER.current > 0) { RUNNER.current--; persistRunnerState(); renderRunner(testId); }
     if (e.key === 'ArrowRight' && RUNNER && RUNNER.current < test.questionIds.length - 1) { RUNNER.current++; persistRunnerState(); renderRunner(testId); }
-    if (e.key === 'f' && RUNNER) { RUNNER.flags[qId] = !RUNNER.flags[qId]; syncFlag(qId, RUNNER.flags[qId]); persistRunnerState(); renderRunner(testId); }
+    if (e.key === 'f' && RUNNER) { RUNNER.flags[qId] = !RUNNER.flags[qId]; persistRunnerState(); renderRunner(testId); }
   };
   window.__KEY_HANDLER__ = keyHandler;
   document.addEventListener('keydown', keyHandler);
@@ -404,11 +352,6 @@ function submitTest() {
     total++;
   }
   const pct = Math.round((correct / total) * 100);
-  // Feed the global review pool: record every answered question (scored or not).
-  for (const id of test.questionIds) {
-    const given = RUNNER.answers[id];
-    if (given && given.length) recordQuestionStat(id, given);
-  }
   const attempt = {
     score: correct,
     total,
@@ -510,7 +453,7 @@ function renderResult(testId) {
     </div>
     ${filters}
     <div id="result-list">${rows}</div>
-    <p><a href="#/dashboard"><button>Back to Dashboard</button></a> <a href="#/test/${testId}"><button class="primary">Retake</button></a></p>
+    <p><a href="#/dashboard"><button>Back to Dashboard</button></a> <a href="#/review/${testId}"><button>Review &amp; Redo wrong/unanswered</button></a> <a href="#/test/${testId}"><button class="primary">Retake</button></a></p>
   `);
 
   document.querySelectorAll('.filters button').forEach(b => b.addEventListener('click', () => {
@@ -1225,10 +1168,6 @@ function quizScore(questions) {
 
 function saveModuleResult(mod, questions) {
   if (!PROGRESS.modules) PROGRESS.modules = {};
-  for (const q of questions) {
-    const given = MQUIZ.answers[q.id];
-    if (given && given.length) recordQuestionStat(q.id, given);
-  }
   const wrong = questions.filter(q => verdict(q.correctAnswers, MQUIZ.answers[q.id] || []) !== 'correct').map(q => q.number);
   PROGRESS.modules[mod.id] = {
     quizScore: quizScore(questions),
@@ -1279,27 +1218,44 @@ function wireQuiz(mod, questions) {
   });
 }
 
-let REVISE = { filter: 'wrong', mode: 'read', ids: null };
+// Per-test review data: derive wrong + flagged from that test's saved attempt.
+// `reviewFixed` = questions corrected in redo (drops from wrong; score untouched).
+function testReviewData(testId) {
+  const test = DATA.tests.find(t => t.id === testId);
+  const prog = PROGRESS.tests[testId] || {};
+  const r = prog.lastResult;
+  const answers = (r && r.answers) || {};
+  const flags = (r && r.flags) || {};
+  const fixed = normalizeFlagList(prog.reviewFixed);
+  // To review/redo = anything not fully correct: wrong-answered, partial, or unanswered.
+  const wrongAll = test
+    ? test.questionIds.filter(id => verdict(getQuestion(id).correctAnswers, answers[id] || []) !== 'correct')
+    : [];
+  return {
+    test,
+    attempted: !!r,
+    answers,
+    wrong: subtractIds(wrongAll, fixed),
+    flagged: test ? test.questionIds.filter(id => flags[id]) : [],
+  };
+}
 
-function renderRevise(recompute = true) {
+let REVISE = { testId: null, filter: 'wrong', mode: 'read', ids: null };
+
+function renderReviseTest(testId, recompute = true) {
+  const d = testReviewData(testId);
+  if (!d.test) { render('<p>Test not found.</p>'); return; }
+  if (REVISE.testId !== testId) REVISE = { testId, filter: 'wrong', mode: 'read', ids: null };
   if (recompute || !REVISE.ids) {
-    const ids = REVISE.filter === 'wrong'
-      ? wrongPool(PROGRESS.questionStats)
-      : normalizeFlagList(PROGRESS.flaggedQuestions);
-    REVISE.ids = ids.filter(id => getQuestion(id));
+    REVISE.ids = (REVISE.filter === 'wrong' ? d.wrong : d.flagged).slice();
   }
   const questions = REVISE.ids.map(getQuestion).filter(Boolean);
-  const wrongCount = wrongPool(PROGRESS.questionStats).length;
-  const flaggedCount = normalizeFlagList(PROGRESS.flaggedQuestions).filter(id => getQuestion(id)).length;
 
   if (REVISE.mode === 'read') {
-    // Study-card view: show your past answer if any, else the correct answer.
+    // Study-card view: show your recorded answer if any, else the correct answer.
     MQUIZ = {
       moduleId: '__revise__', mode: 'review', submitted: true,
-      answers: Object.fromEntries(questions.map(q => {
-        const g = PROGRESS.questionStats[q.id]?.given;
-        return [q.id, (g && g.length) ? g.slice() : q.correctAnswers.slice()];
-      })),
+      answers: Object.fromEntries(questions.map(q => [q.id, (d.answers[q.id] || []).slice()])),
       checked: Object.fromEntries(questions.map(q => [q.id, true])),
     };
   } else {
@@ -1309,33 +1265,36 @@ function renderRevise(recompute = true) {
   const body = questions.length
     ? questions.map((q, i) => renderQuizItem(q, i)).join('')
     : `<p class="muted">${REVISE.filter === 'wrong'
-        ? 'Chưa có câu sai nào. Làm vài bài đi! 🎉'
-        : 'Chưa gắn cờ câu nào. Bấm ☆ Flag khi làm bài.'}</p>`;
+        ? 'Không còn câu nào cần làm lại trong bài này. 🎉'
+        : 'Bài này chưa gắn cờ câu nào.'}</p>`;
 
   render(`
-    <h1>Review &amp; Redo</h1>
-    <div class="revise-tabs">
-      <button id="rv-wrong" class="${REVISE.filter === 'wrong' ? 'primary' : ''}">Câu sai (${wrongCount})</button>
-      <button id="rv-flagged" class="${REVISE.filter === 'flagged' ? 'primary' : ''}">Đã gắn cờ (${flaggedCount})</button>
+    <div class="module-detail">
+      <p><a href="#/review">← Tất cả bài test</a></p>
+      <h1>${escapeHtml(d.test.title)} — Review</h1>
+      <div class="revise-tabs">
+        <button id="rv-wrong" class="${REVISE.filter === 'wrong' ? 'primary' : ''}">Sai &amp; chưa trả lời (${d.wrong.length})</button>
+        <button id="rv-flagged" class="${REVISE.filter === 'flagged' ? 'primary' : ''}">Đã gắn cờ (${d.flagged.length})</button>
+      </div>
+      <div class="mode-toggle">
+        <button id="rv-read" class="${REVISE.mode === 'read' ? 'primary' : ''}">Read</button>
+        <button id="rv-redo" class="${REVISE.mode === 'redo' ? 'primary' : ''}">Redo</button>
+      </div>
+      <p class="muted">${REVISE.mode === 'read'
+        ? 'Đọc lại đáp án đúng và giải thích.'
+        : 'Tự làm lại rồi bấm Kiểm tra. Làm đúng → câu rời danh sách (điểm bài thi không đổi).'}</p>
+      <div id="quiz-body">${body}</div>
     </div>
-    <div class="mode-toggle">
-      <button id="rv-read" class="${REVISE.mode === 'read' ? 'primary' : ''}">Read</button>
-      <button id="rv-redo" class="${REVISE.mode === 'redo' ? 'primary' : ''}">Redo</button>
-    </div>
-    <p class="muted">${REVISE.mode === 'read'
-      ? 'Đọc lại đáp án đúng và giải thích.'
-      : 'Tự làm lại rồi bấm Kiểm tra. Làm đúng → lần sau câu rời danh sách.'}</p>
-    <div id="quiz-body">${body}</div>
   `);
   window.scrollTo(0, 0);
-  wireRevise(questions);
+  wireReviseTest(testId, questions);
 }
 
-function wireRevise(questions) {
-  document.getElementById('rv-wrong')?.addEventListener('click', () => { REVISE.filter = 'wrong'; renderRevise(true); });
-  document.getElementById('rv-flagged')?.addEventListener('click', () => { REVISE.filter = 'flagged'; renderRevise(true); });
-  document.getElementById('rv-read')?.addEventListener('click', () => { REVISE.mode = 'read'; renderRevise(true); });
-  document.getElementById('rv-redo')?.addEventListener('click', () => { REVISE.mode = 'redo'; renderRevise(true); });
+function wireReviseTest(testId, questions) {
+  document.getElementById('rv-wrong')?.addEventListener('click', () => { REVISE.filter = 'wrong'; renderReviseTest(testId, true); });
+  document.getElementById('rv-flagged')?.addEventListener('click', () => { REVISE.filter = 'flagged'; renderReviseTest(testId, true); });
+  document.getElementById('rv-read')?.addEventListener('click', () => { REVISE.mode = 'read'; renderReviseTest(testId, true); });
+  document.getElementById('rv-redo')?.addEventListener('click', () => { REVISE.mode = 'redo'; renderReviseTest(testId, true); });
   document.querySelectorAll('#quiz-body input').forEach(inp => {
     inp.addEventListener('change', e => {
       const qid = Number(e.target.dataset.qid);
@@ -1354,9 +1313,12 @@ function wireRevise(questions) {
     btn.addEventListener('click', () => {
       const qid = Number(btn.dataset.qid);
       MQUIZ.checked[qid] = true;
-      recordQuestionStat(qid, MQUIZ.answers[qid] || []);
+      const right = verdict(getQuestion(qid).correctAnswers, MQUIZ.answers[qid] || []) === 'correct';
+      const prog = PROGRESS.tests[testId] || (PROGRESS.tests[testId] = {});
+      const fixed = normalizeFlagList(prog.reviewFixed);
+      prog.reviewFixed = right ? [...new Set([...fixed, qid])] : fixed.filter(x => x !== qid);
       saveProgress();
-      renderRevise(false); // keep the current list so the revealed answer stays visible
+      renderReviseTest(testId, false); // keep current list so the revealed answer stays visible
     });
   });
 }
@@ -1367,7 +1329,6 @@ window.addEventListener('DOMContentLoaded', async () => {
   try {
     DATA = await loadData();
     PROGRESS = loadProgress();
-    backfillStats();
     route();
   } catch (e) {
     render(`<p>Error: ${e.message}</p>`);

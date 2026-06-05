@@ -1,16 +1,7 @@
-// Pure helpers for the Review / Redo page and flag lists. Browser code in
-// app.js does the rendering and localStorage wiring; these are unit-tested in
+// Pure helpers for per-test Review/Redo and flag lists. Browser code in app.js
+// derives each test's wrong/flagged questions from that test's saved attempt
+// (lastResult) and does the rendering; these are unit-tested in
 // scripts/review.test.js.
-
-// Ids whose last result was not fully correct (wrong or partial), sorted.
-// stats shape: { [id]: { verdict: 'correct'|'partial'|'wrong', given: [...] } }
-export function wrongPool(stats) {
-  const s = stats || {};
-  return Object.keys(s)
-    .filter((id) => s[id] && s[id].verdict !== 'correct')
-    .map(Number)
-    .sort((a, b) => a - b);
-}
 
 // Dedupe a list of ids and sort numerically.
 export function normalizeFlagList(arr) {
@@ -21,4 +12,11 @@ export function normalizeFlagList(arr) {
 export function toggleInList(arr, id) {
   const list = arr || [];
   return list.includes(id) ? list.filter((x) => x !== id) : [...list, id];
+}
+
+// Return ids not present in `remove`, preserving order. Used for
+// "wrong questions minus the ones fixed in redo".
+export function subtractIds(ids, remove) {
+  const drop = new Set(remove || []);
+  return (ids || []).filter((id) => !drop.has(id));
 }
