@@ -59,6 +59,11 @@
 - **Dedicated Host**: cả server vật lý dành riêng, dùng cho license BYOL.
 - **Dedicated Instance**: chạy trên hardware riêng nhưng không quản lý host.
 - **Capacity Reservations**: đảm bảo capacity trong AZ, không giảm giá.
+- **Spot Fleet / EC2 Fleet**: gộp nhiều Spot + On-Demand theo nhiều instance type/AZ để đạt **target capacity** với giá thấp nhất (strategy: `lowestPrice`, `diversified`, `capacityOptimized`).
+
+### EC2 nâng cao
+- **Hibernate**: lưu RAM vào EBS root rồi tắt; mở lại khôi phục nguyên trạng (process đang chạy, RAM) → boot rất nhanh. Điều kiện: RAM < 150 GB, EBS root **mã hóa** và đủ lớn. Vẫn trả phí EBS khi đang hibernate.
+- **AWS Nitro System**: nền tảng hypervisor thế hệ mới → hiệu năng gần bare-metal, bảo mật cao hơn, IOPS/throughput EBS cao hơn, nền cho instance đời mới và **Enhanced Networking (ENA / EFA)**.
 
 ### Placement Groups
 - **Cluster**: trong 1 AZ, latency thấp, throughput cao (HPC).
@@ -108,21 +113,44 @@
 - **FSx for NetApp ONTAP**: NFS/SMB/iSCSI, tương thích NetApp.
 - **FSx for OpenZFS**: Linux file system trên ZFS.
 
+### So sánh nhanh các loại storage
+| Dịch vụ | Loại | Truy cập đồng thời | Use case điển hình |
+|---|---|---|---|
+| **EBS** | Block, gắn 1 AZ | 1 EC2 (Multi-Attach với io1/io2) | Boot volume, DB tự quản lý |
+| **Instance Store** | Block ephemeral | 1 EC2 | Cache/buffer IOPS cực cao, mất khi stop |
+| **EFS** | File (NFS) | Nhiều EC2, nhiều AZ (Linux) | Shared file Linux, scale tự động |
+| **FSx for Windows** | File (SMB) | Nhiều client Windows/AD | Shared file Windows |
+| **FSx for Lustre** | File HPC | Nhiều client | HPC/ML, tích hợp S3 |
+| **S3** | Object | HTTP API toàn cầu | Backup, static web, data lake |
+
 ---
 
 ## V. ELB & Auto Scaling
 
 ### Elastic Load Balancer
-- **Application LB (ALB)**: Layer 7 (HTTP/HTTPS), routing theo path/host/header. Hỗ trợ WebSocket, HTTP/2, redirect, target = EC2/IP/Lambda/container.
-- **Network LB (NLB)**: Layer 4 (TCP/UDP/TLS), latency cực thấp, **static IP / Elastic IP** mỗi AZ.
-- **Gateway LB (GLB)**: Layer 3, dùng cho firewall ảo, IDS/IPS.
-- **Classic LB (CLB)**: cũ, không khuyến nghị.
+- **Application LB (ALB)**: Layer 7 (HTTP/HTTPS), routing theo path/host/header/query. Hỗ trợ WebSocket, HTTP/2, redirect, target = EC2/IP/Lambda/container.
+- **Network LB (NLB)**: Layer 4 (TCP/UDP/TLS), latency cực thấp, hàng triệu req/s, **static IP / Elastic IP** mỗi AZ. Target có thể là ALB.
+- **Gateway LB (GWLB — Gateway Load Balancer)**: Layer 3, dùng giao thức **GENEVE (port 6081)**. Là 1 cổng vào duy nhất để **triển khai + scale chuỗi virtual appliance** của bên thứ 3 (firewall, IDS/IPS, deep packet inspection). Traffic đi qua appliance để kiểm tra rồi mới tới đích. Kết hợp **GWLB Endpoint** để định tuyến, target = appliance (EC2/IP).
+- **Classic LB (CLB)**: cũ, không khuyến nghị cho hệ thống mới.
+
+| | ALB | NLB | GWLB |
+|---|---|---|---|
+| Layer | 7 (HTTP/HTTPS) | 4 (TCP/UDP/TLS) | 3 (IP, GENEVE 6081) |
+| Use case | Web app, microservice, routing theo content | Latency thấp, triệu req/s, cần static IP | Chuỗi firewall/IDS/IPS ảo |
+| Target | EC2 / IP / Lambda / container | EC2 / IP / ALB | Appliance (EC2 / IP) |
+| Static IP | Không (chỉ DNS) | Có (EIP mỗi AZ) | Qua GWLB Endpoint |
+| Routing | path / host / header / query | port / protocol | inline traffic inspection |
 
 **Sticky Sessions**: ALB/CLB hỗ trợ session affinity qua cookie.
 
 **Cross-Zone Load Balancing**:
 - ALB: bật mặc định, miễn phí.
-- NLB/GLB: tắt mặc định, bật sẽ phát sinh chi phí inter-AZ.
+- NLB/GWLB: tắt mặc định, bật sẽ phát sinh chi phí inter-AZ.
+
+**Connection Draining** (tên ở CLB) / **Deregistration Delay** (ALB/NLB/GWLB):
+- Khi instance bị deregister hoặc unhealthy, LB **ngừng gửi request mới** nhưng **chờ request đang xử lý xong** rồi mới đóng kết nối.
+- Mặc định 300s (đặt 1–3600s). Request ngắn → đặt thấp; có session dài → đặt cao.
+- Quan trọng lúc ASG **scale-in** để không cắt ngang người dùng.
 
 **SSL/TLS**: 
 - ALB/NLB hỗ trợ **SNI** (nhiều cert trên 1 listener).
@@ -217,6 +245,8 @@
 - **Storage Lens**: phân tích usage cross-account.
 - **Access Points**: nhiều endpoint riêng biệt cho cùng bucket.
 - **S3 Object Lambda**: biến đổi object lúc GET.
+- **S3 Batch Operations**: thao tác hàng loạt trên hàng tỷ object trong 1 job (copy, set tag/ACL, restore từ Glacier, gọi Lambda). Dùng **manifest** (từ S3 Inventory) liệt kê object. Khác **Lifecycle**: lifecycle chạy tự động theo tuổi/lịch, Batch Operations là job chạy **một lần theo yêu cầu**.
+- **Strong consistency**: từ 2020 S3 đảm bảo **read-after-write** mạnh cho PUT/GET/LIST mọi object (không còn eventual như trước) — ghi xong đọc lại thấy ngay.
 
 ---
 
@@ -230,7 +260,11 @@
 - Hỗ trợ **field-level encryption**, **WAF**, **Shield**.
 - **CloudFront Functions** (rất nhẹ, viewer request/response) và **Lambda@Edge** (mạnh hơn, mọi event).
 - **Geo restriction**: chặn/cho phép theo quốc gia.
+- **Cache behavior + TTL**: cache theo path pattern; điều khiển bằng **Min/Max/Default TTL** và header `Cache-Control`. Tăng cache hit → giảm tải origin. **Invalidation** để xóa cache sớm.
+- **Origin Group (origin failover)**: 2 origin (primary + secondary); lỗi/timeout origin chính → tự chuyển sang origin dự phòng → tăng độ sẵn sàng.
 - Pricing: trả theo data transfer + request, **không tính S3 → CloudFront**.
+
+> **CloudFront vs Global Accelerator**: CloudFront = CDN, **cache** nội dung ở edge (HTTP/S, web/static/video). Global Accelerator = **không cache**, dùng Anycast IP đưa traffic TCP/UDP vào AWS backbone nhanh nhất (game, IoT, VoIP, app non-HTTP).
 
 **Global Accelerator** (khác CloudFront):
 - Anycast IP qua AWS backbone, dùng cho ứng dụng non-HTTP, gaming, IoT.
@@ -275,7 +309,12 @@
 - Tối đa 15 **Aurora Replicas**, failover < 30s.
 - **Aurora Serverless**: tự scale capacity (ACU), trả theo dùng. Serverless v2 scale mượt hơn.
 - **Aurora Global Database**: 1 primary region + 5 read region, replicate < 1s, RPO < 1s, RTO < 1 phút.
-- **Backtrack** (MySQL): rewind DB tới điểm trước.
+- **Backtrack** (MySQL): rewind DB tới điểm trước (không cần restore từ backup).
+- **Fast Database Cloning**: clone DB gần như tức thời (copy-on-write), test trên dữ liệu thật không tốn storage gấp đôi.
+- **Endpoints** (điểm hay hỏi):
+  - **Cluster (writer) endpoint**: trỏ tới primary, dùng cho write.
+  - **Reader endpoint**: load-balance read tới các replica.
+  - **Custom endpoint**: nhóm replica tự chọn (VD instance mạnh cho báo cáo).
 
 ### DynamoDB
 - NoSQL, key-value + document, **fully managed serverless**.
@@ -298,6 +337,13 @@
 - **MemoryDB for Redis**: in-memory + durable, dùng làm primary DB.
 
 **Khi nào dùng cache**: read nhiều, latency thấp, session store, leaderboard, rate limit.
+
+**Caching strategies** (hay hỏi):
+- **Lazy Loading (cache-aside)**: chỉ cache khi có request miss → ghi vào cache. Ưu: chỉ cache dữ liệu cần. Nhược: lần đầu chậm, dữ liệu có thể **stale**.
+- **Write-Through**: ghi DB đồng thời ghi cache. Ưu: cache luôn mới. Nhược: ghi tốn hơn, cache đầy dữ liệu ít dùng.
+- **TTL (Time-To-Live)**: đặt hạn cho key → tự hết hạn, tránh stale. Thường kết hợp với Lazy Loading.
+
+**Redis vs Memcached** (nhanh): cần HA/replication/persistence/sorted set → **Redis**; cần cache đơn giản, multi-thread, scale ngang → **Memcached**.
 
 ---
 
@@ -406,6 +452,14 @@
 ### Amazon MQ
 - Managed ActiveMQ, RabbitMQ. Migrate từ on-prem dễ hơn SQS/SNS.
 
+### So sánh SQS vs SNS vs Kinesis
+| | SQS | SNS | Kinesis Data Streams |
+|---|---|---|---|
+| Mô hình | Queue (1 consumer xử lý 1 message) | Pub/Sub fan-out (1 message → nhiều subscriber) | Stream dữ liệu real-time, nhiều consumer đọc lại |
+| Lưu message | Tới khi consumer xóa (max 14 ngày) | Không lưu (push ngay) | Giữ theo retention (tới 365 ngày), **replay được** |
+| Thứ tự | FIFO queue mới đảm bảo | FIFO topic mới đảm bảo | Theo shard (partition key) |
+| Use case | Decouple, đệm khi traffic tăng | Thông báo, fan-out tới SQS/Lambda/email | Clickstream, log, IoT, analytics real-time |
+
 ---
 
 ## XIV. Migration & Transfer
@@ -443,6 +497,8 @@
 - **OpenSearch (Elasticsearch)**: search, log analytics, kèm Dashboards.
 - **QuickSight**: BI, dashboard, ML insight, SPICE in-memory.
 - **Lake Formation**: build data lake, quản lý quyền dữ liệu.
+- **AppFlow**: tích hợp dữ liệu **no-code** giữa SaaS (Salesforce, SAP, Slack, Google Analytics…) và AWS (S3, Redshift). Đề hỏi "đồng bộ dữ liệu từ ứng dụng SaaS vào AWS, ít code" → AppFlow.
+- **Data Pipeline** (cũ): điều phối di chuyển/biến đổi dữ liệu theo lịch giữa S3/RDS/DynamoDB/EMR. Nay AWS khuyến nghị Glue/Step Functions thay thế, nhưng vẫn xuất hiện trong đề.
 - **MSK, Kinesis**: streaming (đã liệt kê).
 
 ---
@@ -457,6 +513,10 @@
   - **Multi-Region keys**: replicate key cùng material.
   - **Envelope encryption**: data key mã hóa data, KMS key mã hóa data key.
 - **CloudHSM**: HSM phần cứng dedicated, FIPS 140-2 Level 3. Bạn quản lý key hoàn toàn.
+- **Encryption at rest vs in transit**:
+  - **At rest**: dữ liệu lưu trữ — KMS/SSE cho S3/EBS/RDS/DynamoDB…
+  - **In transit**: dữ liệu khi truyền — bắt buộc **TLS/SSL (HTTPS)**. Dùng ACM cấp cert cho ALB/CloudFront/API GW; ép HTTPS bằng listener redirect + bucket policy `aws:SecureTransport`.
+- **KMS key policy**: KMS là **resource-based** — quyền dùng key do **key policy** quyết định (kết hợp IAM + **grant** cho truy cập tạm thời, cross-account).
 - **Secrets Manager**: lưu secret, **tự rotate** (Lambda).
 - **Systems Manager Parameter Store**: lưu config/secret, miễn phí cho Standard tier.
 - **Certificate Manager (ACM)**: SSL/TLS cert miễn phí cho ALB/CloudFront/API GW, auto-renew.
@@ -466,6 +526,8 @@
 - **Shield**:
   - **Shield Standard**: free, DDoS L3/L4.
   - **Shield Advanced**: $3000/tháng, L7, cost protection, DRT.
+- **Network Firewall**: managed stateful firewall ở mức **VPC** — lọc traffic vào/ra, IPS/IDS, domain/URL filtering (dựa trên GWLB bên dưới).
+- **Firewall Manager**: quản lý **tập trung toàn bộ AWS Organization** — WAF rule, Shield Advanced, Security Group, Network Firewall, Route 53 DNS Firewall. Tự **áp policy cho account/resource mới**. Khác WAF (WAF cấu hình từng resource; Firewall Manager áp org-wide, tự động).
 - **GuardDuty**: threat detection bằng ML, phân tích VPC Flow Logs, DNS Logs, CloudTrail, S3 data event, EKS audit log, RDS login, Lambda, EBS malware.
 - **Macie**: phát hiện PII trong S3.
 - **Inspector**: scan vulnerability EC2, ECR image, Lambda.
@@ -729,6 +791,12 @@ Công cụ: **AWS Backup**, **AWS Elastic Disaster Recovery (DRS)**, RDS snapsho
 - **AWS CodeDeploy**: tự động deploy lên EC2/Lambda/ECS.
 - **AWS CodePipeline**: orchestrate pipeline CI/CD (source → build → deploy).
 - **AWS SAM (Serverless Application Model)**: framework + CLI để định nghĩa và deploy ứng dụng **serverless** (mở rộng của CloudFormation, cú pháp ngắn gọn cho Lambda/API Gateway/DynamoDB).
+
+### Dịch vụ khác hay xuất hiện trong đề
+- **AWS Marketplace**: chợ phần mềm bên thứ 3 (AMI, container, SaaS) — mua/triển khai nhanh, tính phí qua hóa đơn AWS. Tình huống "triển khai appliance/phần mềm vendor có sẵn" → Marketplace.
+- **Amazon Pinpoint**: gửi thông điệp đa kênh (email, SMS, push, voice) ở quy mô lớn cho marketing/transactional. Khác **SNS** (SNS là pub/sub/notification hạ tầng; Pinpoint là campaign + analytics tới người dùng cuối).
+- **FSx File Gateway** (thuộc Storage Gateway): cho client on-prem truy cập **FSx for Windows** qua SMB với cache cục bộ — khác **S3 File Gateway** (truy cập S3 qua NFS/SMB).
+- **Data Lifecycle Manager (DLM)**: tự động tạo/giữ/xóa **EBS snapshot** theo lịch và policy (đã nêu).
 
 > Các dịch vụ mục này có **trọng số thấp** trong SAA-C03 — biết khái niệm và use case là đủ, không cần đi sâu.
 
