@@ -124,6 +124,11 @@ function renderDashboard() {
   const totalPassed = Object.values(PROGRESS.tests).filter(t => t.bestPercent >= DATA.passPercent).length;
   const flaggedTests = normalizeFlagList(PROGRESS.flaggedTests);
   const tests = DASH_FILTER === 'flagged' ? DATA.tests.filter(t => flaggedTests.includes(t.id)) : DATA.tests;
+  const examTabs = EXAMS.map(e =>
+    `<button class="exam-tab ${e.code === ACTIVE_EXAM.code ? 'active' : ''}" data-exam="${e.code}">${e.title}</button>`
+  ).join('');
+  const examNote = ACTIVE_EXAM.note
+    ? `<p class="exam-note">⚠ ${escapeHtml(ACTIVE_EXAM.note)}</p>` : '';
   const cards = tests.map(t => {
     const p = PROGRESS.tests[t.id] || { status: 'not-started' };
     const status = p.status || 'not-started';
@@ -152,6 +157,7 @@ function renderDashboard() {
   const emptyFlagged = DASH_FILTER === 'flagged' && !tests.length
     ? '<p class="muted">Chưa gắn cờ bài test nào. Bấm ☆ trên một bài để đánh dấu.</p>' : '';
   render(`
+    <div class="exam-tabs">${examTabs}</div>${examNote}
     <h1>Practice Tests</h1>
     <p>${totalPassed} of ${DATA.totalTests} tests passed.</p>
     <div class="revise-tabs">
@@ -162,6 +168,14 @@ function renderDashboard() {
     ${emptyFlagged}
     <p><a href="#" id="reset-link">Reset all progress</a></p>
   `);
+  document.querySelectorAll('.exam-tab').forEach(btn => {
+    btn.addEventListener('click', () => {
+      if (btn.dataset.exam === ACTIVE_EXAM.code) return;
+      localStorage.setItem('active-exam', btn.dataset.exam);
+      location.hash = '#/dashboard';
+      location.reload();
+    });
+  });
   document.querySelectorAll('.star-btn').forEach(btn => btn.addEventListener('click', e => {
     e.preventDefault();
     const id = Number(btn.dataset.test);
@@ -272,6 +286,7 @@ function renderRunner(testId) {
         <div class="timer" id="timer">${formatTimeLeft(RUNNER.endsAt - Date.now())}</div>
       </div>
       <section class="question">
+        ${q.aiAnswered ? '<span class="badge ai-unverified">AI-answered · unverified</span>' : ''}
         <p class="scenario">${escapeHtml(q.scenario).replace(/\n/g, '<br>')}</p>
         <p class="prompt"><strong>${escapeHtml(q.prompt)}</strong></p>
         ${helper}
@@ -435,6 +450,7 @@ function renderResult(testId) {
       <details class="card result-q" data-wrong="${!unscored && !isRight}" data-flagged="${!!flagged}">
         <summary>
           Q${idx + 1} — ${unscored ? '<span class="badge unscored">Unscored</span>' : sc === 1 ? '<span class="badge pass">Correct</span>' : sc === 0 ? '<span class="badge fail">Incorrect</span>' : `<span class="badge partial">Partial ${fmtScore(sc)}/1</span>`}
+          ${q.aiAnswered ? '<span class="badge ai-unverified">AI-answered · unverified</span>' : ''}
           ${flagged ? '★' : ''} ${q.domain ? `<span class="muted">D${q.domain} ${domainNames[q.domain]}</span>` : ''}
         </summary>
         <p class="scenario">${escapeHtml(q.scenario).replace(/\n/g, '<br>')}</p>
