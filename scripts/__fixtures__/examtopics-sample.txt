@@ -1,0 +1,46 @@
+================================================================================
+URL: https://www.examtopics.com/discussions/amazon/view/1-exam-sample/
+================================================================================
+
+Question #1
+
+A company runs a web app.
+The company needs lower latency.
+Which solution will meet these requirements?
+
+ A.
+
+ Use CloudFront.
+
+ B.
+
+ Use a bigger instance.
+
+ C.
+
+ Move to one AZ.
+
+ D.
+
+ Disable caching.
+
+================================================================================
+URL: https://www.examtopics.com/discussions/amazon/view/2-exam-sample/
+================================================================================
+
+Question #2
+
+A company stores logs.
+Which combination of steps will meet this requirement? (Choose two.)
+
+ A.
+
+ Enable versioning.
+
+ B.
+
+ Use Object Lock.
+
+ C.
+
+ Delete the bucket.
