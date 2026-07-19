@@ -12,12 +12,17 @@
     "build-aip": "node scripts/build-exam-tests.js aip-c01",
     "build": "npm run extract-pdf && npm run parse && npm run classify && npm run build-tests",
     "test": "node --test scripts/*.test.js",
-    "serve": "npx -y http-server public -p 8080 -c-1"
+    "serve": "npx -y http-server public -p 8080 -c-1",
+    "deploy": "wrangler deploy",
+    "preview": "wrangler dev"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.30.0"
   },
   "engines": {
     "node": ">=20"
+  },
+  "devDependencies": {
+    "wrangler": "^4.112.0"
   }
 }
