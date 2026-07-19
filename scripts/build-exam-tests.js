@@ -47,6 +47,7 @@ const CONFIGS = {
     testCount: 2,
     durationMinutes: 130,
     passPercent: 75,
+    expectedCount: 97,
   },
 };
 
@@ -59,6 +60,9 @@ if (invoked) {
   const raw = JSON.parse(readFileSync(join(root, cfg.rawFile), 'utf8'));
   const answers = JSON.parse(readFileSync(join(root, cfg.answersFile), 'utf8'));
   const questions = mergeAnswers(raw, answers);
+  if (cfg.expectedCount != null && questions.length !== cfg.expectedCount) {
+    throw new Error(`Expected ${cfg.expectedCount} questions for ${code}, got ${questions.length}`);
+  }
   const tests = chunkTests(questions.map(q => q.id), cfg.testCount, code);
   const out = {
     version: '1.0',

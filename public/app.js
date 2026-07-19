@@ -467,7 +467,7 @@ function renderResult(testId) {
     <h1>${escapeHtml(test.title)} — Result</h1>
     <div class="card result-summary">
       <div class="score"><strong>${fmtScore(r.score)} / ${r.total}</strong> (${r.percent}%)</div>
-      <div class="muted">Scored ${r.total} of ${test.questionIds.length} — ${test.questionIds.length - r.total} unscored (like the real exam)</div>
+      <div class="muted">Scored ${r.total} of ${test.questionIds.length}${UNSCORED_PER_TEST > 0 ? ` — ${test.questionIds.length - r.total} unscored (like the real exam)` : ''}</div>
       <div>${pass ? '<span class="badge pass">Pass ✓</span>' : '<span class="badge fail">Fail ✗</span>'}</div>
       <div class="muted">Time taken: ${durationMin} min</div>
     </div>
@@ -1178,6 +1178,7 @@ function renderQuizItem(q, i) {
   const checkBtn = (MQUIZ.mode === 'review' && !revealed)
     ? `<button class="quiz-check" data-qid="${q.id}">Kiểm tra</button>` : '';
   return `<div class="quiz-item">
+    ${q.aiAnswered ? '<span class="badge ai-unverified">AI-answered · unverified</span>' : ''}
     <p class="quiz-q"><strong>Câu ${i + 1}.</strong> ${escapeHtml(q.scenario ? q.scenario + ' ' : '')}${escapeHtml(q.prompt)}${q.isMultiSelect ? ' <em>(Chọn nhiều)</em>' : ''}</p>
     ${opts}
     ${checkBtn}
