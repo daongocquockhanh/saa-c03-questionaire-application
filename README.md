@@ -37,6 +37,22 @@ npm run parse           # → data/raw-questions.json
 npm run build-tests     # → public/tests.json (deployable)
 ```
 
+## Multiple exams
+
+The app supports multiple AWS exams through an **exam registry** in `public/exams.js`, defining code, title, data file, and per-exam options. The first entry is the default exam; dashboard tabs let users switch between registered exams, each maintaining separate `localStorage` progress keys (`<exam-code>-progress`).
+
+- **Per-exam data files**: `public/tests.json` (SAA-C03), `public/tests-aip-c01.json` (AIP-C01).
+- **AIP-C01 answers are AI-generated and unverified** — badged throughout the UI.
+
+Build AIP-C01 from ExamTopics txt dumps in `data/aip-c01/`:
+
+```bash
+npm run parse-aip    # ExamTopics txt → data/aip-c01/raw-questions.json
+npm run build-aip    # + AI key (data/aip-c01/answers.json) → public/tests-aip-c01.json
+```
+
+Planned next phases: DOP-C02, SCS-C02. See `docs/superpowers/specs/2026-07-19-multi-exam-support-design.md`.
+
 ## Deploy
 
 Configured for **Cloudflare Pages**:

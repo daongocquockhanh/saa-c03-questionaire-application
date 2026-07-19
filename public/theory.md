@@ -880,6 +880,54 @@ Công cụ: **AWS Backup**, **AWS Elastic Disaster Recovery (DRS)**, RDS snapsho
 
 ---
 
+## ⭐ Số liệu & giới hạn PHẢI NHỚ (Quick Reference)
+
+> Những con số exam hay "gài". Học thuộc bảng này — mỗi phần gói gọn các fact quyết định đúng/sai.
+
+**EC2 & Pricing**
+- Spot: tiết kiệm tới **90%**, thu hồi báo trước **2 phút**. RI: cam kết **1/3 năm**, giảm tới **72%**.
+- Placement **Spread**: tối đa **7 instance/AZ**. Hibernate: RAM **< 150 GB**.
+
+**EBS**
+- **gp3**: baseline **3.000 IOPS / 125 MB/s**, tối đa **16.000 IOPS / 1.000 MB/s**. **gp2**: 3 IOPS/GB.
+- **io2 Block Express**: tối đa **256.000 IOPS**. Multi-Attach chỉ **io1/io2**, tối đa **16 instance**, cùng **1 AZ**.
+
+**S3**
+- Object tối đa **5 TB**; 1 lần PUT tối đa **5 GB**; multipart bắt buộc **> 5 GB**.
+- Durability **11 số 9** (99,999999999%); availability Standard 99,99%.
+- Hiệu năng: **3.500 PUT** + **5.500 GET** mỗi prefix/giây.
+- Min duration: Standard-IA/One Zone-IA **30 ngày**, Glacier **90**, Deep Archive **180**.
+
+**Lambda**
+- Timeout tối đa **15 phút**. Memory **128 MB – 10.240 MB** (CPU scale theo memory).
+- `/tmp` **512 MB – 10 GB**. Package **50 MB** (zip) / **250 MB** (giải nén). Concurrency mặc định **1.000/region**.
+
+**SQS**
+- Message tối đa **256 KB**. Retention mặc định **4 ngày**, tối đa **14 ngày**.
+- Visibility timeout mặc định **30s**, tối đa **12 giờ**. Long polling tối đa **20s**. Delay tối đa **15 phút**.
+- FIFO: **300 msg/s** (**3.000** khi batch). **SNS**: 12,5 triệu subscription/topic.
+
+**Kinesis Data Streams**
+- 1 shard = **1 MB/s hoặc 1.000 record/s** ghi, **2 MB/s** đọc. Retention mặc định **24 giờ**, tối đa **365 ngày**.
+
+**RDS / Aurora**
+- RDS backup retention tối đa **35 ngày**. Read Replica tối đa **5** (Aurora **15**).
+- Multi-AZ = standby **đồng bộ** (HA); Read Replica = **bất đồng bộ** (scale read).
+- Aurora: **6 bản sao / 3 AZ**, storage auto tới **128 TB**. Global DB: **5 region** phụ, replicate **< 1s**.
+
+**DynamoDB**
+- Item tối đa **400 KB**. PITR **35 ngày**. 1 WCU = **1 KB/s** ghi; 1 RCU = **4 KB/s** đọc (strong) / **8 KB/s** (eventual).
+
+**VPC / Networking**
+- CIDR **/16** (65k IP) → **/28** (16 IP). Mỗi subnet AWS giữ **5 IP** đầu. **1 IGW/VPC**; NAT GW nằm trong **1 AZ**.
+- ASG cooldown mặc định **300s**. ELB deregistration delay mặc định **300s** (0–3600).
+
+**Khác**
+- Route 53: **Alias** miễn phí + trỏ được **zone apex (root domain)**; **CNAME** không trỏ root.
+- KMS: key rotation tự động **hằng năm** (symmetric). CloudTrail event history giữ **90 ngày**.
+
+---
+
 ## XXX. Câu thần chú & chiến thuật phòng thi
 
 > Học thuộc các "câu thần chú" này một lần — vào phòng thi nhận diện từ khóa là bật ra đáp án.
