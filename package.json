@@ -9,6 +9,7 @@
     "parse-aip": "node scripts/parse-examtopics-txt.js data/aip-c01 data/aip-c01/raw-questions.json",
     "classify": "node scripts/classify.js",
     "build-tests": "node scripts/build-tests.js",
+    "build-aip": "node scripts/build-exam-tests.js aip-c01",
     "build": "npm run extract-pdf && npm run parse && npm run classify && npm run build-tests",
     "test": "node --test scripts/*.test.js",
     "serve": "npx -y http-server public -p 8080 -c-1"
