@@ -1,11 +1,17 @@
 import { MODULES } from './modules.js';
 import { scoreQuestion, verdict, pickUnscored } from './scoring.js';
 import { normalizeFlagList, toggleInList, subtractIds } from './review.js';
+import { EXAMS, resolveExam } from './exams.js';
 
-// Real SAA-C03 leaves 15 of 65 questions unscored. Practice Tests mirror that.
-const UNSCORED_PER_TEST = 15;
+// Which exam this session serves. Switching exams reloads the page (Task 7),
+// so everything below can treat ACTIVE_EXAM as constant.
+const ACTIVE_EXAM = resolveExam(localStorage.getItem('active-exam'));
 
-const STORE_KEY = 'saa-c03-progress';
+// Real SAA-C03 leaves 15 of 65 questions unscored; other exams configure their own.
+const UNSCORED_PER_TEST = ACTIVE_EXAM.unscoredPerTest;
+
+// 'saa-c03' + '-progress' === the legacy key, so existing SAA progress survives.
+const STORE_KEY = ACTIVE_EXAM.code + '-progress';
 let DATA = null;
 let PROGRESS = null;
 
@@ -29,8 +35,8 @@ function saveProgress() {
 }
 
 async function loadData() {
-  const res = await fetch('tests.json');
-  if (!res.ok) throw new Error('Failed to load tests.json');
+  const res = await fetch(ACTIVE_EXAM.dataFile);
+  if (!res.ok) throw new Error(`Failed to load ${ACTIVE_EXAM.dataFile}`);
   return res.json();
 }
 
@@ -45,9 +51,9 @@ function route() {
   const [, screen, arg] = hash.split('/');
   if (screen === 'test' && arg) renderRunner(Number(arg));
   else if (screen === 'result' && arg) renderResult(Number(arg));
-  else if (screen === 'theory') renderTheory(arg || null);
-  else if (screen === 'modules') renderModule(arg || null);
-  else if (screen === 'sources') renderSources();
+  else if (screen === 'theory' && ACTIVE_EXAM.hasTheory) renderTheory(arg || null);
+  else if (screen === 'modules' && ACTIVE_EXAM.hasTheory) renderModule(arg || null);
+  else if (screen === 'sources' && ACTIVE_EXAM.hasTheory) renderSources();
   else if (screen === 'review' && arg) renderReviseTest(Number(arg));
   else renderDashboard();
   updateTopbar(screen || 'dashboard');
@@ -58,9 +64,10 @@ function updateTopbar(screen) {
   if (!el) return;
   el.innerHTML = `
     <a href="#/dashboard" class="nav-link ${screen === 'dashboard' ? 'active' : ''}">Practice Tests</a>
+    ${ACTIVE_EXAM.hasTheory ? `
     <a href="#/modules" class="nav-link ${screen === 'modules' ? 'active' : ''}">Modules</a>
     <a href="#/theory" class="nav-link ${screen === 'theory' ? 'active' : ''}">Theory</a>
-    <a href="#/sources" class="nav-link ${screen === 'sources' ? 'active' : ''}">Sources</a>
+    <a href="#/sources" class="nav-link ${screen === 'sources' ? 'active' : ''}">Sources</a>` : ''}
   `;
 }
 
@@ -391,6 +398,7 @@ function renderResult(testId) {
   for (const id of test.questionIds) {
     if (unscoredSet.has(id)) continue;
     const q = getQuestion(id);
+    if (!byDomain[q.domain]) continue; // exams without domain classification
     byDomain[q.domain].total++;
     byDomain[q.domain].correct += scoreQuestion(q.correctAnswers, r.answers[id]);
   }
@@ -427,7 +435,7 @@ function renderResult(testId) {
       <details class="card result-q" data-wrong="${!unscored && !isRight}" data-flagged="${!!flagged}">
         <summary>
           Q${idx + 1} — ${unscored ? '<span class="badge unscored">Unscored</span>' : sc === 1 ? '<span class="badge pass">Correct</span>' : sc === 0 ? '<span class="badge fail">Incorrect</span>' : `<span class="badge partial">Partial ${fmtScore(sc)}/1</span>`}
-          ${flagged ? '★' : ''} <span class="muted">D${q.domain} ${domainNames[q.domain]}</span>
+          ${flagged ? '★' : ''} ${q.domain ? `<span class="muted">D${q.domain} ${domainNames[q.domain]}</span>` : ''}
         </summary>
         <p class="scenario">${escapeHtml(q.scenario).replace(/\n/g, '<br>')}</p>
         <p><strong>${escapeHtml(q.prompt)}</strong></p>
@@ -447,10 +455,11 @@ function renderResult(testId) {
       <div>${pass ? '<span class="badge pass">Pass ✓</span>' : '<span class="badge fail">Fail ✗</span>'}</div>
       <div class="muted">Time taken: ${durationMin} min</div>
     </div>
+    ${Object.values(byDomain).some(v => v.total > 0) ? `
     <div class="card">
       <h3>By domain</h3>
       ${domainBars}
-    </div>
+    </div>` : ''}
     ${filters}
     <div id="result-list">${rows}</div>
     <p><a href="#/dashboard"><button>Back to Dashboard</button></a> <a href="#/review/${testId}"><button>Review &amp; Redo wrong/unanswered</button></a> <a href="#/test/${testId}"><button class="primary">Retake</button></a></p>
@@ -1325,6 +1334,9 @@ function wireReviseTest(testId, questions) {
 
 window.addEventListener('hashchange', route);
 window.addEventListener('DOMContentLoaded', async () => {
+  document.title = `${ACTIVE_EXAM.title} Practice`;
+  const brand = document.querySelector('.brand');
+  if (brand) brand.textContent = `${ACTIVE_EXAM.title} Practice`;
   initSplash();
   try {
     DATA = await loadData();
