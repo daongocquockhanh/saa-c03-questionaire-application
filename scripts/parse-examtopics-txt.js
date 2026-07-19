@@ -1,7 +1,7 @@
 // Parser for ExamTopics discussion-dump txt files (DOP-C02 / AIP-C01 format).
 // Format: "Question #N" headings, option letters on their own line (" A.")
 // followed by the option text. No answers or explanations in the dump.
-import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
+import { readFileSync, writeFileSync, mkdirSync, readdirSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 
@@ -82,24 +82,52 @@ function splitScenarioPrompt(bodyLines) {
   };
 }
 
+// Sort filenames numerically by their leading number (e.g. "12-foo.txt" before
+// "100-bar.txt"); files without a leading number sort after numeric ones,
+// alphabetically among themselves.
+function compareByLeadingNumber(a, b) {
+  const aMatch = a.match(/^(\d+)/);
+  const bMatch = b.match(/^(\d+)/);
+  if (aMatch && bMatch) return Number(aMatch[1]) - Number(bMatch[1]);
+  if (aMatch) return -1;
+  if (bMatch) return 1;
+  return a.localeCompare(b);
+}
+
+// Reads every non "-ans" .txt file in inputDir, concatenates them (sorted
+// numerically by leading filename number), and parses the result. Throws if
+// any question number appears more than once across the files.
+export function parseExamTopicsDir(inputDir) {
+  const files = readdirSync(inputDir)
+    .filter(f => f.endsWith('.txt') && !f.includes('-ans'))
+    .sort(compareByLeadingNumber);
+  const text = files.map(f => readFileSync(join(inputDir, f), 'utf8')).join('\n');
+  const questions = parseExamTopicsTxt(text);
+
+  const seen = new Set();
+  const duplicates = new Set();
+  for (const q of questions) {
+    if (seen.has(q.number)) duplicates.add(q.number);
+    seen.add(q.number);
+  }
+  if (duplicates.size > 0) {
+    const names = [...duplicates].sort((a, b) => a - b).join(', ');
+    throw new Error(`Duplicate question numbers: ${names}`);
+  }
+
+  return questions;
+}
+
 // CLI: node scripts/parse-examtopics-txt.js <input-dir> <output-file>
-// Reads every non "-ans" .txt in input-dir, concatenates, parses, writes JSON.
 const invoked = fileURLToPath(import.meta.url) === process.argv[1];
 if (invoked) {
-  const { readdirSync } = await import('node:fs');
   const [inputDir, outputFile] = process.argv.slice(2);
   if (!inputDir || !outputFile) {
     console.error('Usage: node scripts/parse-examtopics-txt.js <input-dir> <output-file>');
     process.exit(1);
   }
-  const files = readdirSync(inputDir)
-    .filter(f => f.endsWith('.txt') && !f.includes('-ans'))
-    .sort((a, b) => parseInt(a) - parseInt(b));
-  const text = files.map(f => readFileSync(join(inputDir, f), 'utf8')).join('\n');
-  const questions = parseExamTopicsTxt(text);
-  const numbers = new Set(questions.map(q => q.number));
-  if (numbers.size !== questions.length) throw new Error('Duplicate question numbers');
+  const questions = parseExamTopicsDir(inputDir);
   mkdirSync(dirname(outputFile), { recursive: true });
   writeFileSync(outputFile, JSON.stringify(questions, null, 2));
-  console.log(`Parsed ${questions.length} questions from ${files.length} files → ${outputFile}`);
+  console.log(`Parsed ${questions.length} questions → ${outputFile}`);
 }

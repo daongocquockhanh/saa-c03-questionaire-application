@@ -1,14 +1,13 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
+import { readFileSync, writeFileSync, mkdtempSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
-import { parseExamTopicsTxt } from './parse-examtopics-txt.js';
+import { tmpdir } from 'node:os';
+import { parseExamTopicsTxt, parseExamTopicsDir } from './parse-examtopics-txt.js';
 
-const fixture = readFileSync(
-  join(dirname(fileURLToPath(import.meta.url)), '__fixtures__', 'examtopics-sample.txt'),
-  'utf8'
-);
+const fixturePath = join(dirname(fileURLToPath(import.meta.url)), '__fixtures__', 'examtopics-sample.txt');
+const fixture = readFileSync(fixturePath, 'utf8');
 
 test('parses question numbers and counts', () => {
   const qs = parseExamTopicsTxt(fixture);
@@ -41,4 +40,40 @@ test('no answers in dump: needsManualAnswer, empty correctAnswers', () => {
   assert.deepEqual(q1.correctAnswers, []);
   assert.equal(q1.needsManualAnswer, true);
   assert.equal(q1.explanation, null);
+});
+
+test('parseExamTopicsDir ignores -ans decoy files and parses the rest', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'et-'));
+  writeFileSync(join(dir, '1-2.txt'), fixture);
+  writeFileSync(join(dir, '1-2-ans.txt'), 'this is not a question dump, just junk\nQuestion #99\n garbage');
+
+  const questions = parseExamTopicsDir(dir);
+
+  assert.equal(questions.length, 2);
+  assert.deepEqual(questions.map(q => q.number), [1, 2]);
+});
+
+test('parseExamTopicsDir throws on duplicate question numbers, naming them', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'et-'));
+  writeFileSync(join(dir, '1-2.txt'), fixture);
+  writeFileSync(
+    join(dir, '3-dup.txt'),
+    [
+      'Question #1',
+      '',
+      'A different company runs a duplicate scenario.',
+      'Which duplicate solution will meet these requirements?',
+      '',
+      ' A.',
+      '',
+      ' Use a duplicate service.',
+      '',
+      ' B.',
+      '',
+      ' Use another duplicate service.',
+      '',
+    ].join('\n')
+  );
+
+  assert.throws(() => parseExamTopicsDir(dir), /Duplicate question numbers:.*1/);
 });
