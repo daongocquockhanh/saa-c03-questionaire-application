@@ -1,7 +1,7 @@
 import { MODULES } from './modules.js';
 import { scoreQuestion, verdict, pickUnscored } from './scoring.js';
 import { normalizeFlagList, toggleInList, subtractIds } from './review.js';
-import { EXAMS, resolveExam } from './exams.js';
+import { EXAMS, resolveExam, sectionLabel } from './exams.js';
 
 // Which exam this session serves. Switching exams reloads the page (Task 7),
 // so everything below can treat ACTIVE_EXAM as constant.
@@ -287,6 +287,7 @@ function renderRunner(testId) {
       </div>
       <section class="question">
         ${q.aiAnswered ? '<span class="badge ai-unverified">AI-answered · unverified</span>' : ''}
+        ${sectionLabel(q) ? `<span class="badge section">${escapeHtml(sectionLabel(q))}</span>` : ''}
         <p class="scenario">${escapeHtml(q.scenario).replace(/\n/g, '<br>')}</p>
         <p class="prompt"><strong>${escapeHtml(q.prompt)}</strong></p>
         ${helper}
@@ -451,7 +452,7 @@ function renderResult(testId) {
         <summary>
           Q${idx + 1} — ${unscored ? '<span class="badge unscored">Unscored</span>' : sc === 1 ? '<span class="badge pass">Correct</span>' : sc === 0 ? '<span class="badge fail">Incorrect</span>' : `<span class="badge partial">Partial ${fmtScore(sc)}/1</span>`}
           ${q.aiAnswered ? '<span class="badge ai-unverified">AI-answered · unverified</span>' : ''}
-          ${flagged ? '★' : ''} ${q.domain ? `<span class="muted">D${q.domain} ${domainNames[q.domain]}</span>` : ''}
+          ${flagged ? '★' : ''} ${q.domain ? `<span class="muted">D${q.domain} ${domainNames[q.domain]}</span>` : ''}${sectionLabel(q) ? `<span class="muted">${escapeHtml(sectionLabel(q))}</span>` : ''}
         </summary>
         <p class="scenario">${escapeHtml(q.scenario).replace(/\n/g, '<br>')}</p>
         <p><strong>${escapeHtml(q.prompt)}</strong></p>

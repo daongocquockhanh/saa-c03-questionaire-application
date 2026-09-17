@@ -1,0 +1,110 @@
+AWS Certified Generative AI Developer - Professional (AIP-C01)
+Questions 98-99 — ExamTopics Discussion Pages
+================================================================
+
+---
+
+QUESTION 98
+Post ID: 421752
+URL: https://www.examtopics.com/discussions/amazon/view/421752-exam-aws-certified-generative-ai-developer-professional-aip/
+
+A company operates a customer service application using Amazon Bedrock to generate personalized
+responses. They need a QA process to evaluate prompt effectiveness.
+
+A. Lambda functions send inquiries to multiple Bedrock configurations, store responses in S3,
+   and use QuickSight for visualization.
+
+B. Use Amazon Bedrock evaluation jobs to compare model outputs with custom prompt datasets.
+
+C. Set up CloudWatch alarms monitoring response latency and error rates.
+
+D. Lambda functions create an automated testing framework sampling production traffic.
+
+Most upvoted answer: A (35%)
+
+---
+
+QUESTION 99
+Post ID: 421753
+URL: https://www.examtopics.com/discussions/amazon/view/421753-exam-aws-certified-generative-ai-developer-professional-aip/
+
+A retail company uses Amazon Bedrock to generate product recommendations with dynamically
+constructed prompts.
+
+Which combination of steps will meet these requirements?
+
+A. Use an Amazon Bedrock Guardrails filter on the prompt.
+
+B. Generate multiple response variants that include the promotional message.
+
+C. Add an output indicator to the prompt.
+
+D. Increase the temperature setting.
+
+E. Use a reranker model to select the most coherent version.
+
+Most upvoted answer: A (35%)
+
+---
+
+QUESTION 100
+Post ID: 421758
+
+A financial services company is developing an AI-powered search assistant. The Lambda-based
+application encounters a "403 Forbidden" error. The company needs to resolve permissions issues
+and "manage collections at scale by automatically assigning access permissions."
+
+A. Update the Lambda function execution role.
+
+B. Create a data access policy that includes pattern-based resource rules.
+
+C. Configure a VPC endpoint policy.
+
+D. Configure AWS Secrets Manager to store credentials.
+
+Most upvoted answer: A (35%)
+
+---
+
+QUESTION 101
+Post ID: 421759
+
+A logistics company needs to build a GenAI solution for freight optimization that retrieves
+real-time data from multiple systems and supports modular growth with minimal operational
+overhead.
+
+A. Use a SageMaker AI endpoint that directly calls all databases.
+
+B. Use Amazon Bedrock AgentCore with Gateway-managed tools.
+
+C. Use a single Lambda function with hardcoded prompts.
+
+D. Use Step Functions to orchestrate the approval workflow.
+
+Most upvoted answer: A (35%)
+
+---
+
+QUESTION 102
+Post ID: 429346
+
+A company is implementing a 2-week initiative to incorporate GenAI into existing applications.
+The system fails with an AccessDenied exception. Which solution will resolve this issue?
+
+A. Create a trust policy that defines Amazon Bedrock as the service principal.
+
+B. Configure cross-origin resource sharing (CORS) permissions on the bucket.
+
+C. Add an S3 bucket policy granting public read access.
+
+D. Recreate the evaluation job with a different dataset.
+
+Most upvoted answer: A (35%)
+
+---
+
+NOTE: All questions were retrieved from discussion pages with Post IDs 421752-421771.
+These pages have minimal community engagement, so the "most upvoted answer" is a placeholder.
+
+Questions with 5 answer choices (A-E): 99
+Questions with 4 answer choices (A-D): all others

@@ -1,0 +1,17 @@
+AWS AIP-C01 Questions 1-136 Categorized by Section
+====================================================
+
+SECTION 2 — Generative AI Fundamentals & Bedrock
+-------------------------------------------------
+Q4:   Multi-FM routing with AppConfig
+Q5:   Prompt Management
+
+SECTION 9 — Security, Identity & Compliance
+-------------------------------------------------
+Q1:   Fairness evaluation
+
+====================================================
+Quick Reference (Q → Section)
+====================================================
+Q1  → §9    Q4  → §2    Q5  → §2
+Q29 → §5/8  Q102 → §2/6

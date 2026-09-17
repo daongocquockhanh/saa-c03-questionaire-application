@@ -154,3 +154,4 @@ button:disabled { opacity: 0.5; cursor: not-allowed; }
 .exam-tab.active { background: #ff9900; color: #fff; border-color: transparent; }
 .badge.ai-unverified { background: #fff3cd; color: #7a5b00; border: 1px solid #e6c34a; }
 .exam-note { color: #7a5b00; background: #fff8e1; border: 1px solid #e6c34a; border-radius: 6px; padding: 8px 12px; }
+.badge.section { background: #e8eef7; color: #2c4a72; border: 1px solid #c3d3e8; }

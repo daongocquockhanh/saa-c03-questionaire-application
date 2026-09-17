@@ -2863,5 +2863,862 @@
     "explanation": null,
     "references": [],
     "needsManualAnswer": true
+  },
+  {
+    "id": 98,
+    "number": 98,
+    "scenario": "A company operates a customer service application using Amazon Bedrock to generate personalized responses.",
+    "prompt": "They need a QA process to evaluate prompt effectiveness and model configurations that: automatically compares outputs from multiple prompt templates, detects response quality issues, provides quantitative metrics, enables human reviewer feedback, and prevents deployments below quality thresholds.",
+    "options": [
+      {
+        "letter": "A",
+        "text": "Lambda functions send inquiries to multiple Bedrock configurations, store responses in S3, use QuickSight for visualization, perform manual daily reviews, and use CodePipeline to deploy configurations meeting quality thresholds."
+      },
+      {
+        "letter": "B",
+        "text": "Use Amazon Bedrock evaluation jobs to compare model outputs with custom prompt datasets. Configure CodePipeline to run evaluation jobs on prompt template changes and deploy configurations exceeding quality thresholds."
+      },
+      {
+        "letter": "C",
+        "text": "Set up CloudWatch alarms monitoring response latency and error rates, use EventBridge rules for threshold notifications, and configure Systems Manager approval workflow for manual quality checks."
+      },
+      {
+        "letter": "D",
+        "text": "Lambda functions create automated testing framework sampling production traffic, use Amazon Comprehend sentiment analysis for comparison, and block deployment if sentiment scores decrease."
+      }
+    ],
+    "correctAnswers": [],
+    "isMultiSelect": false,
+    "explanation": null,
+    "references": [],
+    "needsManualAnswer": true
+  },
+  {
+    "id": 99,
+    "number": 99,
+    "scenario": "A retail company uses Amazon Bedrock to generate product recommendations with dynamically constructed prompts. After deploying an update instructing the foundation model to include a specific promotional message, the developer observes the message doesn't consistently appear and lacks coherence when present.",
+    "prompt": "The developer must ensure the promotional message always appears in responses.",
+    "options": [
+      {
+        "letter": "A",
+        "text": "Use an Amazon Bedrock Guardrails filter on the prompt. Set the input filter strength to HIGH."
+      },
+      {
+        "letter": "B",
+        "text": "Generate multiple response variants that include the promotional message in different ways. Use a reranker model to select the most coherent version based on relevance to the original prompt."
+      },
+      {
+        "letter": "C",
+        "text": "Run the prompt through Amazon Bedrock. Process the response through Amazon Bedrock Agents to add the promotional message. Rerank the results using the original prompt and desired message as context."
+      },
+      {
+        "letter": "D",
+        "text": "Reinforce the requirement to include the promotional message within product recommendations by using an output indicator in prompts to the FM."
+      }
+    ],
+    "correctAnswers": [],
+    "isMultiSelect": false,
+    "explanation": null,
+    "references": [],
+    "needsManualAnswer": true
+  },
+  {
+    "id": 100,
+    "number": 100,
+    "scenario": "A company is creating a GenAI application using Amazon Bedrock foundation models that must integrate Microsoft Entra ID authentication, maintain private network paths for all FM API calls, limit access by department to specific model families, and maintain comprehensive audit trails of model interactions.",
+    "prompt": "",
+    "options": [
+      {
+        "letter": "A",
+        "text": "Configure SAML federation between Microsoft Entra ID and IAM. Create department-specific IAM roles allowing only required ModelId values. Create AWS PrivateLink interface VPC endpoints for Amazon Bedrock runtime services. Enable AWS CloudTrail to capture API calls and Amazon Bedrock model invocation logging."
+      },
+      {
+        "letter": "B",
+        "text": "Create an IdP connection in IAM for Microsoft Entra ID authentication. Assign department permission sets for model family access. Deploy Lambda functions in private subnets with NAT gateway for Bedrock access. Enable CloudWatch Logs for auditing."
+      },
+      {
+        "letter": "C",
+        "text": "Create a SAML IdP in IAM for Microsoft Entra ID. Use IAM permissions boundaries to limit department access. Configure public Bedrock API endpoints with VPC routing. Set up CloudTrail with S3 Lifecycle rules for audit logs."
+      },
+      {
+        "letter": "D",
+        "text": "Configure OIDC federation between Microsoft Entra ID and IAM. Use attribute-based access control for department-to-model mapping. Apply SCP policies for Bedrock FM restrictions. Use Microsoft Entra ID built-in logging."
+      }
+    ],
+    "correctAnswers": [],
+    "isMultiSelect": false,
+    "explanation": null,
+    "references": [],
+    "needsManualAnswer": true
+  },
+  {
+    "id": 101,
+    "number": 101,
+    "scenario": "A healthcare company is developing an AI application to retrieve medical literature to help doctors conduct research. The company wants to deploy the application to multiple countries. The application needs to index 50,000 text-heavy medical documents containing specialized terminology in English, French, and German.",
+    "prompt": "The application must provide high search accuracy for medical terminology while requiring minimal custom code development and ongoing maintenance.",
+    "options": [
+      {
+        "letter": "A",
+        "text": "Use Amazon Titan Text Embeddings to process documents in their original language without translation. Apply semantic chunking at the medical section level to preserve terminology context and maintain moderate vector dimensions."
+      },
+      {
+        "letter": "B",
+        "text": "Use Amazon Titan Text Embeddings to translate all non-English documents to English before processing. Implement document chunking strategies based on logical sections to improve retrieval accuracy."
+      },
+      {
+        "letter": "C",
+        "text": "Use Amazon Titan Multimodal Embeddings to convert document pages to images. Generate text captions for the images to create a multimodal knowledge base that handles medical content."
+      },
+      {
+        "letter": "D",
+        "text": "Use an Amazon Bedrock knowledge base as the vector store. Use Amazon Kendra to perform multilingual document processing. Configure the vector store to automatically handle language detection and translation for each query."
+      }
+    ],
+    "correctAnswers": [],
+    "isMultiSelect": false,
+    "explanation": null,
+    "references": [],
+    "needsManualAnswer": true
+  },
+  {
+    "id": 102,
+    "number": 102,
+    "scenario": "A publishing company develops a chat assistant using a containerized LLM on Amazon SageMaker AI. The architecture includes an API Gateway REST API routing requests to a Lambda function, which invokes a SageMaker real-time endpoint. Users report uneven response times with high abandonment after 2 seconds waiting for the first token.",
+    "prompt": "The company seeks a solution ensuring p95 latency under 800 ms for interactive requests.",
+    "options": [
+      {
+        "letter": "A",
+        "text": "Enable model preload upon container startup. Implement dynamic batching to process multiple user requests together in a single inference pass."
+      },
+      {
+        "letter": "B",
+        "text": "Select a larger GPU instance type for the SageMaker endpoint. Set minimum instances to 0. Continue per-request processing. Lazily load model weights on first request."
+      },
+      {
+        "letter": "C",
+        "text": "Switch to a multi-model endpoint. Use lazy loading without request batching."
+      },
+      {
+        "letter": "D",
+        "text": "Set minimum instances to greater than 0. Enable response streaming."
+      },
+      {
+        "letter": "E",
+        "text": "Switch to SageMaker Asynchronous Inference for all requests. Store requests in S3. Set minimum instances to 0."
+      }
+    ],
+    "correctAnswers": [],
+    "isMultiSelect": false,
+    "explanation": null,
+    "references": [],
+    "needsManualAnswer": true
+  },
+  {
+    "id": 103,
+    "number": 103,
+    "scenario": "A company operates a GenAI application using multiple Amazon Bedrock foundation models for text generation across three AWS Regions on Lambda functions.",
+    "prompt": "They need dynamic model selection based on response quality and latency, the ability to switch models without code changes, gradual rollout starting at 20% traffic, and automatic rollback when error rates exceed 1%.",
+    "options": [
+      {
+        "letter": "A",
+        "text": "Use AWS AppConfig for feature flags on model selection with validation rules for error rates. Implement the AppConfig Agent Lambda extension to retrieve configurations. Define linear deployment strategies for gradual 20% traffic release."
+      },
+      {
+        "letter": "B",
+        "text": "Store configurations in Amazon DynamoDB with global tables for multi-Region replication. Use EventBridge to monitor CloudWatch metrics and invoke Lambda functions updating DynamoDB. Add custom query code to Lambda functions before model invocation."
+      },
+      {
+        "letter": "C",
+        "text": "Create Lambda function versions for each model configuration. Use Lambda aliases with routing configurations to gradually shift 20% of traffic. Implement CodeDeploy deployments monitoring CloudWatch metrics with automatic rollback on error rate thresholds."
+      },
+      {
+        "letter": "D",
+        "text": "Create CloudWatch dashboards to monitor metrics. Implement custom logic in Lambda functions for model selection based on metric thresholds. Use environment variables in AWS Systems Manager Parameter Store for cross-Region updates."
+      }
+    ],
+    "correctAnswers": [],
+    "isMultiSelect": false,
+    "explanation": null,
+    "references": [],
+    "needsManualAnswer": true
+  },
+  {
+    "id": 104,
+    "number": 104,
+    "scenario": "A financial services company is developing an AI-powered search assistant using Amazon Bedrock with a knowledge base backed by Amazon OpenSearch Serverless. The Lambda-based application encounters a \"400 Bad Authorization\" error from BedrockAgentRuntime API and a \"403 Forbidden\" error when accessing OpenSearch Serverless.",
+    "prompt": "The company needs to resolve permissions issues and \"manage collections at scale by automatically assigning access permissions to collections and indexes that match a specific pattern.\"",
+    "options": [
+      {
+        "letter": "A",
+        "text": "Update the Lambda function execution role to include the bedrock:InvokeAgent permission. Add the aoss:APIAccessAll permission to the Lambda execution role."
+      },
+      {
+        "letter": "B",
+        "text": "Create an OpenSearch Serverless data access policy that includes pattern-based resource rules."
+      },
+      {
+        "letter": "C",
+        "text": "Configure a VPC endpoint policy for OpenSearch Serverless. Add the endpoint to the Lambda function's VPC configuration."
+      },
+      {
+        "letter": "D",
+        "text": "Configure AWS Secrets Manager to store OpenSearch Serverless credentials. Grant the Lambda function access to retrieve the credentials."
+      },
+      {
+        "letter": "E",
+        "text": "Enable IAM authentication for the OpenSearch Serverless domain. Add the es:ESHttp* permission to the Lambda function execution role."
+      }
+    ],
+    "correctAnswers": [],
+    "isMultiSelect": false,
+    "explanation": null,
+    "references": [],
+    "needsManualAnswer": true
+  },
+  {
+    "id": 105,
+    "number": 105,
+    "scenario": "A financial services company needs to develop a GenAI application enabling business analysts to query sensitive customer data using natural language.",
+    "prompt": "The solution must implement content safety by detecting SQL injection attempts, validating generated queries against predefined schemas, and maintaining an audit trail of transformations.",
+    "options": [
+      {
+        "letter": "A",
+        "text": "Use Amazon Bedrock with integrated content filtering, deploy Amazon GuardDuty with custom SQL threat detection rules, use AWS Lambda to check queries against schemas in AWS Systems Manager Parameter Store, and use Amazon EventBridge to store transformation records in S3."
+      },
+      {
+        "letter": "B",
+        "text": "Implement a multi-stage validation pipeline using Amazon Bedrock Guardrails for input filtering, configure AWS Lambda with SQL parsing libraries for syntax validation, use Amazon RDS Data API to verify queries against defined schemas and collect audit logs before pipeline execution."
+      },
+      {
+        "letter": "C",
+        "text": "Configure AWS CloudTrail to log database API calls, implement IAM roles with least privilege access, and use AWS WAF to filter malicious inputs."
+      },
+      {
+        "letter": "D",
+        "text": "Train a custom Amazon SageMaker model for text-to-SQL transformation, attach VPC endpoints to isolate the customer database, and store query history in Amazon DynamoDB."
+      }
+    ],
+    "correctAnswers": [],
+    "isMultiSelect": false,
+    "explanation": null,
+    "references": [],
+    "needsManualAnswer": true
+  },
+  {
+    "id": 106,
+    "number": 106,
+    "scenario": "A company needs a system to automatically generate study materials from multiple content sources, including documents (PDFs, PowerPoint, Word) and multimedia (recorded videos).",
+    "prompt": "The system must process over 10,000 sources daily with peak loads of 500 concurrent uploads, extract key concepts, create contextually accurate summaries, and support real-time collaboration with version control.",
+    "options": [
+      {
+        "letter": "A",
+        "text": "Amazon Bedrock Data Automation (BDA) with Lambda for documents; BDA Knowledge Bases for multimedia; Amazon DocumentDB storage with replication; SNS for collaboration; Bedrock Agents for change tracking."
+      },
+      {
+        "letter": "B",
+        "text": "Amazon Bedrock Data Automation (BDA) with foundation models for documents; integrate with Amazon Textract (PDFs) and Amazon Transcribe (multimedia); store in Amazon S3 with versioning; metadata in DynamoDB; real-time collaboration via AWS AppSync GraphQL subscriptions."
+      },
+      {
+        "letter": "C",
+        "text": "Amazon Bedrock Data Automation (BDA) with SageMaker AI endpoints; Amazon Bedrock Guardrails for content extraction; Amazon Neptune for storage; Amazon Bedrock Chat for messaging."
+      },
+      {
+        "letter": "D",
+        "text": "Amazon Bedrock Data Automation (BDA) with Lambda for batch processing; fine-tuned foundation models for document classification; Amazon ElastiCache (Redis) with Cluster Mode; Bedrock Prompt Management for version control."
+      }
+    ],
+    "correctAnswers": [],
+    "isMultiSelect": false,
+    "explanation": null,
+    "references": [],
+    "needsManualAnswer": true
+  },
+  {
+    "id": 107,
+    "number": 107,
+    "scenario": "A healthcare company needs to develop a proof-of-concept for medical document summarization using Amazon Bedrock.",
+    "prompt": "Requirements include: 3-week validation timeline, data privacy compliance, and metrics for summarization accuracy and processing time.",
+    "options": [
+      {
+        "letter": "A",
+        "text": "Create a dataset with 50-100 anonymized patient records. Implement RAG with a secure knowledge base. Use a judge model to evaluate accuracy metrics across three foundation models."
+      },
+      {
+        "letter": "B",
+        "text": "Fine-tune a single foundation model on patient records. Deploy on Amazon Bedrock. Use Amazon Bedrock AgentCore to configure as an agent. Conduct user testing with 500 staff members."
+      },
+      {
+        "letter": "C",
+        "text": "Select the most powerful available AWS foundation model. Create a chat interface using Converse APIs. Test on 50-100 actual patient records with qualitative stakeholder feedback. Use custom web interface for performance metrics."
+      },
+      {
+        "letter": "D",
+        "text": "Use Strands SDK to deploy multiple agents connecting to multiple knowledge bases with specialized medical documents. Compare agent responses and evaluate integration with existing systems."
+      }
+    ],
+    "correctAnswers": [],
+    "isMultiSelect": false,
+    "explanation": null,
+    "references": [],
+    "needsManualAnswer": true
+  },
+  {
+    "id": 108,
+    "number": 108,
+    "scenario": "A company needs to select a new foundation model for its AI assistant. A GenAI developer must create evaluation reports assessing quality and safety of various FMs using sample prompts provided by a data scientist.",
+    "prompt": "The developer wants to use Amazon Bedrock to automate this process.",
+    "options": [
+      {
+        "letter": "A",
+        "text": "Combine prompts into JSON, create a Bedrock knowledge base, write a prompt asking the FM to generate responses to each sample, use RetrieveAndGenerate API for reports."
+      },
+      {
+        "letter": "B",
+        "text": "Combine prompts into JSONL, store in S3, create a Bedrock evaluation job with a judge model, specify S3 input/output locations, run evaluation for each FM selecting it as generator."
+      },
+      {
+        "letter": "C",
+        "text": "Combine prompts into JSONL, store in S3, create a Bedrock evaluation job with judge model, specify S3 input and QuickSight output, run evaluation selecting FM as evaluator."
+      },
+      {
+        "letter": "D",
+        "text": "Combine prompts into JSON, create knowledge base, create Bedrock evaluation job using retrieval and response generation type, specify S3 output, run for each FM."
+      }
+    ],
+    "correctAnswers": [],
+    "isMultiSelect": false,
+    "explanation": null,
+    "references": [],
+    "needsManualAnswer": true
+  },
+  {
+    "id": 109,
+    "number": 109,
+    "scenario": "A financial services company develops an NLP application using AWS Lambda with Amazon Bedrock foundation models to process customer trade inquiries. The Lambda function generates comprehensive trade analysis responses exceeding 4 MB requiring 15-20 seconds.",
+    "prompt": "Requirements include responding in under 10 seconds and retaining records for 10 years per financial regulations.",
+    "options": [
+      {
+        "letter": "A",
+        "text": "Implement response streaming for partial responses. Set 15-second Lambda timeout. Enable AWS X-Ray tracing."
+      },
+      {
+        "letter": "B",
+        "text": "Use Amazon SQS for asynchronous invocations. Set 30-second Lambda timeout. Use CloudWatch monitoring."
+      },
+      {
+        "letter": "C",
+        "text": "Use API Gateway polling. Integrate Amazon ElastiCache for response caching. Set 30-second timeout. Collect CloudWatch logs."
+      },
+      {
+        "letter": "D",
+        "text": "Implement response streaming for partial responses. Set 30-second Lambda timeout. Store complete records in Amazon S3."
+      }
+    ],
+    "correctAnswers": [],
+    "isMultiSelect": false,
+    "explanation": null,
+    "references": [],
+    "needsManualAnswer": true
+  },
+  {
+    "id": 110,
+    "number": 110,
+    "scenario": "A university is building an AI-powered application with sub-applications including AI assistants, assignment graders, and internal analytics. They're testing multiple prompts across various foundation models and need to compare prompt variants for different use cases.",
+    "prompt": "Requirements: version control for prompts, ability to test variations, collect audit trails for changes and usage, maintain consistency, and integrate into the main application — all with the least operational overhead.",
+    "options": [
+      {
+        "letter": "A",
+        "text": "Use Amazon Bedrock Prompt Management to create versioned prompts with parameterized variables for each use case."
+      },
+      {
+        "letter": "B",
+        "text": "Store prompts in Amazon S3 and use AWS Step Functions to orchestrate model interactions."
+      },
+      {
+        "letter": "C",
+        "text": "Use Amazon Bedrock Flows to create workflows combining FMs and AWS services."
+      },
+      {
+        "letter": "D",
+        "text": "Configure AWS Config for prompt changes and CloudTrail for prompt usage tracking."
+      },
+      {
+        "letter": "E",
+        "text": "Configure Amazon Bedrock intelligent prompt routing."
+      }
+    ],
+    "correctAnswers": [],
+    "isMultiSelect": false,
+    "explanation": null,
+    "references": [],
+    "needsManualAnswer": true
+  },
+  {
+    "id": 111,
+    "number": 111,
+    "scenario": "A company building a multicloud GenAI-powered secret resolution application using Amazon Bedrock and Agent Squad faces performance issues: expired secrets aren't refreshed timely, stale data persists despite drift alerts, and outdated prompt templates cause cascading failures.",
+    "prompt": "The company must resolve these issues.",
+    "options": [
+      {
+        "letter": "A",
+        "text": "Use Step Functions Map states to run agent workflows in parallel. Pass updated secret metadata through Lambda function outputs. Use AWS AppConfig to version all prompt flows to gate and roll back faulty templates."
+      },
+      {
+        "letter": "B",
+        "text": "Use Amazon Bedrock AgentCore only. Configure Amazon Bedrock guardrails to restrict prompt variation. Use an inline JSON schema for a single agent's workflow definition to chain tool calls."
+      },
+      {
+        "letter": "C",
+        "text": "Use a centralized Amazon EventBridge pipeline to invoke each event agent. Store intermediate prompts in Amazon DynamoDB. Resolve agent ordering by using TTL-based backoff and retries."
+      },
+      {
+        "letter": "D",
+        "text": "Use Amazon EventBridge Pipes to invoke resolvers based on Amazon CloudWatch log patterns. Store response metadata in Amazon DynamoDB. Configure a TTL and versioned writes. Use Amazon Q Developer to dynamically generate fallback prompts routed through a Lambda coordinator."
+      }
+    ],
+    "correctAnswers": [],
+    "isMultiSelect": false,
+    "explanation": null,
+    "references": [],
+    "needsManualAnswer": true
+  },
+  {
+    "id": 112,
+    "number": 112,
+    "scenario": "A financial services company processes over 10,000 customer inquiries daily through a multi-agent GenAI application using Amazon Bedrock AgentCore. Custom tools fail at 40% during peak usage.",
+    "prompt": "A developer must implement observability providing end-to-end visibility into agent interactions and tool behavior using built-in Bedrock capabilities without custom instrumentation, requiring minimal performance overhead.",
+    "options": [
+      {
+        "letter": "A",
+        "text": "Enable AgentCore Observability and trace collection. Use AWS X-Ray to capture distributed traces for custom tools. Build CloudWatch dashboards to visualize metrics for errors, throttling, and latency during peak usage."
+      },
+      {
+        "letter": "B",
+        "text": "Use Amazon CloudWatch Container Insights to monitor agents. Configure an AWS Lambda function to poll the Bedrock API for tool usage metrics. Store results in CloudWatch to generate alerts."
+      },
+      {
+        "letter": "C",
+        "text": "Build a custom ETL pipeline using AWS Lambda functions to process CloudWatch logs from Bedrock. Store processed data in DynamoDB. Use Amazon QuickSight to visualize cross-team performance patterns."
+      },
+      {
+        "letter": "D",
+        "text": "Enable AgentCore Observability and send trace data to CloudWatch Logs. Use a custom Lambda function to extract tool performance metrics. Use Amazon Managed Grafana to visualize trends."
+      }
+    ],
+    "correctAnswers": [],
+    "isMultiSelect": false,
+    "explanation": null,
+    "references": [],
+    "needsManualAnswer": true
+  },
+  {
+    "id": 113,
+    "number": 113,
+    "scenario": "An ecommerce company uses Claude Sonnet in Amazon Bedrock for product recommendations. A Lambda function retrieves customer data from multiple sources (DynamoDB, S3, RDS) and sends it directly to the model. Customers with extensive purchase histories receive incomplete recommendations. CloudWatch logs show Lambda timeouts and intermittent Bedrock errors, including context length exceeded errors. Some requests ignore portions of input data.",
+    "prompt": "The company wants recommendations to consider all customer data and plans to use Amazon Bedrock Knowledge Bases.",
+    "options": [
+      {
+        "letter": "A",
+        "text": "Implement chunking strategy dividing customer data into smaller segments, process each separately, then synthesize responses into comprehensive recommendations."
+      },
+      {
+        "letter": "B",
+        "text": "Modify prompt structure placing critical information at beginning/end of context window, implement token-counting logic to truncate less important data."
+      },
+      {
+        "letter": "C",
+        "text": "Replace Claude Sonnet with a larger context window model, increase Lambda timeout for longer processing."
+      },
+      {
+        "letter": "D",
+        "text": "Configure Converse API, modify additionalModelRequestFields to increase maximum token limit beyond default."
+      },
+      {
+        "letter": "E",
+        "text": "Implement RAG using knowledge base to index customer data with vector embeddings, retrieve semantically relevant information per request."
+      }
+    ],
+    "correctAnswers": [],
+    "isMultiSelect": false,
+    "explanation": null,
+    "references": [],
+    "needsManualAnswer": true
+  },
+  {
+    "id": 114,
+    "number": 114,
+    "scenario": "A company developed a multimodal content analysis application using Amazon Bedrock that routes different content types (text, images, code) to specialized foundation models.",
+    "prompt": "The application needs to handle simple routing with minimal latency based on file extensions, complex routing requiring content semantic analysis, detailed history, and fallback options when primary models fail.",
+    "options": [
+      {
+        "letter": "A",
+        "text": "Configure AWS Lambda functions calling Amazon Bedrock FMs for all routing logic with conditional statements based on content type and semantics."
+      },
+      {
+        "letter": "B",
+        "text": "Create a hybrid solution using application code for simple file extension routing and AWS Step Functions with JSONata for complex content-based routing and InvokeModel API calls."
+      },
+      {
+        "letter": "C",
+        "text": "Deploy separate AWS Step Functions workflows per content type with Lambda routing logic and Amazon EventBridge for fallback coordination."
+      },
+      {
+        "letter": "D",
+        "text": "Use Amazon SQS with content-type queues and Lambda consumers analyzing content to invoke appropriate FMs via Amazon Bedrock SDK."
+      }
+    ],
+    "correctAnswers": [],
+    "isMultiSelect": false,
+    "explanation": null,
+    "references": [],
+    "needsManualAnswer": true
+  },
+  {
+    "id": 115,
+    "number": 115,
+    "scenario": "A company developing a customer support chat assistant using Amazon Bedrock needs to validate a newer foundation model version while detecting semantic drift. They require a solution to compare responses across 500 test cases, detect meaning changes, generate similarity scores, complete validations, and log results for historical tracking.",
+    "prompt": "The goal is to minimize operational complexity.",
+    "options": [
+      {
+        "letter": "A",
+        "text": "Configure CloudWatch Synthetics canaries with custom JavaScript to send prompts to both FM versions, store responses in S3, and perform manual reviews for semantic differences."
+      },
+      {
+        "letter": "B",
+        "text": "Configure an AWS Step Functions workflow sending test prompts to both versions, use Bedrock embedding models to calculate cosine similarity scores, and store results in DynamoDB with composite keys."
+      },
+      {
+        "letter": "C",
+        "text": "Use Amazon Bedrock model evaluation jobs to compare the new FM version against the current version using 500 test cases, calculate semantic similarity metrics, and store results in S3 for historical comparison."
+      },
+      {
+        "letter": "D",
+        "text": "Build a custom solution using SageMaker AI to train a classifier model on historical responses to detect anomalies when comparing new FM version responses against previous patterns."
+      }
+    ],
+    "correctAnswers": [],
+    "isMultiSelect": false,
+    "explanation": null,
+    "references": [],
+    "needsManualAnswer": true
+  },
+  {
+    "id": 116,
+    "number": 116,
+    "scenario": "A media company is building an AI-powered content moderation system using Amazon Bedrock. The system classifies text with a small, low-latency model first, then escalates requests with confidence scores below 0.65 to a larger model.",
+    "prompt": "Requirements include near real-time responses for high-confidence results, asynchronous processing for low-confidence requests, scaling for traffic spikes, cost optimization (invoking the larger model only when needed), and decoupled components for resilience.",
+    "options": [
+      {
+        "letter": "A",
+        "text": "Use Amazon API Gateway to invoke the small model synchronously. If confidence score is below 0.65, synchronously call the larger model. Use provisioned concurrency for traffic spikes."
+      },
+      {
+        "letter": "B",
+        "text": "Use AWS Step Functions with parallel branches to run both models for every request. Choose the large model result when confidence scores differ."
+      },
+      {
+        "letter": "C",
+        "text": "Send requests to an Amazon SQS queue. Use AWS Fargate to process messages. Invoke the small model first. If confidence score is below 0.65, place the request in a second SQS queue for asynchronous large model processing."
+      },
+      {
+        "letter": "D",
+        "text": "Deploy both models on Amazon EC2 instances with auto scaling. Use custom application heuristics to route requests based on phrase length and keyword rules."
+      }
+    ],
+    "correctAnswers": [],
+    "isMultiSelect": false,
+    "explanation": null,
+    "references": [],
+    "needsManualAnswer": true
+  },
+  {
+    "id": 117,
+    "number": 117,
+    "scenario": "A social messaging company is building an AI chat assistant using Amazon Bedrock. The company must ensure every inference complies with an approved safety policy.",
+    "prompt": "They want to block harmful prompts before model invocations, filter streamed outputs in real time, and route flagged cases for human review.",
+    "options": [
+      {
+        "letter": "A",
+        "text": "Configure Step Functions workflow with Lambda pre-check using ApplyGuardrail API, InvokeModelWithResponseStream with attached guardrail, Lambda post-check using ApplyGuardrail API, route flagged items to SQS, and enforce guardrail use via IAM condition."
+      },
+      {
+        "letter": "B",
+        "text": "Configure Step Functions workflow calling ApplyGuardrail API before inference, then InvokeModel API without streaming, store results in S3, and use client UI to hide problematic tokens."
+      },
+      {
+        "letter": "C",
+        "text": "Configure Step Functions workflow with InvokeModelWithResponseStream API with attached guardrail for in-stream filtering, Lambda post-check using ApplyGuardrail API, without pre-inference checks."
+      },
+      {
+        "letter": "D",
+        "text": "Configure Step Functions workflow with pre-checks and post-checks using ApplyGuardrail API and InvokeModelWithResponseStream, attach guardrail to check steps, and use process controls instead of IAM enforcement."
+      }
+    ],
+    "correctAnswers": [],
+    "isMultiSelect": false,
+    "explanation": null,
+    "references": [],
+    "needsManualAnswer": true
+  },
+  {
+    "id": 128,
+    "number": 128,
+    "scenario": "A company is designing a GenAI solution for children ages 8-14 to learn world history. The system must handle 30 concurrent users with sub-1-second responses using Amazon Bedrock and Amazon Nova Pro. Testing reveals historically inaccurate, violent, and age-inappropriate responses.",
+    "prompt": "A GenAI developer must prevent the solution from responding inaccurately and inappropriately.",
+    "options": [
+      {
+        "letter": "A",
+        "text": "Increase the inference temperature in the flow. Add a node to the flow after the initial response that calls the Amazon Nova model to remove any violence from the response. Return the result of the model call."
+      },
+      {
+        "letter": "B",
+        "text": "Configure Amazon Bedrock guardrails for the model responses by using content filters. Set the content filter strength high and set the guardrail action to block. Add the guardrail to the flow. Reduce the inference temperature in the flow."
+      },
+      {
+        "letter": "C",
+        "text": "Use Amazon Bedrock Data Automation with a custom output that removes all violent content from the knowledge base. Increase the inference temperature in the flow."
+      },
+      {
+        "letter": "D",
+        "text": "Configure Amazon Bedrock guardrails for the prompts by using content filters. Set the content filter strength to high and set the guardrail action to block. Add the guardrail to the flow. Reduce the inference temperature in the flow."
+      }
+    ],
+    "correctAnswers": [],
+    "isMultiSelect": false,
+    "explanation": null,
+    "references": [],
+    "needsManualAnswer": true
+  },
+  {
+    "id": 129,
+    "number": 129,
+    "scenario": "A legal research company is developing an AI-powered chat assistant using Amazon Bedrock with a knowledge base containing millions of legal documents. The foundation model has a context window limitation allowing effective processing of only 10 documents per query. Currently, retrieval fetches 50 documents via semantic search, but highly relevant precedents frequently appear in positions 15-40.",
+    "prompt": "The company needs a solution meeting latency (3 seconds) and context window constraints while improving result relevance.",
+    "options": [
+      {
+        "letter": "A",
+        "text": "Maintain 50-document retrieval but increase the FM's temperature parameter. Implement prompt engineering to instruct the model to identify the most relevant documents from the full result set before generating responses."
+      },
+      {
+        "letter": "B",
+        "text": "Enable reranking on the knowledge base using a reranker model with language-specific configurations. Initially retrieve 50 documents, use the reranker's cross-encoder architecture to evaluate query-document pairs, and return only the top 10 highest-scored documents."
+      },
+      {
+        "letter": "C",
+        "text": "Configure three separate knowledge bases with different token chunks (500, 1,000, and 2,000). Implement a pre-processing Lambda function retrieving 50 documents from each knowledge base, merging 150 results, and using TF-IDF scoring to select the top 10."
+      },
+      {
+        "letter": "D",
+        "text": "Implement a post-processing Lambda function retrieving 50 documents and calculating cosine similarity scores using Amazon Titan Embeddings. Sort by similarity score and return the top 10 documents."
+      }
+    ],
+    "correctAnswers": [],
+    "isMultiSelect": false,
+    "explanation": null,
+    "references": [],
+    "needsManualAnswer": true
+  },
+  {
+    "id": 130,
+    "number": 130,
+    "scenario": "A multinational healthcare company is building a GenAI solution to analyze patient medical records and clinical trial data to identify treatment patterns and generate research insights. Some countries require on-premises data storage.",
+    "prompt": "The solution must provide sub-100 ms inference at remote clinics worldwide, use cloud-based foundation models for large-scale analytics, ensure data residency compliance, and support consistent hybrid workflows with minimal operational overhead.",
+    "options": [
+      {
+        "letter": "A",
+        "text": "Use AWS Global Accelerator to reduce latency for remote clinics. Replicate on-premises patient data to Amazon S3 using AWS DataSync. Process all model requests through a centralized inference endpoint in one AWS Region."
+      },
+      {
+        "letter": "B",
+        "text": "Deploy open source FMs on Amazon EC2 instances in each country to comply with data residency requirements. Store patient data locally on Amazon EBS volumes. Use AWS Systems Manager for model updates. Manually export aggregated research insights as CSV files to Amazon S3 buckets in each AWS Region."
+      },
+      {
+        "letter": "C",
+        "text": "Deploy FMs in multiple AWS Regions on Amazon EC2 GPU instances. Replicate patient data from on-premises systems to the cloud. Centralize model training and inference."
+      },
+      {
+        "letter": "D",
+        "text": "Use AWS Outposts to process and store sensitive on-premises patient data in countries with data residency requirements. Deploy AWS Wavelength at remote clinics for real-time inference."
+      }
+    ],
+    "correctAnswers": [],
+    "isMultiSelect": false,
+    "explanation": null,
+    "references": [],
+    "needsManualAnswer": true
+  },
+  {
+    "id": 131,
+    "number": 131,
+    "scenario": "A global company runs an AI-powered document-processing pipeline that uses Amazon Bedrock to summarize text documents. The pipeline occasionally times out during peak traffic periods.",
+    "prompt": "Requirements: detect when error rates exceed 10% within any 60-second window, switch to an alternate process path when thresholds are exceeded, automatically resume normal processing upon recovery, and process all documents within 15 minutes.",
+    "options": [
+      {
+        "letter": "A",
+        "text": "Configure an AWS Step Functions workflow implementing a circuit breaker pattern by tracking Amazon Bedrock invocation failures in Amazon DynamoDB, routing jobs between normal and alternate paths based on failure state."
+      },
+      {
+        "letter": "B",
+        "text": "Configure an AWS Step Functions workflow using AWS Lambda to poll CloudWatch metrics for Amazon Bedrock, with manual staff intervention to divert traffic when error rates exceed 10%."
+      },
+      {
+        "letter": "C",
+        "text": "Configure an AWS Step Functions state machine with Retry/Catch logic for Amazon Bedrock calls and an Amazon CloudWatch alarm triggering an Amazon EventBridge rule to direct traffic to alternate processing when error rates exceed 10%."
+      },
+      {
+        "letter": "D",
+        "text": "Deploy multiple identical AWS Step Functions state machines using multiple Amazon Bedrock models behind Amazon API Gateway with a custom health check Lambda function routing requests to the fastest-responding state machine."
+      }
+    ],
+    "correctAnswers": [],
+    "isMultiSelect": false,
+    "explanation": null,
+    "references": [],
+    "needsManualAnswer": true
+  },
+  {
+    "id": 132,
+    "number": 132,
+    "scenario": "A media company needs to automatically generate searchable metadata for a video library containing 10,000 hours of content. Each video includes visual scenes, spoken dialogue, background music, and on-screen text. The company requires extraction of scene descriptions, speaker transcripts with timestamps, text overlay content, and emotional context.",
+    "prompt": "The output must synchronize all metadata types and create a searchable index allowing users to search by any metadata type and jump to specific video moments.",
+    "options": [
+      {
+        "letter": "A",
+        "text": "Use SageMaker AI processing with frame extraction, Amazon Transcribe for audio, Claude in Bedrock for multimodal analysis, storing outputs in separate S3 buckets by content type."
+      },
+      {
+        "letter": "B",
+        "text": "Use SageMaker AI processing with timestamped frame extraction, Transcribe with time markers, Claude analyzing frame-transcript pairs, storing outputs in unified JSON preserving temporal relationships."
+      },
+      {
+        "letter": "C",
+        "text": "Use SageMaker AI parallel processing orchestrated by a pipeline with multiple steps: video segment extraction, Transcribe for audio, Rekognition for text detection, Comprehend for sentiment analysis, storing unified metadata in DynamoDB with time-based partitioning."
+      },
+      {
+        "letter": "D",
+        "text": "Use SageMaker AI processing with Claude Opus in Bedrock for comprehensive multimodal analysis per video, extracting metadata via single inference request, indexing results in OpenSearch Service for temporal search."
+      }
+    ],
+    "correctAnswers": [],
+    "isMultiSelect": false,
+    "explanation": null,
+    "references": [],
+    "needsManualAnswer": true
+  },
+  {
+    "id": 133,
+    "number": 133,
+    "scenario": "A financial services company developing a GenAI application needs to analyze data across multiple AWS accounts using a foundation model. Data resides in separate S3 buckets: Account A (transaction data), Account B (customer profiles with PII), and Account C (GenAI application). Seven more business units will be added soon. The company requires strict PII control and must ensure the FM accesses only necessary data fields.",
+    "prompt": "The organization needs a solution for secure cross-account access.",
+    "options": [
+      {
+        "letter": "A",
+        "text": "Use AWS Identity Center to create permission sets for the FM service account. Configure resource-based policies on S3 buckets allowing specific access to Account C. Deploy a custom AWS Lambda authorizer to filter PII data before passing it to the FM."
+      },
+      {
+        "letter": "B",
+        "text": "Configure Amazon Bedrock cross-account IAM roles. Create role-based access policies in each source account for specific S3 bucket paths. Apply tag-based access controls on S3 objects to classify and control PII access."
+      },
+      {
+        "letter": "C",
+        "text": "Set up AWS Lake Formation in each source account. Register S3 buckets with Lake Formation. Create IAM roles for specific S3 bucket paths. Configure Lake Formation permissions to allow access only to specific data columns using tag-based access controls. Use Amazon SageMaker AI to deploy the FM with an execution role in Account C that can assume cross-account IAM roles to access data through Lake Formation."
+      },
+      {
+        "letter": "D",
+        "text": "Configure resource-based policies on S3 buckets in each source account allowing access from Account C's GenAI application. Configure identity-based policies for the FM's service role allowing access only to specific data columns using AWS Lake Formation tag-based access controls. Set up VPC endpoints in each account for secure cross-account access."
+      }
+    ],
+    "correctAnswers": [],
+    "isMultiSelect": false,
+    "explanation": null,
+    "references": [],
+    "needsManualAnswer": true
+  },
+  {
+    "id": 134,
+    "number": 134,
+    "scenario": "A logistics company needs to build a GenAI solution for freight optimization that retrieves real-time data from multiple systems, includes human approval steps, and supports modular growth with minimal operational overhead.",
+    "prompt": "",
+    "options": [
+      {
+        "letter": "A",
+        "text": "Use Amazon SageMaker AI endpoint hosting an LLM that directly calls all databases and external APIs. Implement human-in-the-loop review via custom web application."
+      },
+      {
+        "letter": "B",
+        "text": "Build a hierarchical system using Strands Agents SDK and Amazon Bedrock AgentCore with coordinating and specialized agents. Use MCP for inter-agent messaging and AWS Step Functions for approval workflow."
+      },
+      {
+        "letter": "C",
+        "text": "Use AWS Glue to aggregate data into S3, Amazon Athena for queries, AWS Lambda for route assignments, and Amazon SNS for notifications."
+      },
+      {
+        "letter": "D",
+        "text": "Use a single Amazon Bedrock AgentCore agent with AWS Lambda-based tools integrated with all systems. Use AWS Step Functions to orchestrate the approval workflow."
+      }
+    ],
+    "correctAnswers": [],
+    "isMultiSelect": false,
+    "explanation": null,
+    "references": [],
+    "needsManualAnswer": true
+  },
+  {
+    "id": 135,
+    "number": 135,
+    "scenario": "A financial services firm is developing a fraud detection system utilizing Amazon Bedrock. The system monitors activity in multiple stock trading applications across the United States and Europe, requiring processing of 1,000 transactions per second with sub-500 ms response times.",
+    "prompt": "The system must maintain high availability during connectivity issues and ensure European customer data processes only in European AWS Regions.",
+    "options": [
+      {
+        "letter": "A",
+        "text": "Configure AWS Lambda and Amazon EKS with InvokeModel API using a global inference profile, automated Route 53 failover, dedicated European inference profile with Geographic cross-Region inference, and CloudWatch monitoring."
+      },
+      {
+        "letter": "B",
+        "text": "Use InvokeModel API with provisioned throughput for Anthropic Claude in each Region separately, custom Application Load Balancer for traffic distribution based on Regional capacity and response times, and EventBridge rules for Regional failover."
+      },
+      {
+        "letter": "C",
+        "text": "Use InvokeModelWithResponseStream API with on-demand throughput, Amazon API Gateway REST API with Regional endpoints, separate IAM roles for US and European applications with Region-specific permissions."
+      },
+      {
+        "letter": "D",
+        "text": "US applications use provisioned throughput with InvokeModel API; European applications use Europe-specific geographic inference profile for data sovereignty, automatic scaling for provisioned capacity, and EventBridge/Lambda for cross-Region failover."
+      }
+    ],
+    "correctAnswers": [],
+    "isMultiSelect": false,
+    "explanation": null,
+    "references": [],
+    "needsManualAnswer": true
+  },
+  {
+    "id": 136,
+    "number": 136,
+    "scenario": "A company is implementing a 2-week initiative to incorporate GenAI into several hundred existing applications. A GenAI Developer builds a system to automatically compare foundation models based on text generation accuracy. The system creates a service role with IAM permissions, requests access to FMs, creates S3 buckets, and creates evaluation configurations using the TREX built-in dataset with Accuracy metric and Generation evaluation type. When attempting to run the system, it fails with an AccessDenied exception.",
+    "prompt": "Which solution will resolve this issue?",
+    "options": [
+      {
+        "letter": "A",
+        "text": "Create a trust policy that defines Amazon Bedrock as the service principal. Attach the trust policy to the service role."
+      },
+      {
+        "letter": "B",
+        "text": "Configure cross-origin resource sharing (CORS) permissions allowing GET and DELETE actions on S3 buckets."
+      },
+      {
+        "letter": "C",
+        "text": "Change the test dataset from TREX to Gigaword in the evaluation configurations."
+      },
+      {
+        "letter": "D",
+        "text": "Change the evaluation type to Summarization and the metric type to Correctness in the evaluation configurations."
+      }
+    ],
+    "correctAnswers": [],
+    "isMultiSelect": false,
+    "explanation": null,
+    "references": [],
+    "needsManualAnswer": true
   }
 ]

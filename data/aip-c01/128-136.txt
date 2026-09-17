@@ -1,0 +1,273 @@
+AWS Certified Generative AI Developer - Professional (AIP-C01)
+Questions 128-136 — ExamTopics Discussion Pages
+================================================================
+
+---
+
+QUESTION 128
+Post ID: 429349
+URL: https://www.examtopics.com/discussions/amazon/view/429349-exam-aws-certified-generative-ai-developer-professional-aip/
+
+A company is designing a GenAI solution for children ages 8-14 to learn world history. The system
+must handle 30 concurrent users with sub-1-second responses using Amazon Bedrock and Amazon Nova
+Pro. Testing reveals historically inaccurate, violent, and age-inappropriate responses. A GenAI
+developer must prevent the solution from responding inaccurately and inappropriately.
+
+A. Increase the inference temperature in the flow. Add a node to the flow after the initial
+   response that calls the Amazon Nova model to remove any violence from the response. Return the
+   result of the model call.
+
+B. Configure Amazon Bedrock guardrails for the model responses by using content filters. Set the
+   content filter strength high and set the guardrail action to block. Add the guardrail to the
+   flow. Reduce the inference temperature in the flow.
+
+C. Use Amazon Bedrock Data Automation with a custom output that removes all violent content from
+   the knowledge base. Increase the inference temperature in the flow.
+
+D. Configure Amazon Bedrock guardrails for the prompts by using content filters. Set the content
+   filter strength to high and set the guardrail action to block. Add the guardrail to the flow.
+   Reduce the inference temperature in the flow.
+
+Most upvoted answer: B or D (vote data obscured by paywall)
+
+---
+
+QUESTION 129
+Post ID: 429345
+URL: https://www.examtopics.com/discussions/amazon/view/429345-exam-aws-certified-generative-ai-developer-professional-aip/
+
+A legal research company is developing an AI-powered chat assistant using Amazon Bedrock with a
+knowledge base containing millions of legal documents. The foundation model has a context window
+limitation allowing effective processing of only 10 documents per query. Currently, retrieval
+fetches 50 documents via semantic search, but highly relevant precedents frequently appear in
+positions 15-40. The company needs a solution meeting latency (3 seconds) and context window
+constraints while improving result relevance.
+
+A. Maintain 50-document retrieval but increase the FM's temperature parameter. Implement prompt
+   engineering to instruct the model to identify the most relevant documents from the full result
+   set before generating responses.
+
+B. Enable reranking on the knowledge base using a reranker model with language-specific
+   configurations. Initially retrieve 50 documents, use the reranker's cross-encoder architecture
+   to evaluate query-document pairs, and return only the top 10 highest-scored documents.
+
+C. Configure three separate knowledge bases with different token chunks (500, 1,000, and 2,000).
+   Implement a pre-processing Lambda function retrieving 50 documents from each knowledge base,
+   merging 150 results, and using TF-IDF scoring to select the top 10.
+
+D. Implement a post-processing Lambda function retrieving 50 documents and calculating cosine
+   similarity scores using Amazon Titan Embeddings. Sort by similarity score and return the top
+   10 documents.
+
+Most upvoted answer: B (vote data obscured by paywall)
+
+---
+
+QUESTION 130
+Post ID: 429352
+URL: https://www.examtopics.com/discussions/amazon/view/429352-exam-aws-certified-generative-ai-developer-professional-aip/
+
+A multinational healthcare company is building a GenAI solution to analyze patient medical records
+and clinical trial data to identify treatment patterns and generate research insights. Some
+countries require on-premises data storage. The solution must provide sub-100 ms inference at
+remote clinics worldwide, use cloud-based foundation models for large-scale analytics, ensure data
+residency compliance, and support consistent hybrid workflows with minimal operational overhead.
+
+A. Use AWS Global Accelerator to reduce latency for remote clinics. Replicate on-premises patient
+   data to Amazon S3 using AWS DataSync. Process all model requests through a centralized
+   inference endpoint in one AWS Region.
+
+B. Deploy open source FMs on Amazon EC2 instances in each country to comply with data residency
+   requirements. Store patient data locally on Amazon EBS volumes. Use AWS Systems Manager for
+   model updates. Manually export aggregated research insights as CSV files to Amazon S3 buckets
+   in each AWS Region.
+
+C. Deploy FMs in multiple AWS Regions on Amazon EC2 GPU instances. Replicate patient data from
+   on-premises systems to the cloud. Centralize model training and inference.
+
+D. Use AWS Outposts to process and store sensitive on-premises patient data in countries with data
+   residency requirements. Deploy AWS Wavelength at remote clinics for real-time inference.
+
+Most upvoted answer: D (vote data obscured by paywall)
+
+---
+
+QUESTION 131
+Post ID: 429348
+URL: https://www.examtopics.com/discussions/amazon/view/429348-exam-aws-certified-generative-ai-developer-professional-aip/
+
+A global company runs an AI-powered document-processing pipeline that uses Amazon Bedrock to
+summarize text documents. The pipeline occasionally times out during peak traffic periods.
+Requirements: detect when error rates exceed 10% within any 60-second window, switch to an
+alternate process path when thresholds are exceeded, automatically resume normal processing upon
+recovery, and process all documents within 15 minutes.
+
+A. Configure an AWS Step Functions workflow implementing a circuit breaker pattern by tracking
+   Amazon Bedrock invocation failures in Amazon DynamoDB, routing jobs between normal and
+   alternate paths based on failure state.
+
+B. Configure an AWS Step Functions workflow using AWS Lambda to poll CloudWatch metrics for Amazon
+   Bedrock, with manual staff intervention to divert traffic when error rates exceed 10%.
+
+C. Configure an AWS Step Functions state machine with Retry/Catch logic for Amazon Bedrock calls
+   and an Amazon CloudWatch alarm triggering an Amazon EventBridge rule to direct traffic to
+   alternate processing when error rates exceed 10%.
+
+D. Deploy multiple identical AWS Step Functions state machines using multiple Amazon Bedrock models
+   behind Amazon API Gateway with a custom health check Lambda function routing requests to the
+   fastest-responding state machine.
+
+Most upvoted answer: A or C (vote data obscured by paywall)
+
+---
+
+QUESTION 132
+Post ID: 429351
+URL: https://www.examtopics.com/discussions/amazon/view/429351-exam-aws-certified-generative-ai-developer-professional-aip/
+
+A media company needs to automatically generate searchable metadata for a video library containing
+10,000 hours of content. Each video includes visual scenes, spoken dialogue, background music, and
+on-screen text. The company requires extraction of scene descriptions, speaker transcripts with
+timestamps, text overlay content, and emotional context. The output must synchronize all metadata
+types and create a searchable index allowing users to search by any metadata type and jump to
+specific video moments.
+
+A. Use SageMaker AI processing with frame extraction, Amazon Transcribe for audio, Claude in
+   Bedrock for multimodal analysis, storing outputs in separate S3 buckets by content type.
+
+B. Use SageMaker AI processing with timestamped frame extraction, Transcribe with time markers,
+   Claude analyzing frame-transcript pairs, storing outputs in unified JSON preserving temporal
+   relationships.
+
+C. Use SageMaker AI parallel processing orchestrated by a pipeline with multiple steps: video
+   segment extraction, Transcribe for audio, Rekognition for text detection, Comprehend for
+   sentiment analysis, storing unified metadata in DynamoDB with time-based partitioning.
+
+D. Use SageMaker AI processing with Claude Opus in Bedrock for comprehensive multimodal analysis
+   per video, extracting metadata via single inference request, indexing results in OpenSearch
+   Service for temporal search.
+
+Most upvoted answer: C or B (vote data obscured by paywall)
+
+---
+
+QUESTION 133
+Post ID: 429347
+URL: https://www.examtopics.com/discussions/amazon/view/429347-exam-aws-certified-generative-ai-developer-professional-aip/
+
+A financial services company developing a GenAI application needs to analyze data across multiple
+AWS accounts using a foundation model. Data resides in separate S3 buckets: Account A (transaction
+data), Account B (customer profiles with PII), and Account C (GenAI application). Seven more
+business units will be added soon. The company requires strict PII control and must ensure the FM
+accesses only necessary data fields. The organization needs a solution for secure cross-account
+access.
+
+A. Use AWS Identity Center to create permission sets for the FM service account. Configure
+   resource-based policies on S3 buckets allowing specific access to Account C. Deploy a custom
+   AWS Lambda authorizer to filter PII data before passing it to the FM.
+
+B. Configure Amazon Bedrock cross-account IAM roles. Create role-based access policies in each
+   source account for specific S3 bucket paths. Apply tag-based access controls on S3 objects to
+   classify and control PII access.
+
+C. Set up AWS Lake Formation in each source account. Register S3 buckets with Lake Formation.
+   Create IAM roles for specific S3 bucket paths. Configure Lake Formation permissions to allow
+   access only to specific data columns using tag-based access controls. Use Amazon SageMaker AI
+   to deploy the FM with an execution role in Account C that can assume cross-account IAM roles
+   to access data through Lake Formation.
+
+D. Configure resource-based policies on S3 buckets in each source account allowing access from
+   Account C's GenAI application. Configure identity-based policies for the FM's service role
+   allowing access only to specific data columns using AWS Lake Formation tag-based access
+   controls. Set up VPC endpoints in each account for secure cross-account access.
+
+Most upvoted answer: C (vote data obscured by paywall)
+
+---
+
+QUESTION 134
+Post ID: 429350
+URL: https://www.examtopics.com/discussions/amazon/view/429350-exam-aws-certified-generative-ai-developer-professional-aip/
+
+A logistics company needs to build a GenAI solution for freight optimization that retrieves
+real-time data from multiple systems, includes human approval steps, and supports modular growth
+with minimal operational overhead.
+
+A. Use Amazon SageMaker AI endpoint hosting an LLM that directly calls all databases and external
+   APIs. Implement human-in-the-loop review via custom web application.
+
+B. Build a hierarchical system using Strands Agents SDK and Amazon Bedrock AgentCore with
+   coordinating and specialized agents. Use MCP for inter-agent messaging and AWS Step Functions
+   for approval workflow.
+
+C. Use AWS Glue to aggregate data into S3, Amazon Athena for queries, AWS Lambda for route
+   assignments, and Amazon SNS for notifications.
+
+D. Use a single Amazon Bedrock AgentCore agent with AWS Lambda-based tools integrated with all
+   systems. Use AWS Step Functions to orchestrate the approval workflow.
+
+Most upvoted answer: B or D (vote data obscured by paywall)
+
+---
+
+QUESTION 135
+Post ID: 429353
+URL: https://www.examtopics.com/discussions/amazon/view/429353-exam-aws-certified-generative-ai-developer-professional-aip/
+
+A financial services firm is developing a fraud detection system utilizing Amazon Bedrock. The
+system monitors activity in multiple stock trading applications across the United States and Europe,
+requiring processing of 1,000 transactions per second with sub-500 ms response times. The system
+must maintain high availability during connectivity issues and ensure European customer data
+processes only in European AWS Regions.
+
+A. Configure AWS Lambda and Amazon EKS with InvokeModel API using a global inference profile,
+   automated Route 53 failover, dedicated European inference profile with Geographic cross-Region
+   inference, and CloudWatch monitoring.
+
+B. Use InvokeModel API with provisioned throughput for Anthropic Claude in each Region separately,
+   custom Application Load Balancer for traffic distribution based on Regional capacity and
+   response times, and EventBridge rules for Regional failover.
+
+C. Use InvokeModelWithResponseStream API with on-demand throughput, Amazon API Gateway REST API
+   with Regional endpoints, separate IAM roles for US and European applications with
+   Region-specific permissions.
+
+D. US applications use provisioned throughput with InvokeModel API; European applications use
+   Europe-specific geographic inference profile for data sovereignty, automatic scaling for
+   provisioned capacity, and EventBridge/Lambda for cross-Region failover.
+
+Most upvoted answer: A or D (vote data obscured by paywall)
+
+---
+
+QUESTION 136
+Post ID: 429346
+URL: https://www.examtopics.com/discussions/amazon/view/429346-exam-aws-certified-generative-ai-developer-professional-aip/
+
+A company is implementing a 2-week initiative to incorporate GenAI into several hundred existing
+applications. A GenAI Developer builds a system to automatically compare foundation models based
+on text generation accuracy. The system creates a service role with IAM permissions, requests
+access to FMs, creates S3 buckets, and creates evaluation configurations using the TREX built-in
+dataset with Accuracy metric and Generation evaluation type. When attempting to run the system,
+it fails with an AccessDenied exception. Which solution will resolve this issue?
+
+A. Create a trust policy that defines Amazon Bedrock as the service principal. Attach the trust
+   policy to the service role.
+
+B. Configure cross-origin resource sharing (CORS) permissions allowing GET and DELETE actions on
+   S3 buckets.
+
+C. Change the test dataset from TREX to Gigaword in the evaluation configurations.
+
+D. Change the evaluation type to Summarization and the metric type to Correctness in the
+   evaluation configurations.
+
+Most upvoted answer: A (vote data obscured by paywall)
+
+---
+
+NOTE: All 9 questions (128-136) were retrieved from discussion pages with Post IDs 429345-429353.
+Vote data is obscured by the ExamTopics paywall; "most upvoted answer" reflects content-based
+analysis rather than verified community votes.
+
+Questions with 4 answer choices (A-D): all (128-136)

@@ -7,6 +7,7 @@
     "extract-pdf": "pdftotext -layout /Users/gondk/Downloads/SAA-C03.pdf data/saa-c03.txt",
     "parse": "node scripts/parse.js",
     "parse-aip": "node scripts/parse-examtopics-txt.js data/aip-c01 data/aip-c01/raw-questions.json",
+    "parse-aip-sections": "node scripts/parse-sections.js data/aip-c01/sections.txt data/aip-c01/sections.json",
     "classify": "node scripts/classify.js",
     "build-tests": "node scripts/build-tests.js",
     "build-aip": "node scripts/build-exam-tests.js aip-c01",
