@@ -11,3 +11,10 @@ export const EXAMS = [
 export function resolveExam(code) {
   return EXAMS.find(e => e.code === code) || EXAMS[0];
 }
+
+// Renders the exam-guide sections a question belongs to, e.g.
+// "§5 Operations, Efficiency & Optimization · §8 Governance & QA". Exams
+// without a section map produce an empty string.
+export function sectionLabel(q) {
+  return (q.sections || []).map(s => `§${s.number} ${s.title}`).join(' · ');
+}

@@ -1,0 +1,57 @@
+## Section 2: Generative AI Fundamentals and Bedrock
+
+### Key topics
+- Foundation Models catalog on Bedrock
+- Fine-tuning vs continued pre-training vs LoRA
+- RAG: embeddings, vector DBs, chunking, evaluation
+- Guardrails and Automated Reasoning
+- Prompt engineering techniques and risks
+- Bedrock Prompts and Flows
+- Enterprise integration + Well-Architected GenAI Lens
+
+### Services / features
+- Amazon Bedrock — serverless API for FMs; supports RAG, agents, SageMaker Canvas integration
+- bedrock — manage/deploy/train models
+- bedrock-runtime — inference: `Converse`, `ConverseStream`, `InvokeModel`, `InvokeModelWithResponseStream`
+- bedrock-agent — manage agents + knowledge bases
+- bedrock-agent-runtime — `InvokeAgent`, `Retrieve`, `RetrieveAndGenerate`
+- Converse API — unified messages API; fields: messages, modelId, guardrailConfig, inferenceConfig (maxTokens, temperature, topP, stopSequences), toolConfig, promptVariables
+- FMs — Jurassic-2 (AI21, multilingual), Claude (Anthropic), Stable Diffusion (images), Llama (Meta), Amazon Titan (text/embeddings), Nova Pro (LLM), Nova Reels (video), Cohere, DeepSeek
+- Bedrock Playgrounds — Chat, Text, Images
+- IAM — `AmazonBedrockFullAccess`, `AmazonBedrockReadOnly`; must use IAM user not root
+- Fine-tuning — Titan, Cohere, Meta fine-tunable; labeled prompt/completion pairs in S3; use VPC + PrivateLink for sensitive data
+- Continued Pre-training — unlabeled data, familiarize model
+- LoRA — low-rank matrices added to attention weights; base model unchanged; efficient
+- Bedrock Knowledge Bases — S3, web crawler, Confluence, Salesforce, SharePoint; embed with Cohere or Titan; vector stores: OpenSearch Serverless (default), MemoryDB, Aurora, MongoDB Atlas, Pinecone, Redis Enterprise Cloud
+- Titan Multimodal Embeddings G1 — base64 image + text JSON
+- Guardrails — word/topic filter, profanity, PII mask, Contextual Grounding Check (grounding + relevance)
+- Automated Reasoning Checks — `CreateAutomatedReasoningPolicy` API; policy PDF → structured rules
+- Bedrock Prompts — versioned reusable prompts, `{{variables}}`, Prompt Variants, Prompt Builder
+- Bedrock Flows — nodes + connections (conditional), Flow Builder or JSON API; absorbed Prompt Flows
+- Amazon Comprehend — NER for token-level redaction pipelines
+- AWS Well-Architected Generative AI Lens — six pillars
+
+### Must-know for exam
+- Converse = unified messages API across models; supports guardrails, tools, prompt variables inline
+- Fine-tuning needs labeled pairs; Continued Pre-training needs unlabeled text; LoRA freezes base weights
+- RAG faster/cheaper than fine-tuning for new info; not "training"; still can hallucinate; non-deterministic
+- Vector store default in Knowledge Bases = serverless OpenSearch; OpenSearch/Elasticsearch can double as vector DB
+- Titan embeddings default 1024+ dims; smaller = cheaper, worse recall
+- Sparse vs dense: sparse = one-hot, better similarity; dense = efficient, standard use; cosine similarity common
+- Chunking defaults: fixed = 300 tokens/chunk honoring sentence boundaries; options: fixed, none, hierarchical (parent/child), semantic (buffer size, breakpoint percentile — costs FM tokens)
+- Hierarchical: search hits child chunks, replaces with parent chunks for context
+- Ingestion pipeline: S3 event → Lambda → `StartIngestionJob`
+- RAG evaluation metrics: Correctness, Completeness, Helpfulness, Logical coherence, Faithfulness, Citation precision/coverage, Harmfulness, Stereotyping, Refusal; groundedness = answer vs context, relevance = answer vs query
+- LLM-as-judge evaluator models: Llama, Claude, Nova, Mistral; supply prompt dataset with reference responses (+ optional reference contexts)
+- Guardrails Contextual Grounding Check prevents hallucination via grounding + relevance scores
+- Automated Reasoning = deterministic policy enforcement (mortgage, medical); provide PDF policy
+- Structured JSON output: prompt instructions OR Tool Use in Converse API ("response format template")
+- Prompt components: Instructions, Context, Input data, Output indicator
+- Prompting: zero-shot, few-shot, Chain-of-Thought ("think step by step")
+- Prompt injection ("ignore the above…") vs prompt leaking ("tell me your initial instructions") — mitigate with system prompt guardrails
+- Bias mitigation: disambiguation (TIED, TAB), rebalance training data, counterfactual data augmentation (detect/segment/augment)
+- Cross-account RAG: OpenSearch remote-inference connector for semantic search; Bedrock account needs IAM role granting `InvokeModel` to OpenSearch account
+- Event-driven integration: SQS, Kafka for loose coupling
+- Well-Architected GenAI Lens pillars: Operational Excellence, Security, Reliability, Performance Efficiency, Cost Optimization, Sustainability; lifecycle: Scoping → Model Selection → Model Customization → Development/Integration → Deployment → Continuous Improvement
+
+

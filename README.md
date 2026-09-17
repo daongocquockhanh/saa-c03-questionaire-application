@@ -47,9 +47,34 @@ The app supports multiple AWS exams through an **exam registry** in `public/exam
 Build AIP-C01 from ExamTopics txt dumps in `data/aip-c01/`:
 
 ```bash
-npm run parse-aip    # ExamTopics txt → data/aip-c01/raw-questions.json
-npm run build-aip    # + AI key (data/aip-c01/answers.json) → public/tests-aip-c01.json
+npm run parse-aip           # ExamTopics dumps → data/aip-c01/raw-questions.json
+npm run parse-aip-sections  # sections.txt → data/aip-c01/sections.json
+npm run build-aip           # + AI key (data/aip-c01/answers.json) → public/tests-aip-c01.json
 ```
+
+### AIP-C01 source data
+
+`data/aip-c01/` holds everything the build reads:
+
+| File | Contents |
+|---|---|
+| `<from>-<to>.txt` | ExamTopics question dumps. Only files named this way are parsed. |
+| `sections.txt` | Exam-guide section map (§2–§9) plus a per-question quick-reference table. |
+| `answers.json` | AI-generated answer key and rationale, one entry per question. |
+| `theory/` | Course section notes. **Internal reference only — never copied into `public/`.** |
+
+The dumps come in two formats and the parser handles both: the original
+`Question #N` style (questions 1–97) and a condensed `QUESTION N` style with
+hard-wrapped prose and hanging-indent options (98–117, 128–136).
+
+**Pool size is 126, not 136.** Questions 118–127 appear in the section map but
+no dump file contains their text, so they are not in the app. The `NOTE:` footer
+in `98-117.txt` claims Q105 has five answer choices; the dump only contains four.
+The "Most upvoted answer" lines in both condensed dumps are ExamTopics paywall
+placeholders — the parser strips them and they are not used as answers.
+
+Each question carries the exam-guide sections it belongs to, shown as a `§N`
+badge in the runner and review screens.
 
 Planned next phases: DOP-C02, SCS-C02. See `docs/superpowers/specs/2026-07-19-multi-exam-support-design.md`.
 

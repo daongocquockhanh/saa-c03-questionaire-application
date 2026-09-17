@@ -1,0 +1,571 @@
+AWS Certified Generative AI Developer - Professional (AIP-C01)
+Questions 98-117 — ExamTopics Discussion Pages
+================================================================
+
+---
+
+QUESTION 98
+Post ID: 421752
+URL: https://www.examtopics.com/discussions/amazon/view/421752-exam-aws-certified-generative-ai-developer-professional-aip/
+
+A company operates a customer service application using Amazon Bedrock to generate personalized
+responses. They need a QA process to evaluate prompt effectiveness and model configurations that:
+automatically compares outputs from multiple prompt templates, detects response quality issues,
+provides quantitative metrics, enables human reviewer feedback, and prevents deployments below
+quality thresholds.
+
+A. Lambda functions send inquiries to multiple Bedrock configurations, store responses in S3, use
+   QuickSight for visualization, perform manual daily reviews, and use CodePipeline to deploy
+   configurations meeting quality thresholds.
+
+B. Use Amazon Bedrock evaluation jobs to compare model outputs with custom prompt datasets.
+   Configure CodePipeline to run evaluation jobs on prompt template changes and deploy
+   configurations exceeding quality thresholds.
+
+C. Set up CloudWatch alarms monitoring response latency and error rates, use EventBridge rules
+   for threshold notifications, and configure Systems Manager approval workflow for manual
+   quality checks.
+
+D. Lambda functions create automated testing framework sampling production traffic, use Amazon
+   Comprehend sentiment analysis for comparison, and block deployment if sentiment scores
+   decrease.
+
+Most upvoted answer: A (35%)
+
+---
+
+QUESTION 99
+Post ID: 421753
+URL: https://www.examtopics.com/discussions/amazon/view/421753-exam-aws-certified-generative-ai-developer-professional-aip/
+
+A retail company uses Amazon Bedrock to generate product recommendations with dynamically
+constructed prompts. After deploying an update instructing the foundation model to include a
+specific promotional message, the developer observes the message doesn't consistently appear and
+lacks coherence when present. The developer must ensure the promotional message always appears
+in responses.
+
+A. Use an Amazon Bedrock Guardrails filter on the prompt. Set the input filter strength to HIGH.
+
+B. Generate multiple response variants that include the promotional message in different ways.
+   Use a reranker model to select the most coherent version based on relevance to the original
+   prompt.
+
+C. Run the prompt through Amazon Bedrock. Process the response through Amazon Bedrock Agents to
+   add the promotional message. Rerank the results using the original prompt and desired message
+   as context.
+
+D. Reinforce the requirement to include the promotional message within product recommendations
+   by using an output indicator in prompts to the FM.
+
+Most upvoted answer: A (35%)
+
+---
+
+QUESTION 100
+Post ID: 421754
+URL: https://www.examtopics.com/discussions/amazon/view/421754-exam-aws-certified-generative-ai-developer-professional-aip/
+
+A company is creating a GenAI application using Amazon Bedrock foundation models that must
+integrate Microsoft Entra ID authentication, maintain private network paths for all FM API calls,
+limit access by department to specific model families, and maintain comprehensive audit trails of
+model interactions.
+
+A. Configure SAML federation between Microsoft Entra ID and IAM. Create department-specific IAM
+   roles allowing only required ModelId values. Create AWS PrivateLink interface VPC endpoints
+   for Amazon Bedrock runtime services. Enable AWS CloudTrail to capture API calls and Amazon
+   Bedrock model invocation logging.
+
+B. Create an IdP connection in IAM for Microsoft Entra ID authentication. Assign department
+   permission sets for model family access. Deploy Lambda functions in private subnets with NAT
+   gateway for Bedrock access. Enable CloudWatch Logs for auditing.
+
+C. Create a SAML IdP in IAM for Microsoft Entra ID. Use IAM permissions boundaries to limit
+   department access. Configure public Bedrock API endpoints with VPC routing. Set up CloudTrail
+   with S3 Lifecycle rules for audit logs.
+
+D. Configure OIDC federation between Microsoft Entra ID and IAM. Use attribute-based access
+   control for department-to-model mapping. Apply SCP policies for Bedrock FM restrictions. Use
+   Microsoft Entra ID built-in logging.
+
+Most upvoted answer: A (35%)
+
+---
+
+QUESTION 101
+Post ID: 421755
+URL: https://www.examtopics.com/discussions/amazon/view/421755-exam-aws-certified-generative-ai-developer-professional-aip/
+
+A healthcare company is developing an AI application to retrieve medical literature to help
+doctors conduct research. The company wants to deploy the application to multiple countries. The
+application needs to index 50,000 text-heavy medical documents containing specialized
+terminology in English, French, and German. The application must provide high search accuracy
+for medical terminology while requiring minimal custom code development and ongoing maintenance.
+
+A. Use Amazon Titan Text Embeddings to process documents in their original language without
+   translation. Apply semantic chunking at the medical section level to preserve terminology
+   context and maintain moderate vector dimensions.
+
+B. Use Amazon Titan Text Embeddings to translate all non-English documents to English before
+   processing. Implement document chunking strategies based on logical sections to improve
+   retrieval accuracy.
+
+C. Use Amazon Titan Multimodal Embeddings to convert document pages to images. Generate text
+   captions for the images to create a multimodal knowledge base that handles medical content.
+
+D. Use an Amazon Bedrock knowledge base as the vector store. Use Amazon Kendra to perform
+   multilingual document processing. Configure the vector store to automatically handle language
+   detection and translation for each query.
+
+Most upvoted answer: A (35%)
+
+---
+
+QUESTION 102
+Post ID: 421756
+URL: https://www.examtopics.com/discussions/amazon/view/421756-exam-aws-certified-generative-ai-developer-professional-aip/
+
+A publishing company develops a chat assistant using a containerized LLM on Amazon SageMaker AI.
+The architecture includes an API Gateway REST API routing requests to a Lambda function, which
+invokes a SageMaker real-time endpoint. Users report uneven response times with high abandonment
+after 2 seconds waiting for the first token. The company seeks a solution ensuring p95 latency
+under 800 ms for interactive requests.
+
+A. Enable model preload upon container startup. Implement dynamic batching to process multiple
+   user requests together in a single inference pass.
+
+B. Select a larger GPU instance type for the SageMaker endpoint. Set minimum instances to 0.
+   Continue per-request processing. Lazily load model weights on first request.
+
+C. Switch to a multi-model endpoint. Use lazy loading without request batching.
+
+D. Set minimum instances to greater than 0. Enable response streaming.
+
+E. Switch to SageMaker Asynchronous Inference for all requests. Store requests in S3. Set
+   minimum instances to 0.
+
+Most upvoted answer: A (35%)
+
+---
+
+QUESTION 103
+Post ID: 421757
+URL: https://www.examtopics.com/discussions/amazon/view/421757-exam-aws-certified-generative-ai-developer-professional-aip/
+
+A company operates a GenAI application using multiple Amazon Bedrock foundation models for text
+generation across three AWS Regions on Lambda functions. They need dynamic model selection based
+on response quality and latency, the ability to switch models without code changes, gradual
+rollout starting at 20% traffic, and automatic rollback when error rates exceed 1%.
+
+A. Use AWS AppConfig for feature flags on model selection with validation rules for error rates.
+   Implement the AppConfig Agent Lambda extension to retrieve configurations. Define linear
+   deployment strategies for gradual 20% traffic release.
+
+B. Store configurations in Amazon DynamoDB with global tables for multi-Region replication. Use
+   EventBridge to monitor CloudWatch metrics and invoke Lambda functions updating DynamoDB. Add
+   custom query code to Lambda functions before model invocation.
+
+C. Create Lambda function versions for each model configuration. Use Lambda aliases with routing
+   configurations to gradually shift 20% of traffic. Implement CodeDeploy deployments monitoring
+   CloudWatch metrics with automatic rollback on error rate thresholds.
+
+D. Create CloudWatch dashboards to monitor metrics. Implement custom logic in Lambda functions
+   for model selection based on metric thresholds. Use environment variables in AWS Systems
+   Manager Parameter Store for cross-Region updates.
+
+Most upvoted answer: A (35%)
+
+---
+
+QUESTION 104
+Post ID: 421758
+URL: https://www.examtopics.com/discussions/amazon/view/421758-exam-aws-certified-generative-ai-developer-professional-aip/
+
+A financial services company is developing an AI-powered search assistant using Amazon Bedrock
+with a knowledge base backed by Amazon OpenSearch Serverless. The Lambda-based application
+encounters a "400 Bad Authorization" error from BedrockAgentRuntime API and a "403 Forbidden"
+error when accessing OpenSearch Serverless. The company needs to resolve permissions issues and
+"manage collections at scale by automatically assigning access permissions to collections and
+indexes that match a specific pattern."
+
+A. Update the Lambda function execution role to include the bedrock:InvokeAgent permission. Add
+   the aoss:APIAccessAll permission to the Lambda execution role.
+
+B. Create an OpenSearch Serverless data access policy that includes pattern-based resource rules.
+
+C. Configure a VPC endpoint policy for OpenSearch Serverless. Add the endpoint to the Lambda
+   function's VPC configuration.
+
+D. Configure AWS Secrets Manager to store OpenSearch Serverless credentials. Grant the Lambda
+   function access to retrieve the credentials.
+
+E. Enable IAM authentication for the OpenSearch Serverless domain. Add the es:ESHttp* permission
+   to the Lambda function execution role.
+
+Most upvoted answer: A (35%)
+
+---
+
+QUESTION 105
+Post ID: 421759
+URL: https://www.examtopics.com/discussions/amazon/view/421759-exam-aws-certified-generative-ai-developer-professional-aip/
+
+A financial services company needs to develop a GenAI application enabling business analysts to
+query sensitive customer data using natural language. The solution must implement content safety
+by detecting SQL injection attempts, validating generated queries against predefined schemas, and
+maintaining an audit trail of transformations.
+
+A. Use Amazon Bedrock with integrated content filtering, deploy Amazon GuardDuty with custom SQL
+   threat detection rules, use AWS Lambda to check queries against schemas in AWS Systems Manager
+   Parameter Store, and use Amazon EventBridge to store transformation records in S3.
+
+B. Implement a multi-stage validation pipeline using Amazon Bedrock Guardrails for input
+   filtering, configure AWS Lambda with SQL parsing libraries for syntax validation, use Amazon
+   RDS Data API to verify queries against defined schemas and collect audit logs before pipeline
+   execution.
+
+C. Configure AWS CloudTrail to log database API calls, implement IAM roles with least privilege
+   access, and use AWS WAF to filter malicious inputs.
+
+D. Train a custom Amazon SageMaker model for text-to-SQL transformation, attach VPC endpoints to
+   isolate the customer database, and store query history in Amazon DynamoDB.
+
+Most upvoted answer: A (35%)
+
+---
+
+QUESTION 106
+Post ID: 421760
+URL: https://www.examtopics.com/discussions/amazon/view/421760-exam-aws-certified-generative-ai-developer-professional-aip/
+
+A company needs a system to automatically generate study materials from multiple content sources,
+including documents (PDFs, PowerPoint, Word) and multimedia (recorded videos). The system must
+process over 10,000 sources daily with peak loads of 500 concurrent uploads, extract key
+concepts, create contextually accurate summaries, and support real-time collaboration with
+version control.
+
+A. Amazon Bedrock Data Automation (BDA) with Lambda for documents; BDA Knowledge Bases for
+   multimedia; Amazon DocumentDB storage with replication; SNS for collaboration; Bedrock Agents
+   for change tracking.
+
+B. Amazon Bedrock Data Automation (BDA) with foundation models for documents; integrate with
+   Amazon Textract (PDFs) and Amazon Transcribe (multimedia); store in Amazon S3 with versioning;
+   metadata in DynamoDB; real-time collaboration via AWS AppSync GraphQL subscriptions.
+
+C. Amazon Bedrock Data Automation (BDA) with SageMaker AI endpoints; Amazon Bedrock Guardrails
+   for content extraction; Amazon Neptune for storage; Amazon Bedrock Chat for messaging.
+
+D. Amazon Bedrock Data Automation (BDA) with Lambda for batch processing; fine-tuned foundation
+   models for document classification; Amazon ElastiCache (Redis) with Cluster Mode; Bedrock
+   Prompt Management for version control.
+
+Most upvoted answer: A (35%)
+
+---
+
+QUESTION 107
+Post ID: 421761
+URL: https://www.examtopics.com/discussions/amazon/view/421761-exam-aws-certified-generative-ai-developer-professional-aip/
+
+A healthcare company needs to develop a proof-of-concept for medical document summarization
+using Amazon Bedrock. Requirements include: 3-week validation timeline, data privacy compliance,
+and metrics for summarization accuracy and processing time.
+
+A. Create a dataset with 50-100 anonymized patient records. Implement RAG with a secure
+   knowledge base. Use a judge model to evaluate accuracy metrics across three foundation models.
+
+B. Fine-tune a single foundation model on patient records. Deploy on Amazon Bedrock. Use Amazon
+   Bedrock AgentCore to configure as an agent. Conduct user testing with 500 staff members.
+
+C. Select the most powerful available AWS foundation model. Create a chat interface using
+   Converse APIs. Test on 50-100 actual patient records with qualitative stakeholder feedback.
+   Use custom web interface for performance metrics.
+
+D. Use Strands SDK to deploy multiple agents connecting to multiple knowledge bases with
+   specialized medical documents. Compare agent responses and evaluate integration with existing
+   systems.
+
+Most upvoted answer: A (35%)
+
+---
+
+QUESTION 108
+Post ID: 421762
+URL: https://www.examtopics.com/discussions/amazon/view/421762-exam-aws-certified-generative-ai-developer-professional-aip/
+
+A company needs to select a new foundation model for its AI assistant. A GenAI developer must
+create evaluation reports assessing quality and safety of various FMs using sample prompts
+provided by a data scientist. The developer wants to use Amazon Bedrock to automate this process.
+
+A. Combine prompts into JSON, create a Bedrock knowledge base, write a prompt asking the FM to
+   generate responses to each sample, use RetrieveAndGenerate API for reports.
+
+B. Combine prompts into JSONL, store in S3, create a Bedrock evaluation job with a judge model,
+   specify S3 input/output locations, run evaluation for each FM selecting it as generator.
+
+C. Combine prompts into JSONL, store in S3, create a Bedrock evaluation job with judge model,
+   specify S3 input and QuickSight output, run evaluation selecting FM as evaluator.
+
+D. Combine prompts into JSON, create knowledge base, create Bedrock evaluation job using
+   retrieval and response generation type, specify S3 output, run for each FM.
+
+Most upvoted answer: A (35%)
+
+---
+
+QUESTION 109
+Post ID: 421768
+URL: https://www.examtopics.com/discussions/amazon/view/421768-exam-aws-certified-generative-ai-developer-professional-aip/
+
+A financial services company develops an NLP application using AWS Lambda with Amazon Bedrock
+foundation models to process customer trade inquiries. The Lambda function generates
+comprehensive trade analysis responses exceeding 4 MB requiring 15-20 seconds. Requirements
+include responding in under 10 seconds and retaining records for 10 years per financial
+regulations.
+
+A. Implement response streaming for partial responses. Set 15-second Lambda timeout. Enable AWS
+   X-Ray tracing.
+
+B. Use Amazon SQS for asynchronous invocations. Set 30-second Lambda timeout. Use CloudWatch
+   monitoring.
+
+C. Use API Gateway polling. Integrate Amazon ElastiCache for response caching. Set 30-second
+   timeout. Collect CloudWatch logs.
+
+D. Implement response streaming for partial responses. Set 30-second Lambda timeout. Store
+   complete records in Amazon S3.
+
+Most upvoted answer: A (35%)
+
+---
+
+QUESTION 110
+Post ID: 421767
+URL: https://www.examtopics.com/discussions/amazon/view/421767-exam-aws-certified-generative-ai-developer-professional-aip/
+
+A university is building an AI-powered application with sub-applications including AI assistants,
+assignment graders, and internal analytics. They're testing multiple prompts across various
+foundation models and need to compare prompt variants for different use cases. Requirements:
+version control for prompts, ability to test variations, collect audit trails for changes and
+usage, maintain consistency, and integrate into the main application — all with the least
+operational overhead.
+
+A. Use Amazon Bedrock Prompt Management to create versioned prompts with parameterized variables
+   for each use case.
+
+B. Store prompts in Amazon S3 and use AWS Step Functions to orchestrate model interactions.
+
+C. Use Amazon Bedrock Flows to create workflows combining FMs and AWS services.
+
+D. Configure AWS Config for prompt changes and CloudTrail for prompt usage tracking.
+
+E. Configure Amazon Bedrock intelligent prompt routing.
+
+Most upvoted answer: A (35%)
+
+---
+
+QUESTION 111
+Post ID: 421766
+URL: https://www.examtopics.com/discussions/amazon/view/421766-exam-aws-certified-generative-ai-developer-professional-aip/
+
+A company building a multicloud GenAI-powered secret resolution application using Amazon Bedrock
+and Agent Squad faces performance issues: expired secrets aren't refreshed timely, stale data
+persists despite drift alerts, and outdated prompt templates cause cascading failures. The
+company must resolve these issues.
+
+A. Use Step Functions Map states to run agent workflows in parallel. Pass updated secret metadata
+   through Lambda function outputs. Use AWS AppConfig to version all prompt flows to gate and
+   roll back faulty templates.
+
+B. Use Amazon Bedrock AgentCore only. Configure Amazon Bedrock guardrails to restrict prompt
+   variation. Use an inline JSON schema for a single agent's workflow definition to chain tool
+   calls.
+
+C. Use a centralized Amazon EventBridge pipeline to invoke each event agent. Store intermediate
+   prompts in Amazon DynamoDB. Resolve agent ordering by using TTL-based backoff and retries.
+
+D. Use Amazon EventBridge Pipes to invoke resolvers based on Amazon CloudWatch log patterns.
+   Store response metadata in Amazon DynamoDB. Configure a TTL and versioned writes. Use Amazon
+   Q Developer to dynamically generate fallback prompts routed through a Lambda coordinator.
+
+Most upvoted answer: A (35%)
+
+---
+
+QUESTION 112
+Post ID: 421769
+URL: https://www.examtopics.com/discussions/amazon/view/421769-exam-aws-certified-generative-ai-developer-professional-aip/
+
+A financial services company processes over 10,000 customer inquiries daily through a multi-agent
+GenAI application using Amazon Bedrock AgentCore. Custom tools fail at 40% during peak usage.
+A developer must implement observability providing end-to-end visibility into agent interactions
+and tool behavior using built-in Bedrock capabilities without custom instrumentation, requiring
+minimal performance overhead.
+
+A. Enable AgentCore Observability and trace collection. Use AWS X-Ray to capture distributed
+   traces for custom tools. Build CloudWatch dashboards to visualize metrics for errors,
+   throttling, and latency during peak usage.
+
+B. Use Amazon CloudWatch Container Insights to monitor agents. Configure an AWS Lambda function
+   to poll the Bedrock API for tool usage metrics. Store results in CloudWatch to generate
+   alerts.
+
+C. Build a custom ETL pipeline using AWS Lambda functions to process CloudWatch logs from
+   Bedrock. Store processed data in DynamoDB. Use Amazon QuickSight to visualize cross-team
+   performance patterns.
+
+D. Enable AgentCore Observability and send trace data to CloudWatch Logs. Use a custom Lambda
+   function to extract tool performance metrics. Use Amazon Managed Grafana to visualize trends.
+
+Most upvoted answer: A (35%)
+
+---
+
+QUESTION 113
+Post ID: 421771
+URL: https://www.examtopics.com/discussions/amazon/view/421771-exam-aws-certified-generative-ai-developer-professional-aip/
+
+An ecommerce company uses Claude Sonnet in Amazon Bedrock for product recommendations. A Lambda
+function retrieves customer data from multiple sources (DynamoDB, S3, RDS) and sends it directly
+to the model. Customers with extensive purchase histories receive incomplete recommendations.
+CloudWatch logs show Lambda timeouts and intermittent Bedrock errors, including context length
+exceeded errors. Some requests ignore portions of input data. The company wants recommendations
+to consider all customer data and plans to use Amazon Bedrock Knowledge Bases.
+
+A. Implement chunking strategy dividing customer data into smaller segments, process each
+   separately, then synthesize responses into comprehensive recommendations.
+
+B. Modify prompt structure placing critical information at beginning/end of context window,
+   implement token-counting logic to truncate less important data.
+
+C. Replace Claude Sonnet with a larger context window model, increase Lambda timeout for longer
+   processing.
+
+D. Configure Converse API, modify additionalModelRequestFields to increase maximum token limit
+   beyond default.
+
+E. Implement RAG using knowledge base to index customer data with vector embeddings, retrieve
+   semantically relevant information per request.
+
+Most upvoted answer: A (35%)
+
+---
+
+QUESTION 114
+Post ID: 421765
+URL: https://www.examtopics.com/discussions/amazon/view/421765-exam-aws-certified-generative-ai-developer-professional-aip/
+
+A company developed a multimodal content analysis application using Amazon Bedrock that routes
+different content types (text, images, code) to specialized foundation models. The application
+needs to handle simple routing with minimal latency based on file extensions, complex routing
+requiring content semantic analysis, detailed history, and fallback options when primary models
+fail.
+
+A. Configure AWS Lambda functions calling Amazon Bedrock FMs for all routing logic with
+   conditional statements based on content type and semantics.
+
+B. Create a hybrid solution using application code for simple file extension routing and AWS
+   Step Functions with JSONata for complex content-based routing and InvokeModel API calls.
+
+C. Deploy separate AWS Step Functions workflows per content type with Lambda routing logic and
+   Amazon EventBridge for fallback coordination.
+
+D. Use Amazon SQS with content-type queues and Lambda consumers analyzing content to invoke
+   appropriate FMs via Amazon Bedrock SDK.
+
+Most upvoted answer: A (35%)
+
+---
+
+QUESTION 115
+Post ID: 421770
+URL: https://www.examtopics.com/discussions/amazon/view/421770-exam-aws-certified-generative-ai-developer-professional-aip/
+
+A company developing a customer support chat assistant using Amazon Bedrock needs to validate a
+newer foundation model version while detecting semantic drift. They require a solution to compare
+responses across 500 test cases, detect meaning changes, generate similarity scores, complete
+validations, and log results for historical tracking. The goal is to minimize operational
+complexity.
+
+A. Configure CloudWatch Synthetics canaries with custom JavaScript to send prompts to both FM
+   versions, store responses in S3, and perform manual reviews for semantic differences.
+
+B. Configure an AWS Step Functions workflow sending test prompts to both versions, use Bedrock
+   embedding models to calculate cosine similarity scores, and store results in DynamoDB with
+   composite keys.
+
+C. Use Amazon Bedrock model evaluation jobs to compare the new FM version against the current
+   version using 500 test cases, calculate semantic similarity metrics, and store results in S3
+   for historical comparison.
+
+D. Build a custom solution using SageMaker AI to train a classifier model on historical responses
+   to detect anomalies when comparing new FM version responses against previous patterns.
+
+Most upvoted answer: A (35%)
+
+---
+
+QUESTION 116
+Post ID: 421763
+URL: https://www.examtopics.com/discussions/amazon/view/421763-exam-aws-certified-generative-ai-developer-professional-aip/
+
+A media company is building an AI-powered content moderation system using Amazon Bedrock. The
+system classifies text with a small, low-latency model first, then escalates requests with
+confidence scores below 0.65 to a larger model. Requirements include near real-time responses
+for high-confidence results, asynchronous processing for low-confidence requests, scaling for
+traffic spikes, cost optimization (invoking the larger model only when needed), and decoupled
+components for resilience.
+
+A. Use Amazon API Gateway to invoke the small model synchronously. If confidence score is below
+   0.65, synchronously call the larger model. Use provisioned concurrency for traffic spikes.
+
+B. Use AWS Step Functions with parallel branches to run both models for every request. Choose
+   the large model result when confidence scores differ.
+
+C. Send requests to an Amazon SQS queue. Use AWS Fargate to process messages. Invoke the small
+   model first. If confidence score is below 0.65, place the request in a second SQS queue for
+   asynchronous large model processing.
+
+D. Deploy both models on Amazon EC2 instances with auto scaling. Use custom application
+   heuristics to route requests based on phrase length and keyword rules.
+
+Most upvoted answer: A (35%)
+
+---
+
+QUESTION 117
+Post ID: 421764
+URL: https://www.examtopics.com/discussions/amazon/view/421764-exam-aws-certified-generative-ai-developer-professional-aip/
+
+A social messaging company is building an AI chat assistant using Amazon Bedrock. The company
+must ensure every inference complies with an approved safety policy. They want to block harmful
+prompts before model invocations, filter streamed outputs in real time, and route flagged cases
+for human review.
+
+A. Configure Step Functions workflow with Lambda pre-check using ApplyGuardrail API,
+   InvokeModelWithResponseStream with attached guardrail, Lambda post-check using ApplyGuardrail
+   API, route flagged items to SQS, and enforce guardrail use via IAM condition.
+
+B. Configure Step Functions workflow calling ApplyGuardrail API before inference, then
+   InvokeModel API without streaming, store results in S3, and use client UI to hide problematic
+   tokens.
+
+C. Configure Step Functions workflow with InvokeModelWithResponseStream API with attached
+   guardrail for in-stream filtering, Lambda post-check using ApplyGuardrail API, without
+   pre-inference checks.
+
+D. Configure Step Functions workflow with pre-checks and post-checks using ApplyGuardrail API
+   and InvokeModelWithResponseStream, attach guardrail to check steps, and use process controls
+   instead of IAM enforcement.
+
+Most upvoted answer: A (35%)
+
+---
+
+NOTE: All 20 questions (98-117) were retrieved from discussion pages with Post IDs 421752-421771.
+These pages were recently published and have minimal community engagement, so the "most upvoted
+answer" shown (A at 35%) reflects a placeholder/default voting state rather than established
+community consensus.
+
+Questions with 5 answer choices (A-E): 102, 104, 105, 110, 113
+Questions with 4 answer choices (A-D): all others

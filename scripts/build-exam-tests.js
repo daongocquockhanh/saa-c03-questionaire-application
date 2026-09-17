@@ -20,6 +20,21 @@ export function mergeAnswers(questions, answers) {
   });
 }
 
+// Attaches the exam-guide sections a question belongs to, as {number, title}
+// pairs. Questions absent from the map get an empty list rather than an error:
+// the map may lag behind newly added questions.
+export function mergeSections(questions, sectionMap) {
+  return questions.map(q => {
+    const numbers = sectionMap.questions[String(q.number)] || [];
+    const sections = numbers.map(number => {
+      const title = sectionMap.sections[String(number)];
+      if (!title) throw new Error(`Question ${q.number} maps to unknown section ${number}`);
+      return { number, title };
+    });
+    return { ...q, sections };
+  });
+}
+
 export function chunkTests(questionIds, testCount, seed) {
   const shuffled = seededShuffle(questionIds, `${seed}-pool`);
   const base = Math.floor(shuffled.length / testCount);
@@ -43,11 +58,12 @@ const CONFIGS = {
   'aip-c01': {
     rawFile: 'data/aip-c01/raw-questions.json',
     answersFile: 'data/aip-c01/answers.json',
+    sectionsFile: 'data/aip-c01/sections.json',
     outFile: 'public/tests-aip-c01.json',
-    testCount: 2,
+    testCount: 3,
     durationMinutes: 130,
     passPercent: 75,
-    expectedCount: 97,
+    expectedCount: 126,
   },
 };
 
@@ -59,7 +75,11 @@ if (invoked) {
   const root = join(dirname(fileURLToPath(import.meta.url)), '..');
   const raw = JSON.parse(readFileSync(join(root, cfg.rawFile), 'utf8'));
   const answers = JSON.parse(readFileSync(join(root, cfg.answersFile), 'utf8'));
-  const questions = mergeAnswers(raw, answers);
+  let questions = mergeAnswers(raw, answers);
+  if (cfg.sectionsFile) {
+    const sectionMap = JSON.parse(readFileSync(join(root, cfg.sectionsFile), 'utf8'));
+    questions = mergeSections(questions, sectionMap);
+  }
   if (cfg.expectedCount != null && questions.length !== cfg.expectedCount) {
     throw new Error(`Expected ${cfg.expectedCount} questions for ${code}, got ${questions.length}`);
   }

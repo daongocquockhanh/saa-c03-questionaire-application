@@ -1,7 +1,7 @@
 // scripts/build-exam-tests.test.js
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { mergeAnswers, chunkTests } from './build-exam-tests.js';
+import { mergeAnswers, mergeSections, chunkTests } from './build-exam-tests.js';
 
 const questions = [
   { id: 1, number: 1, prompt: 'Q1?', options: [{ letter: 'A', text: 'a' }, { letter: 'B', text: 'b' }], correctAnswers: [], isMultiSelect: false, explanation: null, needsManualAnswer: true },
@@ -40,4 +40,25 @@ test('chunkTests is deterministic per seed', () => {
   const ids = [1, 2, 3, 4, 5, 6];
   assert.deepEqual(chunkTests(ids, 2, 's'), chunkTests(ids, 2, 's'));
   assert.notDeepEqual(chunkTests(ids, 2, 's')[0].questionIds, chunkTests(ids, 2, 'other')[0].questionIds);
+});
+
+const sectionMap = {
+  sections: { '2': 'Generative AI Fundamentals & Bedrock', '9': 'Security, Identity & Compliance' },
+  questions: { '1': [9], '2': [2, 9] },
+};
+
+test('mergeSections attaches section numbers and titles', () => {
+  const merged = mergeSections(questions, sectionMap);
+  assert.deepEqual(merged[0].sections, [{ number: 9, title: 'Security, Identity & Compliance' }]);
+  assert.deepEqual(merged[1].sections.map(s => s.number), [2, 9]);
+});
+
+test('mergeSections leaves an empty list for unmapped questions', () => {
+  const merged = mergeSections(questions, { sections: {}, questions: {} });
+  assert.deepEqual(merged[0].sections, []);
+});
+
+test('mergeSections throws when a mapped section has no title', () => {
+  const orphan = { sections: {}, questions: { '1': [9], '2': [2] } };
+  assert.throws(() => mergeSections(questions, orphan), /unknown section 9/i);
 });

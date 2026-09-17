@@ -1,0 +1,199 @@
+AWS AIP-C01 Questions 1-136 Categorized by Section
+====================================================
+
+SECTION 2 — Generative AI Fundamentals & Bedrock
+-------------------------------------------------
+Q4:   Multi-FM routing with AppConfig (dynamic config, no code deploy)
+Q5:   Prompt Management + business unit tone adaptation
+Q9:   Prompt Management version control + audit trails
+Q10:  Streaming responses (InvokeModelWithResponseStream) for real-time display
+Q15:  RAG grounding, latency optimization (PerformanceConfigLatency)
+Q23:  Provisioned throughput — must use model ARN, not model ID
+Q24:  Extended thinking + source attribution, <3s latency
+Q25:  Token management, proactive alerting, cost allocation per business unit
+Q30:  Reduce hallucinations in long-doc summaries — CoT + RAG grounding
+Q32:  Context window overflow — hierarchical chunking + Bedrock Knowledge Bases (ans B; C invalid: bufferSize only 0/1, not 3)
+Q33:  Real-time call suggestions — low-latency model + provisioned throughput, <200ms
+Q42:  Cost-effective peak traffic — latency-optimized inference + prompt caching
+Q49:  Dynamic model switching per customer tier — AppConfig feature flags + A/B testing
+Q50:  Cross-Region throughput bottlenecks — cross-Region inference profiles + token batching
+Q57:  Multi-env FM switching (dev/prod) — CDK FoundationModel.fromFoundationModelId()
+Q59:  Runtime model provider switching without redeploy — AppConfig with validation + rollback
+Q60:  Adaptive retry for streaming + token-aware handling — exponential backoff + circuit breaker
+Q67:  Hybrid on-prem/cloud FM deployment — Bedrock provisioned throughput (batch) + SageMaker Neo edge (on-prem)
+Q73:  Multi-SDK, multi-environment FM calls — Converse API + IAM roles + conversation history
+Q74:  Global throttling at peak — cross-Region inference profiles (no fixed hourly cost)
+Q76:  Transient API errors + distributed tracing — SDK adaptive retry + X-Ray annotations
+Q82:  Streaming API with token limits + retry — API Gateway HTTP API + Lambda response streaming
+Q83:  Automatic routing by complexity — Bedrock intelligent prompt routing
+Q84:  Output consistency + safety — provisioned throughput + Prompt Management + guardrails
+Q99:  Prompt output consistency — output indicator in prompt to enforce promotional message
+Q102: SageMaker endpoint cold-start latency — min instances >0 + response streaming
+Q103: Dynamic model selection across Regions — AppConfig feature flags + linear rollout + auto rollback
+Q109: Large response streaming + 10yr retention — response streaming + 30s timeout + S3 storage
+Q110: Prompt version control for multi-app university — Bedrock Prompt Management parameterized prompts
+Q130: Hybrid on-prem/cloud healthcare analytics, sub-100ms remote clinics — AWS Outposts (on-prem residency) + AWS Wavelength (remote clinic real-time inference)
+
+SECTION 3 — Managing Data for Generative AI
+--------------------------------------------
+Q6:   Vector DB selection — OpenSearch Serverless, multilingual, metadata filtering
+Q7:   Hybrid search (vector + keyword) for exact medical terms + acronyms
+Q17:  Graph RAG + Neptune Analytics for multi-hop financial relationships
+Q19:  Data lineage — Glue Data Catalog registration, metadata tagging, CloudTrail audit
+Q28:  Semantic search at scale (20M restaurants) — OpenSearch + Bedrock embeddings + k-NN
+Q43:  Legal RAG chunking — semantic boundary chunking to preserve legal argument context
+Q45:  Unstructured data pre-processing pipeline — Glue ETL + Glue Data Quality + metadata
+Q46:  RAG retrieval accuracy — metadata-aware filtering within Bedrock knowledge base
+Q47:  Small vector index, max accuracy — MemoryDB + Flat algorithm
+Q48:  50 GB JSON ETL, PII removal, embeddings — Step Functions + Comprehend + Bedrock
+Q51:  Semantic response caching — MemoryDB for Valkey + vector embeddings similarity
+Q63:  S3 metadata framework for FM context — custom user-defined metadata + S3 object tags
+Q64:  Cross-account prompt augmentation with customer data governance — Q Business + data accessor
+Q65:  Legal RAG — hybrid search (vector + keyword) + Bedrock reranker model
+Q88:  RAG reranking for regulatory docs — Bedrock Knowledge Bases reranker configuration
+Q90:  Structured data (RDS) for recommendations — text-to-SQL + SQL validation + guardrails
+Q92:  Semantic similarity search <1M files — Titan Embeddings + Aurora PostgreSQL pgvector
+Q97:  Medical query decomposition, <2s — Bedrock knowledge base + query decomposition + flow
+Q101: Multilingual medical doc indexing — Titan Text Embeddings + semantic chunking, no translation
+Q113: Context window overflow on large customer data — RAG with Knowledge Bases + vector embeddings
+Q123: Millions of embeddings updated hourly, peak-event latency/failures on similarity search — OpenSearch multi-node + vector index settings + memory circuit breakers + dedicated vector queues
+Q125: Financial doc data-quality (PII redaction + formatting inconsistencies + compliance) — Macie PII detect/redact + Lambda/Textract formatting standardization + dynamic schema prompts (also §9)
+Q129: RAG relevance under context-window/latency limits (50 docs retrieved, top 10 needed, sub-3s) — Bedrock Knowledge Bases reranker (cross-encoder) retrieve 50 → return top 10
+
+SECTION 4 — Agentic AI
+-----------------------
+Q11:  Bedrock Flows + Guardrails (detect vs block; notify without blocking)
+Q16:  AgentCore — memory, session-aware reasoning, event-driven + sync invocation
+Q20:  Step Functions Parallel state to parallelize batch FM calls (45s → <10s)
+Q26:  Customer service agent — Bedrock agent + action groups + knowledge base + trace audit
+Q27:  Step Functions 256 KB limit — S3 URI pass-by-reference via ResultPath/ResultSelector
+Q35:  Human-in-the-loop for AI recommendations — Step Functions waitForTaskToken + SendTaskSuccess
+Q36:  Loan document processing — Textract + A2I + Lambda PII redact + guardrails + Step Functions (check)
+Q44:  Multi-turn conversation + clarification workflows — Step Functions Express + DynamoDB session
+Q52:  MCP server on Lambda — API Gateway HTTP API + Streamable HTTP transport + Cognito OAuth 2.1
+Q53:  Multi-agent rewards workflow — Step Functions state machine + retry/catch per task
+Q54:  Template parsing + model review + S3 write — Step Functions + S3 GetObject + Bedrock InvokeModel
+Q56:  Multi-department healthcare agent — supervisor + collaborator agents + per-dept knowledge bases
+Q58:  Per-hotel knowledge bases — one KB per hotel, multi-account, real-time sync
+Q75:  MCP servers as Lambda functions — API Gateway HTTP API + Streamable HTTP + Cognito OAuth (check)
+Q80:  Multimodal wildlife research agent — SageMaker pre-process + RAG KB + guardrails + AppConfig prompts
+Q104: Bedrock agent "400 Bad Authorization" + OpenSearch "403" — OpenSearch Serverless data access policy with pattern-based rules (check)
+Q106: Multimodal doc + video processing pipeline — Bedrock Data Automation + Textract/Transcribe + S3 versioning + AppSync (check)
+Q111: Multi-agent secret resolution failures — Step Functions Map + Lambda + AppConfig prompt versioning
+Q112: AgentCore observability for tool failures — AgentCore Observability + X-Ray + CloudWatch dashboards
+Q114: Hybrid content-type routing — app code for simple extension routing + Step Functions + JSONata for complex routing
+Q116: Two-tier content moderation (small → large model escalation) — SQS + Fargate + confidence-based second queue
+Q117: Guardrails pre/post inference + streaming filter + human review — ApplyGuardrail pre-check + InvokeModelWithResponseStream + SQS flagging + IAM enforcement
+Q122: AI recommendation system — real-time eval + multi-step orchestration + secure feedback + immutable audit repos — AgentCore + Kendra + Lambda sanitize/fact-check + A/B traffic split + DynamoDB feedback + CloudTrail in S3 Object Lock + Model Monitor
+Q132: Video library (10K hrs) searchable metadata — scenes, transcripts w/ timestamps, on-screen text, sentiment, synchronized — SageMaker pipeline + Transcribe (time markers) + Rekognition text detection + Comprehend sentiment + unified metadata in DynamoDB (time-based partitioning)
+Q134: Freight optimization multi-system agent + human approval + modular growth — hierarchical Strands Agents SDK + Bedrock AgentCore (coordinator/specialist agents) + MCP inter-agent messaging + Step Functions approval workflow
+
+SECTION 5 — Operations, Efficiency & Optimization
+--------------------------------------------------
+Q3:   Fix timeout/slow response — streaming via Amplify AI Kit or WebSocket
+Q18:  Near real-time hallucination detection + token anomaly alarms (minimal custom dev)
+Q22:  Canary deployment — automated traffic shifting, rollback on metric degradation
+Q25:  Token usage monitoring, >5000 req/min, cost allocation
+Q29:  Prompt evaluation for clinical docs — version-controlled prompts + automated eval framework
+Q31:  FM behavior observability — CloudWatch Application Insights + anomaly detection + Logs Insights
+Q34:  Model evaluation jobs — S3 dataset + Bedrock eval jobs (RWK + BERT Score) + CloudWatch dashboard
+Q66:  Token usage observability, multi-app — CloudWatch Logs Insights + CloudWatch dashboards + alarms
+Q69:  Multilingual consistency CI/CD gate — Bedrock model eval jobs + similarity thresholds + pipeline block
+Q70:  Tool-specific token anomaly detection — CloudWatch metric filters + anomaly detection alarms
+Q78:  Continuous model retraining on S3 upload — EventBridge + Lambda + SageMaker Pipelines
+Q95:  Unified technical + business metrics observability — CloudWatch composite alarms + SNS
+Q98:  QA process for prompt evaluation — Bedrock evaluation jobs + CodePipeline quality gate
+Q115: FM version semantic drift detection — Bedrock model evaluation jobs + cosine similarity + S3 history
+Q121: Prompt promotion dev→prod for multilingual assistant — verify improvements across 5 languages + consistency variance + compliance — Bedrock Prompt Management version control + A/B + Bedrock Evaluations LLM-judge + CI/CD (also §8)
+Q131: Circuit breaker for Bedrock timeouts at peak — Step Functions Retry/Catch + CloudWatch alarm (error rate >10%/60s) triggering EventBridge rule to alternate path, auto-resume on recovery
+
+SECTION 6 — Managing Models with SageMaker AI
+----------------------------------------------
+Q78:  Auto retrain on new data upload — EventBridge → Lambda → SageMaker Pipelines
+Q102: SageMaker endpoint cold-start latency — min instances >0, response streaming
+
+SECTION 7 — More Tools for Building AI Applications
+-----------------------------------------------------
+Q37:  Amazon Q Business ACL for S3 prefix-based dept access — acl.json per folder in data source
+Q41:  Amazon Q Developer customization for approved code resources
+Q89:  Amazon Comprehend layered content filtering — parallel toxicity + PII + prompt safety
+
+SECTION 8 — Governance & QA
+-----------------------------
+Q1:   Fairness evaluation, bias monitoring across demographic groups, A/B prompt comparison
+Q12:  RAG evaluation — LLM-as-judge + human review hybrid, hallucination detection
+Q29:  Prompt versioning + eval metrics for clinical docs
+Q55:  AI assistant evaluation — Bedrock LLM-as-judge + guardrails compliance + A2I human review
+Q68:  Multi-BU GenAI governance — CloudFormation templates + CI/CD + CloudFormation Guard
+Q79:  RAG evaluation (chunking + FM comparison) — retrieve-and-generate eval + LLM-as-judge
+Q86:  Responsible AI governance — KB grounding + guardrails + OpenSearch for audit + QuickSight drift
+Q98:  Automated prompt eval + deployment gate — Bedrock eval jobs + CodePipeline
+Q107: Medical summarization PoC eval — anonymized dataset + RAG KB + judge model + multi-FM comparison
+Q108: FM selection via automated evaluation — JSONL prompts in S3 + Bedrock eval job + judge model
+Q119: Clinical KB hallucination detection + semantic inconsistency across rephrased questions — validated Q-A pairs + output diffing (Guardrails) + Bedrock evaluation factual accuracy
+Q120: Automated QA for GenAI outputs — semantic similarity vs 500+ golden examples, scheduled, scale 2000+, visualizations, degradation alerts — Lambda FM invoke+compare + EventBridge schedule + custom CloudWatch metrics
+Q136: FM evaluation job AccessDenied on run — service role missing Bedrock trust policy — create trust policy with Bedrock as service principal, attach to service role
+
+SECTION 9 — Security, Identity & Compliance
+---------------------------------------------
+Q2:   Guardrails — denied topics, word filters, grounding score threshold
+Q8:   Private VPC endpoints for Bedrock + Lake Formation cross-account column-level access
+Q13:  Cross-Region Inference (CRI), SCP data residency enforcement (eu-central-1 only)
+Q14:  Guardrail config — PII masking vs block, denied topics, minimal false positives
+Q21:  Defense-in-depth against prompt injection, guardrail profiles, cross-Region failover
+Q38:  Clinical RAG citations, no hallucination — Bedrock KB + RetrieveAndGenerate (source attribution)
+Q39:  Real-time call center streaming — Transcribe streaming partial results + InvokeModelWithResponseStream + WebSocket
+Q40:  Content moderation + PII for UGC — Step Functions + Bedrock guardrails + Comprehend PII + Rekognition
+Q61:  PII guardrails + denied topics + audit logs including images — Bedrock guardrails + Converse API logging
+Q62:  RAG with citations + audit + 10K concurrent — Bedrock agent tracing + KB + Multi-AZ + API GW + Lambda
+Q71:  Cross-Region inference + data residency — CRI profiles with geo codes + separate API GW per region
+Q72:  Multi-region RAG with data residency — Bedrock per-Region + cross-Region inference profile + regional KBs
+Q77:  Video platform secure model I/O + audit — VPC endpoints + IAM ABAC + CloudTrail Lake + CloudWatch alarms
+Q81:  Org-wide guardrail enforcement — SCP requiring guardrail ID + permissions boundary for approved models
+Q85:  Data residency + audit + classification — S3 Object Lock + regional pre-processing + Macie + CloudTrail
+Q87:  Lake Formation PII column redaction for FM — LF-Tags + IAM roles + CloudTrail audit
+Q91:  PII guardrail mask vs block, regional — per-Region guardrail + mask in dev, block in prod
+Q93:  Call recording transcription + analysis — EventBridge S3 trigger + Step Functions + Transcribe + Bedrock
+Q94:  Role-based PII exposure (surgeons vs engineers) — Cognito groups + ApplyGuardrail + S3 Lifecycle 3yr
+Q96:  Private FM access in approved Regions — VPC endpoint + cross-Region inference profile + SCP extension
+Q100: Microsoft Entra ID + private Bedrock + dept model access + audit — SAML federation + IAM roles + PrivateLink + CloudTrail
+Q105: Text-to-SQL safety pipeline — Bedrock Guardrails input filter + Lambda SQL validation + RDS audit logs
+Q118: Mask PII from FM responses, minimal ops effort — Bedrock guardrail PII filter, action MASK, applied to FM responses
+Q124: PHI audit trails — track prompt-completion with original data + redact PHI from stored records + retention — S3 SSE + Lambda w/ Comprehend Medical scan+delete after retention
+Q126: Cross-account AgentCore over 25→40+ accounts — strict access boundaries + user-identity audit + preserve identity — dynamic AssumeRole via outbound credential provider + per-account IAM trust roles + session tags (also §4)
+Q127: PII leakage in outputs (3-5%) despite input tokenization, sub-500ms — Bedrock guardrails sensitive-info filters to detect/block PII in model outputs
+Q128: Age-inappropriate/inaccurate/violent GenAI responses for children (30 concurrent, sub-1s) — Bedrock guardrails content filters on model RESPONSES, strength high, action block, added to flow + reduced inference temperature
+Q133: Cross-account (3+, growing to 10) PII-sensitive data access for FM, column-level control — AWS Lake Formation per source account + IAM cross-account roles + column-level tag-based access controls + SageMaker execution role assuming cross-account roles via Lake Formation
+Q135: Fraud detection, 1000 TPS, sub-500ms, US/EU data residency, HA on connectivity issues — US: provisioned throughput InvokeModel; EU: geographic cross-Region inference profile (data sovereignty) + auto scaling + EventBridge/Lambda cross-Region failover
+
+====================================================
+Quick Reference (Q → Section)
+====================================================
+Q1  → §8    Q2  → §9    Q3  → §5    Q4  → §2    Q5  → §2
+Q6  → §3    Q7  → §3    Q8  → §9    Q9  → §2    Q10 → §2
+Q11 → §4    Q12 → §8    Q13 → §9    Q14 → §9    Q15 → §2
+Q16 → §4    Q17 → §3    Q18 → §5    Q19 → §3    Q20 → §4
+Q21 → §9    Q22 → §5    Q23 → §2    Q24 → §2    Q25 → §5
+Q26 → §4    Q27 → §4    Q28 → §3    Q29 → §5/8  Q30 → §2
+Q31 → §5    Q32 → §2    Q33 → §2    Q34 → §5    Q35 → §4
+Q36 → §4    Q37 → §7    Q38 → §9    Q39 → §9    Q40 → §9
+Q41 → §7    Q42 → §2    Q43 → §3    Q44 → §4    Q45 → §3
+Q46 → §3    Q47 → §3    Q48 → §3    Q49 → §2    Q50 → §2
+Q51 → §3    Q52 → §4    Q53 → §4    Q54 → §4    Q55 → §8
+Q56 → §4    Q57 → §2    Q58 → §4    Q59 → §2    Q60 → §2
+Q61 → §9    Q62 → §9    Q63 → §3    Q64 → §3    Q65 → §3
+Q66 → §5    Q67 → §2    Q68 → §8    Q69 → §5    Q70 → §5
+Q71 → §9    Q72 → §9    Q73 → §2    Q74 → §2    Q75 → §4
+Q76 → §2    Q77 → §9    Q78 → §5/6  Q79 → §8    Q80 → §4
+Q81 → §9    Q82 → §2    Q83 → §2    Q84 → §2    Q85 → §9
+Q86 → §8    Q87 → §9    Q88 → §3    Q89 → §7    Q90 → §3
+Q91 → §9    Q92 → §3    Q93 → §9    Q94 → §9    Q95 → §5
+Q96 → §9    Q97 → §3    Q98 → §5/8  Q99 → §2    Q100 → §9
+Q101 → §3   Q102 → §2/6 Q103 → §2   Q104 → §4   Q105 → §9
+Q106 → §4   Q107 → §8   Q108 → §8   Q109 → §2   Q110 → §2
+Q111 → §4   Q112 → §4   Q113 → §3   Q114 → §4   Q115 → §5
+Q116 → §4   Q117 → §9
+Q118 → §9   Q119 → §8   Q120 → §8   Q121 → §5/8  Q122 → §4
+Q123 → §3   Q124 → §9   Q125 → §3/9 Q126 → §9/4  Q127 → §9
+Q128 → §9   Q129 → §3   Q130 → §2   Q131 → §5    Q132 → §4
+Q133 → §9   Q134 → §4   Q135 → §9   Q136 → §8
