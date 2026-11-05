@@ -17,6 +17,11 @@ button:disabled { opacity: 0.5; cursor: not-allowed; }
 .badge.unscored { background: #e2e3e5; color: #383d41; }
 .timer { font-variant-numeric: tabular-nums; font-weight: 600; }
 .timer.warning { color: #d9534f; }
+.timer-group { display: flex; align-items: center; gap: 0.5rem; }
+.timer-group button { padding: 0.25rem 0.6rem; font-size: 0.85rem; }
+.pause-overlay { position: fixed; inset: 0; background: #232f3e; display: flex; align-items: center; justify-content: center; z-index: 900; padding: 1rem; }
+.pause-card { background: #fff; max-width: 440px; width: 100%; padding: 1.5rem 1.75rem; border-radius: 8px; text-align: center; box-shadow: 0 8px 24px rgba(0,0,0,0.3); }
+.pause-card h2 { margin-top: 0; color: #232f3e; }
 .test-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 1rem; }
 .test-card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; }
 .test-card-header h3 { margin: 0; font-size: 1.05rem; }
