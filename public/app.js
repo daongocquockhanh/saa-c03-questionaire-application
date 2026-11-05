@@ -235,10 +235,34 @@ function formatTimeLeft(ms) {
   return `${h}:${m}:${s}`;
 }
 
+function timeLeftMs() {
+  return RUNNER.endsAt - (RUNNER.pausedAt || Date.now());
+}
+
+function pauseExam() {
+  if (!RUNNER || RUNNER.pausedAt) return;
+  RUNNER.pausedAt = Date.now();
+  persistRunnerState();
+  renderRunner(RUNNER.testId);
+}
+
+function resumeExam() {
+  if (!RUNNER || !RUNNER.pausedAt) return;
+  const pausedFor = Date.now() - RUNNER.pausedAt;
+  RUNNER.endsAt += pausedFor;
+  RUNNER.pausedMs = (RUNNER.pausedMs || 0) + pausedFor;
+  RUNNER.pausedAt = null;
+  persistRunnerState();
+  renderRunner(RUNNER.testId);
+}
+
 function tickTimer() {
   const el = document.getElementById('timer');
   if (!el || !RUNNER) return;
-  const left = RUNNER.endsAt - Date.now();
+  const pausedEl = document.getElementById('paused-for');
+  if (pausedEl && RUNNER.pausedAt) pausedEl.textContent = formatTimeLeft(Date.now() - RUNNER.pausedAt);
+  if (RUNNER.pausedAt) return;
+  const left = timeLeftMs();
   el.textContent = formatTimeLeft(left);
   el.classList.toggle('warning', left < 10 * 60 * 1000);
   if (left <= 0) submitTest();
@@ -283,7 +307,10 @@ function renderRunner(testId) {
       <div class="runner-topbar">
         <div>${escapeHtml(test.title)}</div>
         <div>Question ${RUNNER.current + 1} of ${test.questionIds.length}</div>
-        <div class="timer" id="timer">${formatTimeLeft(RUNNER.endsAt - Date.now())}</div>
+        <div class="timer-group">
+          <div class="timer${timeLeftMs() < 10 * 60 * 1000 ? ' warning' : ''}" id="timer">${formatTimeLeft(timeLeftMs())}</div>
+          <button id="pause" title="Pause the exam timer (P)">⏸ Pause</button>
+        </div>
       </div>
       <section class="question">
         ${q.aiAnswered ? '<span class="badge ai-unverified">AI-answered · unverified</span>' : ''}
@@ -301,7 +328,19 @@ function renderRunner(testId) {
       </footer>
       <aside class="grid">${grid}</aside>
     </div>
+    ${RUNNER.pausedAt ? `
+    <div class="pause-overlay" role="dialog" aria-modal="true" aria-labelledby="pause-title">
+      <div class="pause-card">
+        <h2 id="pause-title">⏸ Exam paused</h2>
+        <p>The timer is stopped and the question is hidden. Take your break — your answers are saved.</p>
+        <p class="muted">Time remaining: <strong>${formatTimeLeft(timeLeftMs())}</strong> · Paused for <span id="paused-for">${formatTimeLeft(Date.now() - RUNNER.pausedAt)}</span></p>
+        <button id="resume" class="primary">▶ Resume exam</button>
+      </div>
+    </div>` : ''}
   `);
+  document.getElementById('pause').addEventListener('click', pauseExam);
+  document.getElementById('resume')?.addEventListener('click', resumeExam);
+  document.getElementById('resume')?.focus();
 
   document.getElementById('opts').addEventListener('change', e => {
     const letter = e.target.value;
@@ -329,6 +368,11 @@ function renderRunner(testId) {
   if (window.__KEY_HANDLER__) document.removeEventListener('keydown', window.__KEY_HANDLER__);
   const keyHandler = e => {
     if (e.target.tagName === 'INPUT') return;
+    if (RUNNER && RUNNER.pausedAt) {
+      if (e.key === 'p' || e.key === 'Escape') resumeExam();
+      return;
+    }
+    if (e.key === 'p' && RUNNER) { pauseExam(); return; }
     if (e.key === 'ArrowLeft' && RUNNER && RUNNER.current > 0) { RUNNER.current--; persistRunnerState(); renderRunner(testId); }
     if (e.key === 'ArrowRight' && RUNNER && RUNNER.current < test.questionIds.length - 1) { RUNNER.current++; persistRunnerState(); renderRunner(testId); }
     if (e.key === 'f' && RUNNER) { RUNNER.flags[qId] = !RUNNER.flags[qId]; persistRunnerState(); renderRunner(testId); }
@@ -384,6 +428,7 @@ function submitTest() {
     unscored,
     startedAt: RUNNER.startedAt,
     finishedAt: Date.now(),
+    pausedMs: RUNNER.pausedMs || 0,
   };
   const prev = PROGRESS.tests[test.id] || {};
   PROGRESS.tests[test.id] = {
@@ -407,7 +452,7 @@ function renderResult(testId) {
   if (!prog || !prog.lastResult) { render('<p>No result yet.</p>'); return; }
   const r = prog.lastResult;
   const pass = r.percent >= DATA.passPercent;
-  const durationMin = Math.round((r.finishedAt - r.startedAt) / 60000);
+  const durationMin = Math.round((r.finishedAt - r.startedAt - (r.pausedMs || 0)) / 60000);
 
   const unscoredSet = new Set(r.unscored || pickUnscored(test.questionIds, test.id, test.questionIds.length > UNSCORED_PER_TEST ? UNSCORED_PER_TEST : 0));
   const byDomain = { 1: { correct: 0, total: 0 }, 2: { correct: 0, total: 0 }, 3: { correct: 0, total: 0 }, 4: { correct: 0, total: 0 } };
